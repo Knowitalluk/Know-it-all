@@ -88,15 +88,14 @@
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       cursor:pointer;
-      position: relative;
       transition: transform .08s ease, border-color .08s ease, background .08s ease, box-shadow .08s ease;
     }
     .answer:active{ transform: scale(.99); }
     .answer.locked{ opacity:.55; cursor:not-allowed; }
     .answer.selected{
-      border-color: rgba(255,255,255,.65);
-      background: rgba(255,255,255,.10);
-      box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 10px 30px rgba(0,0,0,.25);
+      border-color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.14);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.22) inset, 0 10px 30px rgba(0,0,0,.25);
     }
     .answer.removed{
       border-color: rgba(255,59,92,.70);
@@ -125,37 +124,6 @@
     .powerRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
     .powerRow button{ flex:1; min-width:160px; }
 
-    .targetBox{
-      margin-top: 10px;
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      background: rgba(255,255,255,.03);
-      overflow:hidden;
-      display:none;
-    }
-    .targetBoxHeader{
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      color: var(--muted);
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-    }
-    .targetBtn{
-      width:100%;
-      border:0;
-      border-radius: 0;
-      background: transparent;
-      box-shadow:none;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      text-align:left;
-      padding: 12px 12px;
-      cursor:pointer;
-      color: var(--text);
-    }
-    .targetBtn:last-child{ border-bottom:0; }
-    .targetBtn:hover{ background: rgba(255,106,0,.08); }
-    .tLine{ display:flex; justify-content:space-between; align-items:center; gap:10px; color: var(--muted); }
-    .tLine strong{ color: var(--text); }
-
     .kpi{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 8px; }
     .kpi .pill{
       padding: 10px 12px; border-radius: 14px;
@@ -166,19 +134,39 @@
     }
     .kpi .pill strong{ color: var(--text); display:block; }
 
+    /* MODALS */
+    .modal{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      padding:18px;
+      background: rgba(0,0,0,.68);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+    }
+    .modal.on{ display:flex; }
+    .modalCard{
+      width:min(680px, 100%);
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(15,17,23,.96), rgba(10,12,16,.96));
+      box-shadow: 0 20px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,106,0,.06) inset;
+      padding: 16px;
+    }
+    .modalTop{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      margin-bottom: 10px;
+    }
+    .modalTitle{
+      font-size: 20px;
+      font-weight: 1000;
+      letter-spacing: .02em;
+    }
     .lb{
-      margin-top: 12px;
-      border: 1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
       border-radius: 16px;
       overflow:hidden;
-      display:none;
       background: rgba(255,255,255,.03);
-    }
-    .lbHeader{
-      padding:10px 12px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      color: var(--muted);
-      display:flex; justify-content:space-between; align-items:center;
     }
     .lbRow{
       display:flex; justify-content:space-between; align-items:center; gap:10px;
@@ -188,6 +176,17 @@
     }
     .lbRow:last-child{ border-bottom:0; }
     .lbRow strong{ color: var(--text); }
+    .targetBtn{
+      width:100%;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      box-shadow:none;
+      padding: 12px 12px;
+      margin-top: 10px;
+      text-align:left;
+    }
+    .targetBtn:hover{ filter:brightness(1.12); }
   </style>
 </head>
 <body>
@@ -239,24 +238,7 @@
         <button id="btnHelp" disabled>HELP (3)</button>
       </div>
 
-      <div class="targetBox" id="targetBox">
-        <div class="targetBoxHeader">
-          <span class="mono">Pick a player to jam</span>
-          <button id="btnCancelTarget" class="btn-ghost" style="padding:8px 10px;">Cancel</button>
-        </div>
-        <div id="targetList"></div>
-      </div>
-
-      <div class="toast" id="resultToast" style="display:none;"></div>
       <div class="toast" id="playToast" style="display:none;"></div>
-
-      <div class="lb" id="lbBox">
-        <div class="lbHeader">
-          <span class="mono">Leaderboard</span>
-          <span class="mono" id="lbCount"></span>
-        </div>
-        <div id="lbRows"></div>
-      </div>
     </div>
 
     <div class="card" id="finalCard" style="display:none;">
@@ -267,7 +249,38 @@
     </div>
   </div>
 
+  <!-- Reveal Modal (everyone sees this on reveal) -->
+  <div class="modal" id="revealModal">
+    <div class="modalCard">
+      <div class="modalTop">
+        <div class="modalTitle">Reveal • Leaderboard</div>
+        <div class="badge mono" id="revealRoomMini">----</div>
+      </div>
+
+      <div class="toast" id="revealResultToast" style="display:none;"></div>
+
+      <div class="lb" id="revealLB"></div>
+
+      <div class="small" style="margin-top:10px; opacity:.85;">
+        Host will start the next question…
+      </div>
+    </div>
+  </div>
+
+  <!-- Sabotage Modal (only streak player sees this when they press Sabotage) -->
+  <div class="modal" id="sabotageModal">
+    <div class="modalCard">
+      <div class="modalTop">
+        <div class="modalTitle">Sabotage • Choose a player</div>
+        <button class="btn-ghost" id="btnCloseSab" style="padding:10px 12px;">Close</button>
+      </div>
+      <div class="small">Tap a player to block them from answering the <b>next</b> question.</div>
+      <div id="sabTargets"></div>
+    </div>
+  </div>
+
   <script>
+    /************** FIREBASE CONFIG **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
       authDomain: "knowitall-a47a1.firebaseapp.com",
@@ -291,6 +304,11 @@
     }
     function qparam(name){ return new URL(location.href).searchParams.get(name); }
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
+    function modalOn(id, on){
+      const m = $(id);
+      if(on) m.classList.add("on");
+      else m.classList.remove("on");
+    }
 
     let uid = null;
     let joined = false;
@@ -305,11 +323,10 @@
 
     let timerUI = null;
 
-    let pickingTarget = false;
-
-    // per-question local UI helpers
+    // per-question local UI state
     const localHelpRemoved = new Map();   // key `${room}|${qIdx}` -> [idx,idx]
     const localSelected = new Map();      // key `${room}|${qIdx}` -> idx
+    let lastSeenQIdx = null;
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
     function playersRef(){ return roomRef().collection("players"); }
@@ -367,7 +384,7 @@
       if(room.status !== "reveal") return false;
       if(!room.pause || room.pause.type !== "streak") return false;
       const pending = room.pause.pendingPlayerIds || [];
-      return me && me.rewardPending === true && pending.includes(uid);
+      return !!(me && me.rewardPending === true && pending.includes(uid));
     }
 
     async function alreadyAnswered(qIdx){
@@ -375,15 +392,24 @@
       return doc.exists;
     }
 
+    function currentKey(){
+      if(!latestRoom) return "";
+      return `${roomId}|${latestRoom.questionIndex}`;
+    }
+
     async function submitAnswer(choiceIndex){
       if(!latestRoom) return;
       if(latestRoom.status !== "question") return;
       if(isSabotaged(latestRoom)) return;
 
-      const key = `${roomId}|${latestRoom.questionIndex}`;
-      localSelected.set(key, choiceIndex);
-      renderAnswers(); // immediate highlight
+      const key = currentKey();
 
+      // LOCK selection immediately (cannot be changed)
+      if(localSelected.has(key)) return;
+      localSelected.set(key, choiceIndex);
+      renderAnswers();
+
+      // write answer once
       if(await alreadyAnswered(latestRoom.questionIndex)) return;
 
       await answersRef().doc(`${latestRoom.questionIndex}_${uid}`).set({
@@ -405,7 +431,6 @@
       const me = meSnap.data();
       if(!isPendingStreakDecision(latestRoom, me)) return;
 
-      // transaction: remove me from pending list and add points
       await db.runTransaction(async (tx) => {
         const roomDoc = await tx.get(roomRef());
         const meDoc = await tx.get(playersRef().doc(uid));
@@ -432,20 +457,26 @@
         });
       });
 
-      pickingTarget = false;
-      show($("targetBox"), false);
+      modalOn("sabotageModal", false);
     }
 
     async function openSabotage(){
+      // Always open modal if button is enabled (UI already guards it),
+      // but we still verify on fresh reads.
       if(!latestRoom) return;
       const meSnap = await playersRef().doc(uid).get();
       if(!meSnap.exists) return;
       const me = meSnap.data();
       if(!isPendingStreakDecision(latestRoom, me)) return;
 
-      pickingTarget = true;
-      show($("targetBox"), true);
-      await renderTargets();
+      // Ensure we have a fresh player list (fixes “no list showing”)
+      if(!latestPlayers || latestPlayers.length === 0){
+        const pSnap = await playersRef().get();
+        latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+      }
+
+      await renderSabotageTargets();
+      modalOn("sabotageModal", true);
     }
 
     async function applySabotage(targetId){
@@ -464,7 +495,6 @@
 
         const newPending = pending.filter(x => x !== uid);
 
-        // add block for NEXT question (multiple sabotages allowed)
         const nextQ = room.questionIndex + 1;
         let sabotage = room.sabotage;
 
@@ -488,8 +518,7 @@
         });
       });
 
-      pickingTarget = false;
-      show($("targetBox"), false);
+      modalOn("sabotageModal", false);
     }
 
     async function cheat(){
@@ -501,15 +530,17 @@
       if(!meSnap.exists) return;
       const me = meSnap.data();
 
+      const key = currentKey();
+      if(localSelected.has(key)) return;            // can't cheat after selecting
+      if(localHelpRemoved.has(key)) return;         // optional: keep clean
       if(me.rewardPending) return;
       if((me.cheatLeft||0) <= 0) return;
       if(await alreadyAnswered(latestRoom.questionIndex)) return;
 
       await playersRef().doc(uid).update({ cheatLeft: (me.cheatLeft||0) - 1 });
 
-      // submit correct answer + highlight instantly
       const correctIndex = latestRoom.currentQuestion.correctIndex;
-      const key = `${roomId}|${latestRoom.questionIndex}`;
+      // lock selection immediately
       localSelected.set(key, correctIndex);
       renderAnswers();
       await submitAnswer(correctIndex);
@@ -524,11 +555,12 @@
       if(!meSnap.exists) return;
       const me = meSnap.data();
 
+      const key = currentKey();
+      if(localSelected.has(key)) return; // can't use help after selecting
+
       if(me.rewardPending) return;
       if((me.helpLeft||0) <= 0) return;
       if(await alreadyAnswered(latestRoom.questionIndex)) return;
-
-      const key = `${roomId}|${latestRoom.questionIndex}`;
       if(localHelpRemoved.has(key)) return;
 
       const correct = latestRoom.currentQuestion.correctIndex;
@@ -541,59 +573,8 @@
 
       await playersRef().doc(uid).update({ helpLeft: (me.helpLeft||0) - 1 });
 
-      // NEW: redraw immediately so wrong answers go red now
+      // IMPORTANT: redraw immediately so wrong answers go red now
       renderAnswers();
-    }
-
-    async function renderTargets(){
-      const list = $("targetList");
-      list.innerHTML = "";
-
-      const players = latestPlayers
-        .filter(p => p.id !== uid)
-        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
-
-      if(players.length === 0){
-        const div = document.createElement("div");
-        div.style.padding = "12px";
-        div.className = "small";
-        div.textContent = "No players available.";
-        list.appendChild(div);
-        return;
-      }
-
-      players.forEach((p,i)=>{
-        const btn = document.createElement("button");
-        btn.className = "targetBtn";
-        btn.innerHTML = `<div class="tLine"><div><strong>${p.name}</strong> <span class="small mono" style="opacity:.75">#${i+1}</span></div><span class="mono">${p.score||0}</span></div>`;
-        btn.onclick = () => applySabotage(p.id);
-        list.appendChild(btn);
-      });
-    }
-
-    function renderLeaderboard(){
-      const box = $("lbBox");
-      const rows = $("lbRows");
-
-      if(!latestRoom || latestRoom.status !== "reveal"){
-        box.style.display = "none";
-        rows.innerHTML = "";
-        return;
-      }
-
-      box.style.display = "";
-      $("lbCount").textContent = `${latestPlayers.length} players`;
-
-      rows.innerHTML = "";
-      latestPlayers
-        .slice()
-        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""))
-        .forEach((p, i)=>{
-          const div = document.createElement("div");
-          div.className = "lbRow";
-          div.innerHTML = `<div><span class="mono" style="opacity:.7">#${i+1}</span> <strong>${p.name||"Player"}</strong></div><div class="mono">${p.score||0}</div>`;
-          rows.appendChild(div);
-        });
     }
 
     function renderAnswers(){
@@ -605,16 +586,12 @@
       const q = latestRoom.currentQuestion;
       if(!q) return;
 
-      const key = `${roomId}|${latestRoom.questionIndex}`;
+      const key = currentKey();
       const removed = localHelpRemoved.get(key) || [];
       const selected = localSelected.get(key);
 
-      const lockedForGame = latestRoom.status !== "question";
-      const sabotaged = isSabotaged(latestRoom);
-
-      // also lock if I’m currently choosing streak reward
-      const me = latestPlayers.find(p=>p.id===uid);
-      const lockedForStreak = latestRoom.status === "reveal" && me && me.rewardPending;
+      const lockedGlobal = latestRoom.status !== "question" || isSabotaged(latestRoom) || localSelected.has(key);
+      // ^ localSelected.has(key) locks all answers after first tap
 
       q.options.forEach((opt, idx)=>{
         const b = document.createElement("button");
@@ -628,11 +605,13 @@
           b.disabled = true;
         }
 
-        const locked = lockedForGame || sabotaged || lockedForStreak;
-        if(locked){
+        if(lockedGlobal && !b.classList.contains("selected")){
+          // lock all, keep selected visible
           b.classList.add("locked");
           b.disabled = true;
-        }else{
+        }
+
+        if(!lockedGlobal && !b.disabled){
           b.onclick = () => submitAnswer(idx);
         }
 
@@ -641,15 +620,83 @@
       });
     }
 
+    function renderRevealLeaderboard(me){
+      const box = $("revealLB");
+      box.innerHTML = "";
+
+      const sorted = latestPlayers.slice().sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
+      sorted.forEach((p,i)=>{
+        const row = document.createElement("div");
+        row.className = "lbRow";
+        row.innerHTML = `<div><span class="mono" style="opacity:.7">#${i+1}</span> <strong>${p.name||"Player"}</strong>${p.id===uid ? ' <span class="badge" style="padding:4px 10px; font-size:12px;">YOU</span>' : ''}</div><div class="mono">${p.score||0}</div>`;
+        box.appendChild(row);
+      });
+
+      // result toast
+      if(latestRoom && latestRoom.status === "reveal" && me && me.lastAnswer && me.lastAnswer.questionIndex === latestRoom.questionIndex){
+        if(me.lastAnswer.isCorrect){
+          setToast($("revealResultToast"), `✅ Correct! +${me.lastAnswer.pointsAwarded||0} points`, "good");
+        }else{
+          setToast($("revealResultToast"), `❌ Wrong answer`, "bad");
+        }
+      }else{
+        setToast($("revealResultToast"), "", "");
+      }
+    }
+
+    async function renderSabotageTargets(){
+      const wrap = $("sabTargets");
+      wrap.innerHTML = "";
+
+      const candidates = latestPlayers
+        .filter(p => p.id !== uid)
+        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
+
+      if(candidates.length === 0){
+        const d = document.createElement("div");
+        d.className = "toast bad";
+        d.textContent = "No players available to sabotage.";
+        wrap.appendChild(d);
+        return;
+      }
+
+      candidates.forEach((p,i)=>{
+        const btn = document.createElement("button");
+        btn.className = "targetBtn";
+        btn.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px;">
+          <div><span class="mono" style="opacity:.7">#${i+1}</span> <b>${p.name}</b></div>
+          <div class="mono">${p.score||0}</div>
+        </div>`;
+        btn.onclick = () => applySabotage(p.id);
+        wrap.appendChild(btn);
+      });
+    }
+
     function listenLive(){
       if(unsubRoom) unsubRoom();
       if(unsubPlayers) unsubPlayers();
+
+      unsubPlayers = playersRef().onSnapshot((snap)=>{
+        latestPlayers = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        // keep reveal modal leaderboard fresh
+        if(latestRoom && latestRoom.status === "reveal"){
+          const me = latestPlayers.find(p=>p.id===uid) || null;
+          renderRevealLeaderboard(me);
+        }
+      }, (err)=>console.error("Players listener error:", err));
 
       unsubRoom = roomRef().onSnapshot(async (snap)=>{
         if(!snap.exists) return;
         latestRoom = snap.data();
 
-        // basic page visibility
+        $("revealRoomMini").textContent = roomId || "----";
+
+        // reset per-question local UI when question changes
+        if(latestRoom.status === "question" && lastSeenQIdx !== latestRoom.questionIndex){
+          lastSeenQIdx = latestRoom.questionIndex;
+          // (we keep old entries in maps; key includes qIdx so it won’t affect new question)
+        }
+
         show($("joinCard"), !joined);
         show($("waitCard"), joined && latestRoom.status === "lobby");
         show($("playCard"), joined && (latestRoom.status === "question" || latestRoom.status === "reveal"));
@@ -676,13 +723,10 @@
           setToast($("blockedToast"), "", "bad");
         }
 
-        // render answers + leaderboard if available
-        renderAnswers();
-        renderLeaderboard();
-
-        // update me info + buttons
+        // get me
         const meSnap = await playersRef().doc(uid).get();
         const me = meSnap.exists ? meSnap.data() : null;
+
         if(me){
           $("score").textContent = String(me.score||0);
           $("streak").textContent = String(me.streak||0);
@@ -690,44 +734,41 @@
           $("btnHelp").textContent = `HELP (${me.helpLeft||0})`;
         }
 
+        // enable/disable power buttons
         const pendingForMe = isPendingStreakDecision(latestRoom, me);
-
         $("btnClaim").disabled = !pendingForMe;
         $("btnSabotage").disabled = !pendingForMe;
 
-        const canAct = latestRoom.status === "question" && !isSabotaged(latestRoom) && me && !me.rewardPending;
+        const key = currentKey();
+        const canAct = latestRoom.status === "question"
+          && !isSabotaged(latestRoom)
+          && me && !me.rewardPending
+          && !localSelected.has(key); // can’t use cheat/help after selecting
+
         $("btnCheat").disabled = !(canAct && (me?.cheatLeft||0) > 0);
         $("btnHelp").disabled  = !(canAct && (me?.helpLeft||0) > 0);
 
-        // toasts: reveal result
-        if(latestRoom.status === "reveal" && me && me.lastAnswer && me.lastAnswer.questionIndex === latestRoom.questionIndex){
-          if(me.lastAnswer.isCorrect){
-            setToast($("resultToast"), `✅ Correct! +${me.lastAnswer.pointsAwarded || 0} points`, "good");
-          }else{
-            setToast($("resultToast"), `❌ Wrong answer.`, "bad");
+        // answers (and selection locking)
+        renderAnswers();
+
+        // reveal modal for everyone
+        if(joined && latestRoom.status === "reveal"){
+          modalOn("revealModal", true);
+          // ensure latestPlayers is present; if not, fetch once
+          if(!latestPlayers || latestPlayers.length === 0){
+            const pSnap = await playersRef().get();
+            latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
           }
+          renderRevealLeaderboard(me);
+          setToast($("playToast"), pendingForMe ? "5-streak unlocked! Claim +20 or Sabotage." : "Waiting for next question…");
         }else{
-          setToast($("resultToast"), "", "");
+          modalOn("revealModal", false);
+          // also close sabotage modal if game moved on
+          modalOn("sabotageModal", false);
+          setToast($("playToast"), "");
         }
 
-        // toasts: streak decision
-        if(pendingForMe && pickingTarget){
-          setToast($("playToast"), "Pick a player to sabotage.", "");
-          show($("targetBox"), true);
-          await renderTargets();
-        }else if(pendingForMe){
-          setToast($("playToast"), "5-streak unlocked! Claim +20 or Sabotage.", "");
-          show($("targetBox"), false);
-        }else if(latestRoom.status === "reveal" && latestRoom.pause && (latestRoom.pause.pendingPlayerIds||[]).length>0){
-          setToast($("playToast"), `Paused: waiting for ${latestRoom.pause.pendingPlayerIds.length} streak decision(s)…`, "");
-          show($("targetBox"), false);
-        }else{
-          setToast($("playToast"), "", "");
-          show($("targetBox"), false);
-          pickingTarget = false;
-        }
-
-        // final screen text
+        // final
         if(latestRoom.status === "final" && me){
           const winners = latestRoom.winners || [];
           const isWinner = winners.includes(uid);
@@ -737,19 +778,13 @@
         }
 
       }, (err)=>console.error("Room listener error:", err));
-
-      // Live players list for leaderboard + sabotage target list
-      unsubPlayers = playersRef().onSnapshot((snap)=>{
-        latestPlayers = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-        renderLeaderboard();
-        renderAnswers();
-      }, (err)=>console.error("Players listener error:", err));
     }
 
+    // UI handlers
     $("btnJoin").onclick = joinGame;
     $("btnClaim").onclick = claim20;
     $("btnSabotage").onclick = openSabotage;
-    $("btnCancelTarget").onclick = () => { pickingTarget = false; show($("targetBox"), false); };
+    $("btnCloseSab").onclick = () => modalOn("sabotageModal", false);
     $("btnCheat").onclick = cheat;
     $("btnHelp").onclick = help5050;
 
@@ -760,4 +795,3 @@
   </script>
 </body>
 </html>
-
