@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Know It All? — Player</title>
 
-  <!-- Firebase (Compat CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -15,7 +14,7 @@
       --bg0:#050506; --bg1:#0b0b10; --line: rgba(255,255,255,.10);
       --text:#f5f7ff; --muted: rgba(245,247,255,.70);
       --orange:#ff6a00; --orange2:#ff9a3d; --glow: rgba(255,106,0,.35);
-      --bad:#ff3b5c; --radius:18px;
+      --good:#2cff9a; --bad:#ff3b5c; --radius:18px;
     }
     *{ box-sizing:border-box; }
     body{
@@ -29,7 +28,6 @@
       min-height:100vh;
     }
     .container{ max-width:900px; margin:0 auto; padding:22px; }
-
     .brand h1{ margin:0; font-weight:1000; font-size:36px; letter-spacing:.5px; }
     .brand h1 span{ color:var(--orange); text-shadow:0 0 20px var(--glow); }
     .tag{ color:var(--muted); font-size:13px; letter-spacing:.18em; text-transform:uppercase; margin-top:6px; }
@@ -84,19 +82,39 @@
     .qtext{ font-size:30px; font-weight:1000; margin:10px 0 6px; }
     .answers{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
     @media (max-width:520px){ .answers{ grid-template-columns:1fr; } }
+
     .answer{
       text-align:left; padding:14px; border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       cursor:pointer;
+      position: relative;
+      transition: transform .08s ease, border-color .08s ease, background .08s ease, box-shadow .08s ease;
     }
+    .answer:active{ transform: scale(.99); }
     .answer.locked{ opacity:.55; cursor:not-allowed; }
+    .answer.selected{
+      border-color: rgba(255,255,255,.65);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 10px 30px rgba(0,0,0,.25);
+    }
+    .answer.removed{
+      border-color: rgba(255,59,92,.70);
+      background: rgba(255,59,92,.14);
+      opacity:.55;
+      cursor:not-allowed;
+    }
 
     .toast{
       margin-top:10px; padding:10px 12px; border-radius:14px;
       border:1px solid rgba(255,106,0,.25);
       background: rgba(255,106,0,.08);
       color: var(--orange2);
+    }
+    .toast.good{
+      border-color: rgba(44,255,154,.35);
+      background: rgba(44,255,154,.10);
+      color: rgba(220,255,240,.95);
     }
     .toast.bad{
       border-color: rgba(255,59,92,.28);
@@ -147,6 +165,29 @@
       min-width: 150px;
     }
     .kpi .pill strong{ color: var(--text); display:block; }
+
+    .lb{
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      overflow:hidden;
+      display:none;
+      background: rgba(255,255,255,.03);
+    }
+    .lbHeader{
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .lbRow{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      color: var(--muted);
+    }
+    .lbRow:last-child{ border-bottom:0; }
+    .lbRow strong{ color: var(--text); }
   </style>
 </head>
 <body>
@@ -181,7 +222,7 @@
 
     <div class="card" id="playCard" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-        <div class="badge">Question</div>
+        <div class="badge" id="phaseBadge">Question</div>
         <div class="badge">Timer: <span class="mono" id="timer">20</span>s</div>
       </div>
 
@@ -206,7 +247,16 @@
         <div id="targetList"></div>
       </div>
 
+      <div class="toast" id="resultToast" style="display:none;"></div>
       <div class="toast" id="playToast" style="display:none;"></div>
+
+      <div class="lb" id="lbBox">
+        <div class="lbHeader">
+          <span class="mono">Leaderboard</span>
+          <span class="mono" id="lbCount"></span>
+        </div>
+        <div id="lbRows"></div>
+      </div>
     </div>
 
     <div class="card" id="finalCard" style="display:none;">
@@ -218,7 +268,6 @@
   </div>
 
   <script>
-    /************** FIREBASE CONFIG (yours) **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
       authDomain: "knowitall-a47a1.firebaseapp.com",
@@ -235,7 +284,11 @@
     function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
     function $(id){ return document.getElementById(id); }
     function show(el,on=true){ el.style.display = on ? "" : "none"; }
-    function setToast(el,msg){ if(!msg){ el.style.display="none"; el.textContent=""; } else { el.style.display=""; el.textContent=msg; } }
+    function setToast(el,msg,cls){
+      el.className = "toast" + (cls ? (" " + cls) : "");
+      if(!msg){ el.style.display="none"; el.textContent=""; }
+      else { el.style.display=""; el.textContent=msg; }
+    }
     function qparam(name){ return new URL(location.href).searchParams.get(name); }
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
 
@@ -243,11 +296,20 @@
     let joined = false;
 
     let roomId = (qparam("room") || "").toUpperCase();
+
     let unsubRoom = null;
+    let unsubPlayers = null;
+
+    let latestRoom = null;
+    let latestPlayers = [];
+
     let timerUI = null;
 
     let pickingTarget = false;
-    const localHelpRemoved = new Map(); // `${room}|${qIdx}` -> [i,i]
+
+    // per-question local UI helpers
+    const localHelpRemoved = new Map();   // key `${room}|${qIdx}` -> [idx,idx]
+    const localSelected = new Map();      // key `${room}|${qIdx}` -> idx
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
     function playersRef(){ return roomRef().collection("players"); }
@@ -256,14 +318,13 @@
     async function signInPlayer(){
       const cred = await auth.signInAnonymously();
       uid = cred.user.uid;
-      console.log("PLAYER UID:", uid);
     }
 
     async function joinGame(){
       roomId = ($("roomInput").value || "").trim().toUpperCase();
       const name = ($("nameInput").value || "").trim();
       if(!roomId || !name){
-        setToast($("joinToast"), "Enter your nickname (and ensure room code is present).");
+        setToast($("joinToast"), "Enter nickname (and ensure room code is present).");
         return;
       }
 
@@ -291,17 +352,22 @@
       show($("joinCard"), false);
       show($("waitCard"), true);
 
-      listenRoom();
-    }
-
-    function isPausedForMe(room, me){
-      return room.status === "reveal" && room.pause && room.pause.type==="streak" && room.pause.playerId === uid && me.rewardPending === true;
+      listenLive();
     }
 
     function isSabotaged(room){
-      return room.status === "question" && room.sabotage &&
-        room.sabotage.activeForQuestionIndex === room.questionIndex &&
-        room.sabotage.targetPlayerId === uid;
+      if(room.status !== "question") return false;
+      const s = room.sabotage;
+      if(!s || s.activeForQuestionIndex !== room.questionIndex) return false;
+      const blocks = s.blocks || [];
+      return blocks.some(b => b.targetPlayerId === uid);
+    }
+
+    function isPendingStreakDecision(room, me){
+      if(room.status !== "reveal") return false;
+      if(!room.pause || room.pause.type !== "streak") return false;
+      const pending = room.pause.pendingPlayerIds || [];
+      return me && me.rewardPending === true && pending.includes(uid);
     }
 
     async function alreadyAnswered(qIdx){
@@ -310,55 +376,72 @@
     }
 
     async function submitAnswer(choiceIndex){
-      const roomSnap = await roomRef().get();
-      if(!roomSnap.exists) return;
-      const room = roomSnap.data();
-      if(room.status !== "question") return;
-      if(isSabotaged(room)) return;
+      if(!latestRoom) return;
+      if(latestRoom.status !== "question") return;
+      if(isSabotaged(latestRoom)) return;
 
-      if(await alreadyAnswered(room.questionIndex)) return;
+      const key = `${roomId}|${latestRoom.questionIndex}`;
+      localSelected.set(key, choiceIndex);
+      renderAnswers(); // immediate highlight
 
-      await answersRef().doc(`${room.questionIndex}_${uid}`).set({
-        id: `${room.questionIndex}_${uid}`,
+      if(await alreadyAnswered(latestRoom.questionIndex)) return;
+
+      await answersRef().doc(`${latestRoom.questionIndex}_${uid}`).set({
+        id: `${latestRoom.questionIndex}_${uid}`,
         uid,
         roomId,
-        questionIndex: room.questionIndex,
+        questionIndex: latestRoom.questionIndex,
         choiceIndex,
         answeredAtMs: nowMs()
       });
 
-      setToast($("playToast"), "Answer sent!");
+      setToast($("playToast"), "Answer locked in.");
     }
 
     async function claim20(){
-      const roomSnap = await roomRef().get();
+      if(!latestRoom) return;
       const meSnap = await playersRef().doc(uid).get();
-      if(!roomSnap.exists || !meSnap.exists) return;
-
-      const room = roomSnap.data();
+      if(!meSnap.exists) return;
       const me = meSnap.data();
-      if(!isPausedForMe(room, me)) return;
+      if(!isPendingStreakDecision(latestRoom, me)) return;
 
-      await playersRef().doc(uid).update({
-        score: (me.score||0) + 20,
-        rewardPending: false,
-        rewardEarnedAtQuestionIndex: null,
-        streak: 0
+      // transaction: remove me from pending list and add points
+      await db.runTransaction(async (tx) => {
+        const roomDoc = await tx.get(roomRef());
+        const meDoc = await tx.get(playersRef().doc(uid));
+        if(!roomDoc.exists || !meDoc.exists) return;
+
+        const room = roomDoc.data();
+        const player = meDoc.data();
+
+        const pending = (room.pause?.pendingPlayerIds || []).slice();
+        if(!pending.includes(uid)) return;
+
+        const newPending = pending.filter(x => x !== uid);
+
+        tx.update(playersRef().doc(uid), {
+          score: (player.score||0) + 20,
+          rewardPending: false,
+          rewardEarnedAtQuestionIndex: null,
+          streak: 0
+        });
+
+        tx.update(roomRef(), {
+          pause: newPending.length ? { ...room.pause, pendingPlayerIds: newPending } : null,
+          updatedAtMs: nowMs()
+        });
       });
 
-      await roomRef().update({ pause: null, updatedAtMs: nowMs() });
       pickingTarget = false;
       show($("targetBox"), false);
     }
 
     async function openSabotage(){
-      const roomSnap = await roomRef().get();
+      if(!latestRoom) return;
       const meSnap = await playersRef().doc(uid).get();
-      if(!roomSnap.exists || !meSnap.exists) return;
-
-      const room = roomSnap.data();
+      if(!meSnap.exists) return;
       const me = meSnap.data();
-      if(!isPausedForMe(room, me)) return;
+      if(!isPendingStreakDecision(latestRoom, me)) return;
 
       pickingTarget = true;
       show($("targetBox"), true);
@@ -366,29 +449,43 @@
     }
 
     async function applySabotage(targetId){
-      const roomSnap = await roomRef().get();
-      const meSnap = await playersRef().doc(uid).get();
-      if(!roomSnap.exists || !meSnap.exists) return;
+      if(!latestRoom) return;
 
-      const room = roomSnap.data();
-      const me = meSnap.data();
-      if(!isPausedForMe(room, me)) return;
+      await db.runTransaction(async (tx) => {
+        const roomDoc = await tx.get(roomRef());
+        const meDoc = await tx.get(playersRef().doc(uid));
+        if(!roomDoc.exists || !meDoc.exists) return;
 
-      await roomRef().update({
-        sabotage: {
-          activeForQuestionIndex: room.questionIndex + 1,
-          targetPlayerId: targetId,
-          byPlayerId: uid,
-          byName: me.name
-        },
-        pause: null,
-        updatedAtMs: nowMs()
-      });
+        const room = roomDoc.data();
+        const me = meDoc.data();
 
-      await playersRef().doc(uid).update({
-        rewardPending: false,
-        rewardEarnedAtQuestionIndex: null,
-        streak: 0
+        const pending = (room.pause?.pendingPlayerIds || []).slice();
+        if(!pending.includes(uid)) return;
+
+        const newPending = pending.filter(x => x !== uid);
+
+        // add block for NEXT question (multiple sabotages allowed)
+        const nextQ = room.questionIndex + 1;
+        let sabotage = room.sabotage;
+
+        if(!sabotage || sabotage.activeForQuestionIndex !== nextQ){
+          sabotage = { activeForQuestionIndex: nextQ, blocks: [] };
+        }
+
+        const blocks = Array.isArray(sabotage.blocks) ? sabotage.blocks.slice() : [];
+        blocks.push({ targetPlayerId: targetId, byName: me.name });
+
+        tx.update(roomRef(), {
+          sabotage: { activeForQuestionIndex: nextQ, blocks },
+          pause: newPending.length ? { ...room.pause, pendingPlayerIds: newPending } : null,
+          updatedAtMs: nowMs()
+        });
+
+        tx.update(playersRef().doc(uid), {
+          rewardPending: false,
+          rewardEarnedAtQuestionIndex: null,
+          streak: 0
+        });
       });
 
       pickingTarget = false;
@@ -396,57 +493,63 @@
     }
 
     async function cheat(){
-      const roomSnap = await roomRef().get();
-      const meSnap = await playersRef().doc(uid).get();
-      if(!roomSnap.exists || !meSnap.exists) return;
+      if(!latestRoom) return;
+      if(latestRoom.status !== "question") return;
+      if(isSabotaged(latestRoom)) return;
 
-      const room = roomSnap.data();
+      const meSnap = await playersRef().doc(uid).get();
+      if(!meSnap.exists) return;
       const me = meSnap.data();
 
-      if(room.status !== "question") return;
-      if(isSabotaged(room)) return;
       if(me.rewardPending) return;
       if((me.cheatLeft||0) <= 0) return;
-      if(await alreadyAnswered(room.questionIndex)) return;
+      if(await alreadyAnswered(latestRoom.questionIndex)) return;
 
       await playersRef().doc(uid).update({ cheatLeft: (me.cheatLeft||0) - 1 });
-      await submitAnswer(room.currentQuestion.correctIndex);
+
+      // submit correct answer + highlight instantly
+      const correctIndex = latestRoom.currentQuestion.correctIndex;
+      const key = `${roomId}|${latestRoom.questionIndex}`;
+      localSelected.set(key, correctIndex);
+      renderAnswers();
+      await submitAnswer(correctIndex);
     }
 
     async function help5050(){
-      const roomSnap = await roomRef().get();
-      const meSnap = await playersRef().doc(uid).get();
-      if(!roomSnap.exists || !meSnap.exists) return;
+      if(!latestRoom) return;
+      if(latestRoom.status !== "question") return;
+      if(isSabotaged(latestRoom)) return;
 
-      const room = roomSnap.data();
+      const meSnap = await playersRef().doc(uid).get();
+      if(!meSnap.exists) return;
       const me = meSnap.data();
 
-      if(room.status !== "question") return;
-      if(isSabotaged(room)) return;
       if(me.rewardPending) return;
       if((me.helpLeft||0) <= 0) return;
-      if(await alreadyAnswered(room.questionIndex)) return;
+      if(await alreadyAnswered(latestRoom.questionIndex)) return;
 
-      const key = `${roomId}|${room.questionIndex}`;
+      const key = `${roomId}|${latestRoom.questionIndex}`;
       if(localHelpRemoved.has(key)) return;
 
-      const correct = room.currentQuestion.correctIndex;
+      const correct = latestRoom.currentQuestion.correctIndex;
       const wrong = [];
-      for(let i=0;i<room.currentQuestion.options.length;i++){
+      for(let i=0;i<latestRoom.currentQuestion.options.length;i++){
         if(i !== correct) wrong.push(i);
       }
       wrong.sort(()=>Math.random()-0.5);
       localHelpRemoved.set(key, wrong.slice(0,2));
 
       await playersRef().doc(uid).update({ helpLeft: (me.helpLeft||0) - 1 });
+
+      // NEW: redraw immediately so wrong answers go red now
+      renderAnswers();
     }
 
     async function renderTargets(){
       const list = $("targetList");
       list.innerHTML = "";
 
-      const pSnap = await playersRef().get();
-      const players = pSnap.docs.map(d => ({ id:d.id, ...d.data() }))
+      const players = latestPlayers
         .filter(p => p.id !== uid)
         .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
 
@@ -459,7 +562,7 @@
         return;
       }
 
-      players.forEach((p, i) => {
+      players.forEach((p,i)=>{
         const btn = document.createElement("button");
         btn.className = "targetBtn";
         btn.innerHTML = `<div class="tLine"><div><strong>${p.name}</strong> <span class="small mono" style="opacity:.75">#${i+1}</span></div><span class="mono">${p.score||0}</span></div>`;
@@ -468,109 +571,179 @@
       });
     }
 
-    function listenRoom(){
+    function renderLeaderboard(){
+      const box = $("lbBox");
+      const rows = $("lbRows");
+
+      if(!latestRoom || latestRoom.status !== "reveal"){
+        box.style.display = "none";
+        rows.innerHTML = "";
+        return;
+      }
+
+      box.style.display = "";
+      $("lbCount").textContent = `${latestPlayers.length} players`;
+
+      rows.innerHTML = "";
+      latestPlayers
+        .slice()
+        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""))
+        .forEach((p, i)=>{
+          const div = document.createElement("div");
+          div.className = "lbRow";
+          div.innerHTML = `<div><span class="mono" style="opacity:.7">#${i+1}</span> <strong>${p.name||"Player"}</strong></div><div class="mono">${p.score||0}</div>`;
+          rows.appendChild(div);
+        });
+    }
+
+    function renderAnswers(){
+      if(!latestRoom) return;
+
+      const ansBox = $("answers");
+      ansBox.innerHTML = "";
+
+      const q = latestRoom.currentQuestion;
+      if(!q) return;
+
+      const key = `${roomId}|${latestRoom.questionIndex}`;
+      const removed = localHelpRemoved.get(key) || [];
+      const selected = localSelected.get(key);
+
+      const lockedForGame = latestRoom.status !== "question";
+      const sabotaged = isSabotaged(latestRoom);
+
+      // also lock if I’m currently choosing streak reward
+      const me = latestPlayers.find(p=>p.id===uid);
+      const lockedForStreak = latestRoom.status === "reveal" && me && me.rewardPending;
+
+      q.options.forEach((opt, idx)=>{
+        const b = document.createElement("button");
+        b.className = "answer";
+
+        if(typeof selected === "number" && selected === idx){
+          b.classList.add("selected");
+        }
+        if(removed.includes(idx)){
+          b.classList.add("removed");
+          b.disabled = true;
+        }
+
+        const locked = lockedForGame || sabotaged || lockedForStreak;
+        if(locked){
+          b.classList.add("locked");
+          b.disabled = true;
+        }else{
+          b.onclick = () => submitAnswer(idx);
+        }
+
+        b.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
+        ansBox.appendChild(b);
+      });
+    }
+
+    function listenLive(){
       if(unsubRoom) unsubRoom();
+      if(unsubPlayers) unsubPlayers();
 
-      unsubRoom = roomRef().onSnapshot(async (snap) => {
+      unsubRoom = roomRef().onSnapshot(async (snap)=>{
         if(!snap.exists) return;
-        const room = snap.data();
+        latestRoom = snap.data();
 
+        // basic page visibility
         show($("joinCard"), !joined);
-        show($("waitCard"), joined && room.status === "lobby");
-        show($("playCard"), joined && (room.status === "question" || room.status === "reveal"));
-        show($("finalCard"), joined && room.status === "final");
+        show($("waitCard"), joined && latestRoom.status === "lobby");
+        show($("playCard"), joined && (latestRoom.status === "question" || latestRoom.status === "reveal"));
+        show($("finalCard"), joined && latestRoom.status === "final");
 
-        $("status").textContent = room.status;
+        $("status").textContent = latestRoom.status;
+        $("phaseBadge").textContent = latestRoom.status === "reveal" ? "Reveal" : "Question";
 
+        // timer
+        if(timerUI) clearInterval(timerUI);
+        if(latestRoom.status === "question" || latestRoom.status === "reveal"){
+          timerUI = setInterval(()=> $("timer").textContent = String(fmtTimeLeft(latestRoom.questionEndsAt)), 150);
+        }
+
+        // question text
+        $("qText").textContent = latestRoom.currentQuestion?.text || "Question";
+
+        // sabotage message
+        if(joined && isSabotaged(latestRoom)){
+          const blocks = latestRoom.sabotage?.blocks || [];
+          const hit = blocks.find(b=>b.targetPlayerId === uid);
+          setToast($("blockedToast"), `⚠ You have been sabotaged by ${hit?.byName || "a player"}. You cannot answer this question.`, "bad");
+        }else{
+          setToast($("blockedToast"), "", "bad");
+        }
+
+        // render answers + leaderboard if available
+        renderAnswers();
+        renderLeaderboard();
+
+        // update me info + buttons
         const meSnap = await playersRef().doc(uid).get();
         const me = meSnap.exists ? meSnap.data() : null;
         if(me){
           $("score").textContent = String(me.score||0);
           $("streak").textContent = String(me.streak||0);
+          $("btnCheat").textContent = `CHEAT (${me.cheatLeft||0})`;
+          $("btnHelp").textContent = `HELP (${me.helpLeft||0})`;
         }
 
-        // sabotage message
-        if(joined && isSabotaged(room)){
-          setToast($("blockedToast"), `⚠ You have been sabotaged by ${room.sabotage.byName}. You cannot answer this question.`);
-        }else{
-          setToast($("blockedToast"), "");
-        }
+        const pendingForMe = isPendingStreakDecision(latestRoom, me);
 
-        if(room.status === "question" || room.status === "reveal"){
-          if(timerUI) clearInterval(timerUI);
-          timerUI = setInterval(() => {
-            $("timer").textContent = String(fmtTimeLeft(room.questionEndsAt));
-          }, 150);
+        $("btnClaim").disabled = !pendingForMe;
+        $("btnSabotage").disabled = !pendingForMe;
 
-          $("qText").textContent = room.currentQuestion?.text || "Question";
+        const canAct = latestRoom.status === "question" && !isSabotaged(latestRoom) && me && !me.rewardPending;
+        $("btnCheat").disabled = !(canAct && (me?.cheatLeft||0) > 0);
+        $("btnHelp").disabled  = !(canAct && (me?.helpLeft||0) > 0);
 
-          // render answers
-          const ansBox = $("answers");
-          ansBox.innerHTML = "";
-          const q = room.currentQuestion;
-
-          const pausedForMe = (me && isPausedForMe(room, me));
-          const lockedGlobal = (room.status !== "question") || pausedForMe || isSabotaged(room);
-
-          // claim/sabotage buttons
-          $("btnClaim").disabled = !pausedForMe;
-          $("btnSabotage").disabled = !pausedForMe;
-
-          // cheat/help buttons
-          const canAct = (room.status === "question") && !pausedForMe && !isSabotaged(room);
-          $("btnCheat").disabled = !(canAct && (me?.cheatLeft||0) > 0);
-          $("btnHelp").disabled  = !(canAct && (me?.helpLeft||0) > 0);
-          $("btnCheat").textContent = `CHEAT (${me?.cheatLeft||0})`;
-          $("btnHelp").textContent  = `HELP (${me?.helpLeft||0})`;
-
-          const key = `${roomId}|${room.questionIndex}`;
-          const removed = localHelpRemoved.get(key) || [];
-
-          if(q){
-            q.options.forEach((opt, idx)=>{
-              const b = document.createElement("button");
-              b.className = "answer";
-              b.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
-
-              let locked = lockedGlobal;
-              if(removed.includes(idx)){
-                locked = true;
-                b.style.borderColor = "rgba(255,59,92,.60)";
-                b.style.background = "rgba(255,59,92,.12)";
-                b.style.opacity = ".55";
-              }
-
-              if(locked){
-                b.classList.add("locked");
-                b.disabled = true;
-              }else{
-                b.onclick = () => submitAnswer(idx);
-              }
-              ansBox.appendChild(b);
-            });
-          }
-
-          // streak UI toasts / target picker
-          show($("targetBox"), pausedForMe && pickingTarget);
-          if(pausedForMe && pickingTarget){
-            setToast($("playToast"), "Pick a player to sabotage.");
-          }else if(pausedForMe){
-            setToast($("playToast"), "5-streak unlocked! Claim +20 or Sabotage.");
-          }else if(room.status === "reveal"){
-            setToast($("playToast"), room.pause ? "Paused: someone is choosing a streak reward…" : "Answer locked. Host is revealing…");
+        // toasts: reveal result
+        if(latestRoom.status === "reveal" && me && me.lastAnswer && me.lastAnswer.questionIndex === latestRoom.questionIndex){
+          if(me.lastAnswer.isCorrect){
+            setToast($("resultToast"), `✅ Correct! +${me.lastAnswer.pointsAwarded || 0} points`, "good");
           }else{
-            setToast($("playToast"), "");
+            setToast($("resultToast"), `❌ Wrong answer.`, "bad");
           }
+        }else{
+          setToast($("resultToast"), "", "");
         }
 
-        if(room.status === "final" && me){
-          const winners = room.winners || [];
+        // toasts: streak decision
+        if(pendingForMe && pickingTarget){
+          setToast($("playToast"), "Pick a player to sabotage.", "");
+          show($("targetBox"), true);
+          await renderTargets();
+        }else if(pendingForMe){
+          setToast($("playToast"), "5-streak unlocked! Claim +20 or Sabotage.", "");
+          show($("targetBox"), false);
+        }else if(latestRoom.status === "reveal" && latestRoom.pause && (latestRoom.pause.pendingPlayerIds||[]).length>0){
+          setToast($("playToast"), `Paused: waiting for ${latestRoom.pause.pendingPlayerIds.length} streak decision(s)…`, "");
+          show($("targetBox"), false);
+        }else{
+          setToast($("playToast"), "", "");
+          show($("targetBox"), false);
+          pickingTarget = false;
+        }
+
+        // final screen text
+        if(latestRoom.status === "final" && me){
+          const winners = latestRoom.winners || [];
           const isWinner = winners.includes(uid);
           $("finalTitle").textContent = isWinner ? "You Know It All" : "Not too bad!";
           $("finalSpark").textContent = isWinner ? "✦ ✧ ✦ ✧ ✦" : "☹";
           $("finalSub").textContent = `Final score: ${me.score||0}`;
         }
-      }, (err) => console.error("Player room listener error:", err));
+
+      }, (err)=>console.error("Room listener error:", err));
+
+      // Live players list for leaderboard + sabotage target list
+      unsubPlayers = playersRef().onSnapshot((snap)=>{
+        latestPlayers = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        renderLeaderboard();
+        renderAnswers();
+      }, (err)=>console.error("Players listener error:", err));
     }
 
     $("btnJoin").onclick = joinGame;
