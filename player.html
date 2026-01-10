@@ -249,25 +249,20 @@
     </div>
   </div>
 
-  <!-- Reveal Modal (everyone sees this on reveal) -->
+  <!-- Reveal Modal -->
   <div class="modal" id="revealModal">
     <div class="modalCard">
       <div class="modalTop">
         <div class="modalTitle">Reveal • Leaderboard</div>
         <div class="badge mono" id="revealRoomMini">----</div>
       </div>
-
       <div class="toast" id="revealResultToast" style="display:none;"></div>
-
       <div class="lb" id="revealLB"></div>
-
-      <div class="small" style="margin-top:10px; opacity:.85;">
-        Host will start the next question…
-      </div>
+      <div class="small" style="margin-top:10px; opacity:.85;">Host will start the next question…</div>
     </div>
   </div>
 
-  <!-- Sabotage Modal (only streak player sees this when they press Sabotage) -->
+  <!-- Sabotage Modal -->
   <div class="modal" id="sabotageModal">
     <div class="modalCard">
       <div class="modalTop">
@@ -280,7 +275,6 @@
   </div>
 
   <script>
-    /************** FIREBASE CONFIG **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
       authDomain: "knowitall-a47a1.firebaseapp.com",
@@ -306,8 +300,7 @@
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
     function modalOn(id, on){
       const m = $(id);
-      if(on) m.classList.add("on");
-      else m.classList.remove("on");
+      if(on) m.classList.add("on"); else m.classList.remove("on");
     }
 
     let uid = null;
@@ -323,10 +316,8 @@
 
     let timerUI = null;
 
-    // per-question local UI state
     const localHelpRemoved = new Map();   // key `${room}|${qIdx}` -> [idx,idx]
     const localSelected = new Map();      // key `${room}|${qIdx}` -> idx
-    let lastSeenQIdx = null;
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
     function playersRef(){ return roomRef().collection("players"); }
@@ -372,6 +363,10 @@
       listenLive();
     }
 
+    function keyForRoomQ(room){
+      return `${roomId}|${room.questionIndex}`;
+    }
+
     function isSabotaged(room){
       if(room.status !== "question") return false;
       const s = room.sabotage;
@@ -392,35 +387,32 @@
       return doc.exists;
     }
 
-    function currentKey(){
-      if(!latestRoom) return "";
-      return `${roomId}|${latestRoom.questionIndex}`;
+    async function writeAnswer(qIdx, choiceIndex){
+      if(await alreadyAnswered(qIdx)) return;
+      await answersRef().doc(`${qIdx}_${uid}`).set({
+        id: `${qIdx}_${uid}`,
+        uid,
+        roomId,
+        questionIndex: qIdx,
+        choiceIndex,
+        answeredAtMs: nowMs()
+      });
     }
 
-    async function submitAnswer(choiceIndex){
+    async function pickAnswer(choiceIndex){
       if(!latestRoom) return;
       if(latestRoom.status !== "question") return;
       if(isSabotaged(latestRoom)) return;
 
-      const key = currentKey();
+      const key = keyForRoomQ(latestRoom);
 
-      // LOCK selection immediately (cannot be changed)
+      // LOCK: once chosen, can't change
       if(localSelected.has(key)) return;
+
       localSelected.set(key, choiceIndex);
       renderAnswers();
 
-      // write answer once
-      if(await alreadyAnswered(latestRoom.questionIndex)) return;
-
-      await answersRef().doc(`${latestRoom.questionIndex}_${uid}`).set({
-        id: `${latestRoom.questionIndex}_${uid}`,
-        uid,
-        roomId,
-        questionIndex: latestRoom.questionIndex,
-        choiceIndex,
-        answeredAtMs: nowMs()
-      });
-
+      await writeAnswer(latestRoom.questionIndex, choiceIndex);
       setToast($("playToast"), "Answer locked in.");
     }
 
@@ -461,22 +453,48 @@
     }
 
     async function openSabotage(){
-      // Always open modal if button is enabled (UI already guards it),
-      // but we still verify on fresh reads.
       if(!latestRoom) return;
       const meSnap = await playersRef().doc(uid).get();
       if(!meSnap.exists) return;
       const me = meSnap.data();
       if(!isPendingStreakDecision(latestRoom, me)) return;
 
-      // Ensure we have a fresh player list (fixes “no list showing”)
+      // ensure list exists even if snapshot lagged
       if(!latestPlayers || latestPlayers.length === 0){
         const pSnap = await playersRef().get();
         latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
       }
 
-      await renderSabotageTargets();
+      renderSabotageTargets();
       modalOn("sabotageModal", true);
+    }
+
+    function renderSabotageTargets(){
+      const wrap = $("sabTargets");
+      wrap.innerHTML = "";
+
+      const candidates = latestPlayers
+        .filter(p => p.id !== uid)
+        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
+
+      if(candidates.length === 0){
+        const d = document.createElement("div");
+        d.className = "toast bad";
+        d.textContent = "No players available to sabotage.";
+        wrap.appendChild(d);
+        return;
+      }
+
+      candidates.forEach((p,i)=>{
+        const btn = document.createElement("button");
+        btn.className = "targetBtn";
+        btn.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px;">
+          <div><span class="mono" style="opacity:.7">#${i+1}</span> <b>${p.name}</b></div>
+          <div class="mono">${p.score||0}</div>
+        </div>`;
+        btn.onclick = () => applySabotage(p.id);
+        wrap.appendChild(btn);
+      });
     }
 
     async function applySabotage(targetId){
@@ -492,7 +510,6 @@
 
         const pending = (room.pause?.pendingPlayerIds || []).slice();
         if(!pending.includes(uid)) return;
-
         const newPending = pending.filter(x => x !== uid);
 
         const nextQ = room.questionIndex + 1;
@@ -530,20 +547,22 @@
       if(!meSnap.exists) return;
       const me = meSnap.data();
 
-      const key = currentKey();
-      if(localSelected.has(key)) return;            // can't cheat after selecting
-      if(localHelpRemoved.has(key)) return;         // optional: keep clean
+      const key = keyForRoomQ(latestRoom);
+      if(localSelected.has(key)) return; // can't after selecting
+
       if(me.rewardPending) return;
       if((me.cheatLeft||0) <= 0) return;
-      if(await alreadyAnswered(latestRoom.questionIndex)) return;
 
       await playersRef().doc(uid).update({ cheatLeft: (me.cheatLeft||0) - 1 });
 
       const correctIndex = latestRoom.currentQuestion.correctIndex;
+
       // lock selection immediately
       localSelected.set(key, correctIndex);
       renderAnswers();
-      await submitAnswer(correctIndex);
+
+      await writeAnswer(latestRoom.questionIndex, correctIndex);
+      setToast($("playToast"), "CHEAT used. Answer locked in.");
     }
 
     async function help5050(){
@@ -555,12 +574,10 @@
       if(!meSnap.exists) return;
       const me = meSnap.data();
 
-      const key = currentKey();
-      if(localSelected.has(key)) return; // can't use help after selecting
-
+      const key = keyForRoomQ(latestRoom);
+      if(localSelected.has(key)) return; // can't after selecting
       if(me.rewardPending) return;
       if((me.helpLeft||0) <= 0) return;
-      if(await alreadyAnswered(latestRoom.questionIndex)) return;
       if(localHelpRemoved.has(key)) return;
 
       const correct = latestRoom.currentQuestion.correctIndex;
@@ -573,8 +590,9 @@
 
       await playersRef().doc(uid).update({ helpLeft: (me.helpLeft||0) - 1 });
 
-      // IMPORTANT: redraw immediately so wrong answers go red now
+      // immediate visual change
       renderAnswers();
+      setToast($("playToast"), "HELP used.");
     }
 
     function renderAnswers(){
@@ -582,16 +600,14 @@
 
       const ansBox = $("answers");
       ansBox.innerHTML = "";
-
       const q = latestRoom.currentQuestion;
       if(!q) return;
 
-      const key = currentKey();
+      const key = keyForRoomQ(latestRoom);
       const removed = localHelpRemoved.get(key) || [];
       const selected = localSelected.get(key);
 
-      const lockedGlobal = latestRoom.status !== "question" || isSabotaged(latestRoom) || localSelected.has(key);
-      // ^ localSelected.has(key) locks all answers after first tap
+      const lockAll = latestRoom.status !== "question" || isSabotaged(latestRoom) || localSelected.has(key);
 
       q.options.forEach((opt, idx)=>{
         const b = document.createElement("button");
@@ -605,14 +621,13 @@
           b.disabled = true;
         }
 
-        if(lockedGlobal && !b.classList.contains("selected")){
-          // lock all, keep selected visible
+        if(lockAll && !(typeof selected === "number" && selected === idx)){
           b.classList.add("locked");
           b.disabled = true;
         }
 
-        if(!lockedGlobal && !b.disabled){
-          b.onclick = () => submitAnswer(idx);
+        if(!lockAll && !b.disabled){
+          b.onclick = () => pickAnswer(idx);
         }
 
         b.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
@@ -632,7 +647,6 @@
         box.appendChild(row);
       });
 
-      // result toast
       if(latestRoom && latestRoom.status === "reveal" && me && me.lastAnswer && me.lastAnswer.questionIndex === latestRoom.questionIndex){
         if(me.lastAnswer.isCorrect){
           setToast($("revealResultToast"), `✅ Correct! +${me.lastAnswer.pointsAwarded||0} points`, "good");
@@ -644,41 +658,12 @@
       }
     }
 
-    async function renderSabotageTargets(){
-      const wrap = $("sabTargets");
-      wrap.innerHTML = "";
-
-      const candidates = latestPlayers
-        .filter(p => p.id !== uid)
-        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
-
-      if(candidates.length === 0){
-        const d = document.createElement("div");
-        d.className = "toast bad";
-        d.textContent = "No players available to sabotage.";
-        wrap.appendChild(d);
-        return;
-      }
-
-      candidates.forEach((p,i)=>{
-        const btn = document.createElement("button");
-        btn.className = "targetBtn";
-        btn.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px;">
-          <div><span class="mono" style="opacity:.7">#${i+1}</span> <b>${p.name}</b></div>
-          <div class="mono">${p.score||0}</div>
-        </div>`;
-        btn.onclick = () => applySabotage(p.id);
-        wrap.appendChild(btn);
-      });
-    }
-
     function listenLive(){
       if(unsubRoom) unsubRoom();
       if(unsubPlayers) unsubPlayers();
 
       unsubPlayers = playersRef().onSnapshot((snap)=>{
         latestPlayers = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-        // keep reveal modal leaderboard fresh
         if(latestRoom && latestRoom.status === "reveal"){
           const me = latestPlayers.find(p=>p.id===uid) || null;
           renderRevealLeaderboard(me);
@@ -691,12 +676,6 @@
 
         $("revealRoomMini").textContent = roomId || "----";
 
-        // reset per-question local UI when question changes
-        if(latestRoom.status === "question" && lastSeenQIdx !== latestRoom.questionIndex){
-          lastSeenQIdx = latestRoom.questionIndex;
-          // (we keep old entries in maps; key includes qIdx so it won’t affect new question)
-        }
-
         show($("joinCard"), !joined);
         show($("waitCard"), joined && latestRoom.status === "lobby");
         show($("playCard"), joined && (latestRoom.status === "question" || latestRoom.status === "reveal"));
@@ -705,13 +684,11 @@
         $("status").textContent = latestRoom.status;
         $("phaseBadge").textContent = latestRoom.status === "reveal" ? "Reveal" : "Question";
 
-        // timer
         if(timerUI) clearInterval(timerUI);
         if(latestRoom.status === "question" || latestRoom.status === "reveal"){
           timerUI = setInterval(()=> $("timer").textContent = String(fmtTimeLeft(latestRoom.questionEndsAt)), 150);
         }
 
-        // question text
         $("qText").textContent = latestRoom.currentQuestion?.text || "Question";
 
         // sabotage message
@@ -723,7 +700,7 @@
           setToast($("blockedToast"), "", "bad");
         }
 
-        // get me
+        // me info
         const meSnap = await playersRef().doc(uid).get();
         const me = meSnap.exists ? meSnap.data() : null;
 
@@ -734,41 +711,38 @@
           $("btnHelp").textContent = `HELP (${me.helpLeft||0})`;
         }
 
-        // enable/disable power buttons
         const pendingForMe = isPendingStreakDecision(latestRoom, me);
         $("btnClaim").disabled = !pendingForMe;
         $("btnSabotage").disabled = !pendingForMe;
 
-        const key = currentKey();
+        const key = keyForRoomQ(latestRoom);
         const canAct = latestRoom.status === "question"
           && !isSabotaged(latestRoom)
           && me && !me.rewardPending
-          && !localSelected.has(key); // can’t use cheat/help after selecting
+          && !localSelected.has(key);
 
         $("btnCheat").disabled = !(canAct && (me?.cheatLeft||0) > 0);
         $("btnHelp").disabled  = !(canAct && (me?.helpLeft||0) > 0);
 
-        // answers (and selection locking)
         renderAnswers();
 
-        // reveal modal for everyone
+        // reveal popup for everyone
         if(joined && latestRoom.status === "reveal"){
           modalOn("revealModal", true);
-          // ensure latestPlayers is present; if not, fetch once
           if(!latestPlayers || latestPlayers.length === 0){
             const pSnap = await playersRef().get();
             latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
           }
           renderRevealLeaderboard(me);
+
           setToast($("playToast"), pendingForMe ? "5-streak unlocked! Claim +20 or Sabotage." : "Waiting for next question…");
         }else{
           modalOn("revealModal", false);
-          // also close sabotage modal if game moved on
           modalOn("sabotageModal", false);
           setToast($("playToast"), "");
         }
 
-        // final
+        // final screen
         if(latestRoom.status === "final" && me){
           const winners = latestRoom.winners || [];
           const isWinner = winners.includes(uid);
@@ -780,13 +754,12 @@
       }, (err)=>console.error("Room listener error:", err));
     }
 
-    // UI handlers
-    $("btnJoin").onclick = joinGame;
-    $("btnClaim").onclick = claim20;
-    $("btnSabotage").onclick = openSabotage;
+    $("btnJoin").onclick = () => joinGame();
+    $("btnClaim").onclick = () => claim20();
+    $("btnSabotage").onclick = () => openSabotage();
     $("btnCloseSab").onclick = () => modalOn("sabotageModal", false);
-    $("btnCheat").onclick = cheat;
-    $("btnHelp").onclick = help5050;
+    $("btnCheat").onclick = () => cheat();
+    $("btnHelp").onclick = () => help5050();
 
     (async function init(){
       await signInPlayer();
