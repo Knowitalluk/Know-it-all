@@ -82,6 +82,12 @@
       box-shadow:none;
       font-weight:900;
     }
+    .btn-share{
+      border-color: rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      box-shadow:none;
+      font-weight:900;
+    }
 
     .list{ list-style:none; margin:0; padding:0; }
     .list li{
@@ -164,11 +170,21 @@
           <div>
             <div class="badge">Scan to Join</div>
             <div class="small" style="margin-top:8px;">Players open <span class="mono">player.html</span> with this room.</div>
+
             <div class="copyRow">
               <button class="btn-ghost" id="btnCopy">Copy Join Link</button>
               <button class="btn-ghost" id="btnOpen">Open Join Link</button>
             </div>
+
+            <div class="copyRow">
+              <button class="btn-share" id="btnShareWhatsApp">Share WhatsApp</button>
+              <button class="btn-share" id="btnShareMessenger">Share Messenger</button>
+            </div>
+
             <div class="small mono" id="joinLinkText" style="margin-top:10px; word-break:break-all;"></div>
+            <div class="small" style="margin-top:8px;">
+              Messenger share uses your phone share sheet when available (best). WhatsApp share works everywhere.
+            </div>
           </div>
         </div>
 
@@ -219,6 +235,7 @@
   </div>
 
   <script>
+    /************** FIREBASE **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
       authDomain: "knowitall-a47a1.firebaseapp.com",
@@ -231,6 +248,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    /************** GAME DATA **************/
     const QUESTIONS = [
       { text:"Which planet is known as the Red Planet?", options:["Earth","Mars","Jupiter","Venus"], correctIndex:1 },
       { text:"What does HTML stand for?", options:["HyperText Markup Language","HighText Machine Language","Hyperlink Tool Markup Language","Home Tool Markup Language"], correctIndex:0 },
@@ -243,9 +261,9 @@
       { text:"Primary color NOT in RGB?", options:["Red","Green","Blue","Yellow"], correctIndex:3 },
       { text:"How many seconds in a minute?", options:["30","45","60","90"], correctIndex:2 },
     ];
-
     const QUESTION_SECONDS = 20;
 
+    /************** HELPERS **************/
     function nowMs(){ return Date.now(); }
     function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
     function randomCode(len=4){
@@ -263,6 +281,7 @@
     function setToast(el,msg){ if(!msg){ el.style.display="none"; el.textContent=""; } else { el.style.display=""; el.textContent=msg; } }
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
 
+    /************** STATE **************/
     let hostUid = null;
     let roomId = null;
 
@@ -274,6 +293,7 @@
 
     let timerUI = null;
     let joinLink = "";
+    let shareText = "";
     let qrObj = null;
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
@@ -295,13 +315,10 @@
         questionEndsAt: 0,
         currentQuestion: null,
         reveal: null,
-
-        // pause: { type:"streak", pendingPlayerIds:[uid,...], earnedAtQuestionIndex:number }
+        // pause: { type:"streak", pendingPlayerIds:[...], earnedAtQuestionIndex:number }
         pause: null,
-
         // sabotage: { activeForQuestionIndex:number, blocks:[{targetPlayerId, byName}] }
         sabotage: null,
-
         winners: [],
         updatedAtMs: nowMs()
       };
@@ -312,14 +329,62 @@
       return base + "player.html?room=" + encodeURIComponent(roomId);
     }
 
+    function updateShareText(){
+      shareText = `Just started a quiz game fancy joining in? ${joinLink}`;
+    }
+
     function renderQRCode(){
       joinLink = getJoinLink();
+      updateShareText();
+
       $("joinLinkText").textContent = joinLink;
       show($("qrArea"), true);
+
       $("qr").innerHTML = "";
       qrObj = new QRCode(document.getElementById("qr"), { text: joinLink, width: 128, height: 128 });
+
       $("roomCode").textContent = roomId;
       $("hint").textContent = "Players scan the QR or use the join link.";
+    }
+
+    async function shareViaWebShare(preferText){
+      // phone share sheet (best: includes WhatsApp + Messenger)
+      if(navigator.share){
+        try{
+          await navigator.share({ title: "Know It All?", text: preferText, url: joinLink });
+          setToast($("hostToast"), "Share opened.");
+          return true;
+        }catch(e){
+          // user cancelled or not allowed
+        }
+      }
+      return false;
+    }
+
+    async function shareWhatsApp(){
+      if(!joinLink) return;
+      const usedShare = await shareViaWebShare(shareText);
+      if(usedShare) return;
+      const url = "https://wa.me/?text=" + encodeURIComponent(shareText);
+      window.open(url, "_blank");
+    }
+
+    async function shareMessenger(){
+      if(!joinLink) return;
+      const usedShare = await shareViaWebShare(shareText);
+      if(usedShare) return;
+
+      // Mobile deep link (works on many phones that have Messenger installed)
+      const deep = "fb-messenger://share?link=" + encodeURIComponent(joinLink);
+      window.open(deep, "_blank");
+
+      // Helpful fallback (copy)
+      try{
+        await navigator.clipboard.writeText(shareText);
+        setToast($("hostToast"), "Copied message + link. Paste into Messenger.");
+      }catch{
+        setToast($("hostToast"), "Copy failed. Copy the link manually and paste into Messenger.");
+      }
     }
 
     function listenLive(){
@@ -459,8 +524,9 @@
       const room = snap.data();
       if(room.status !== "reveal") return;
 
-      if(room.pause && room.pause.type==="streak" && (room.pause.pendingPlayerIds||[]).length>0){
-        setToast($("pauseToast"), `GAME PAUSED: waiting for ${room.pause.pendingPlayerIds.length} streak decision(s).`);
+      const pendingCount = (room.pause?.pendingPlayerIds||[]).length;
+      if(pendingCount > 0){
+        setToast($("pauseToast"), `GAME PAUSED: waiting for ${pendingCount} streak decision(s).`);
         return;
       }
 
@@ -535,7 +601,6 @@
       $("btnReset").disabled = room.status !== "lobby";
       $("btnStart").disabled = (players.length === 0) || room.status !== "lobby";
 
-      // players joined list
       const ul = $("playersList");
       ul.innerHTML = "";
       if(players.length === 0){
@@ -569,7 +634,6 @@
           });
         }
 
-        // leaderboard
         const lb = $("leaderboard");
         lb.innerHTML = "";
         players.slice()
@@ -605,7 +669,7 @@
       }
     }
 
-    // Auto reveal when timer hits 0
+    // Auto-reveal when timer hits 0
     setInterval(async ()=>{
       if(!roomId || !latestRoom) return;
       if(latestRoom.status === "question" && fmtTimeLeft(latestRoom.questionEndsAt) <= 0){
@@ -613,6 +677,7 @@
       }
     }, 500);
 
+    /************** UI **************/
     $("btnCreate").onclick = () => createRoom();
     $("btnStart").onclick = () => startGame();
     $("btnReset").onclick = () => resetGame();
@@ -626,6 +691,9 @@
       catch{ setToast($("hostToast"), "Could not copy. Copy manually from the link."); }
     };
     $("btnOpen").onclick = () => window.open(joinLink, "_blank");
+
+    $("btnShareWhatsApp").onclick = () => shareWhatsApp();
+    $("btnShareMessenger").onclick = () => shareMessenger();
 
     $("btnForgetRoom").onclick = () => {
       localStorage.removeItem("KIA_LAST_ROOM_HOST");
