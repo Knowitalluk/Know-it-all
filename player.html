@@ -29,6 +29,7 @@
       min-height:100vh;
     }
     .container{ max-width:900px; margin:0 auto; padding:22px; }
+
     .brand h1{ margin:0; font-weight:1000; font-size:36px; letter-spacing:.5px; }
     .brand h1 span{ color:var(--orange); text-shadow:0 0 20px var(--glow); }
     .tag{ color:var(--muted); font-size:13px; letter-spacing:.18em; text-transform:uppercase; margin-top:6px; }
@@ -53,6 +54,7 @@
     }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
     .small{ color:var(--muted); font-size:13px; }
+
     input, button{
       font:inherit; border-radius:14px; padding:12px 12px; outline:none;
       border:1px solid rgba(255,255,255,.12);
@@ -68,9 +70,20 @@
     }
     button:disabled{ opacity:.35; cursor:not-allowed; }
 
+    .btn-ghost{
+      border-color: rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      box-shadow:none;
+      font-weight:900;
+    }
+    .btn-cheat{
+      border-color: rgba(255,59,92,.45);
+      background: linear-gradient(180deg, rgba(255,59,92,.18), rgba(255,59,92,.06));
+    }
+
     .qtext{ font-size:30px; font-weight:1000; margin:10px 0 6px; }
     .answers{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
-    @media (max-width:520px){ .answers{ grid-template-columns: 1fr; } }
+    @media (max-width:520px){ .answers{ grid-template-columns:1fr; } }
     .answer{
       text-align:left; padding:14px; border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
@@ -78,7 +91,6 @@
       cursor:pointer;
     }
     .answer.locked{ opacity:.55; cursor:not-allowed; }
-    .answer.selected{ border-color: rgba(255,106,0,.70); background: rgba(255,106,0,.14); }
 
     .toast{
       margin-top:10px; padding:10px 12px; border-radius:14px;
@@ -94,17 +106,6 @@
 
     .powerRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
     .powerRow button{ flex:1; min-width:160px; }
-
-    .btn-ghost{
-      border-color: rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
-      box-shadow:none;
-      font-weight:900;
-    }
-    .btn-cheat{
-      border-color: rgba(255,59,92,.45);
-      background: linear-gradient(180deg, rgba(255,59,92,.18), rgba(255,59,92,.06));
-    }
 
     .targetBox{
       margin-top: 10px;
@@ -230,7 +231,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    const QUESTION_SECONDS = 20;
     function nowMs(){ return Date.now(); }
     function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
     function $(id){ return document.getElementById(id); }
@@ -240,27 +240,26 @@
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
 
     let uid = null;
-    let roomId = (qparam("room") || "").toUpperCase();
     let joined = false;
 
+    let roomId = (qparam("room") || "").toUpperCase();
     let unsubRoom = null;
     let timerUI = null;
 
-    // local-only HELP: remove 2 wrong answers for this device this question
-    const localHelpRemoved = new Map(); // key: `${room}|${qIdx}` -> [i,i]
     let pickingTarget = false;
+    const localHelpRemoved = new Map(); // `${room}|${qIdx}` -> [i,i]
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
     function playersRef(){ return roomRef().collection("players"); }
     function answersRef(){ return roomRef().collection("answers"); }
 
-    async function signIn(){
+    async function signInPlayer(){
       const cred = await auth.signInAnonymously();
       uid = cred.user.uid;
       console.log("PLAYER UID:", uid);
     }
 
-    async function join(){
+    async function joinGame(){
       roomId = ($("roomInput").value || "").trim().toUpperCase();
       const name = ($("nameInput").value || "").trim();
       if(!roomId || !name){
@@ -268,9 +267,9 @@
         return;
       }
 
-      const roomSnap = await roomRef().get();
-      if(!roomSnap.exists){
-        setToast($("joinToast"), "Room not found. Scan the host QR again.");
+      const snap = await roomRef().get();
+      if(!snap.exists){
+        setToast($("joinToast"), "Room not found. Scan the QR again.");
         return;
       }
 
@@ -305,17 +304,19 @@
         room.sabotage.targetPlayerId === uid;
     }
 
+    async function alreadyAnswered(qIdx){
+      const doc = await answersRef().doc(`${qIdx}_${uid}`).get();
+      return doc.exists;
+    }
+
     async function submitAnswer(choiceIndex){
       const roomSnap = await roomRef().get();
+      if(!roomSnap.exists) return;
       const room = roomSnap.data();
       if(room.status !== "question") return;
-
-      // blocked?
       if(isSabotaged(room)) return;
 
-      // already answered?
-      const existing = await answersRef().doc(`${room.questionIndex}_${uid}`).get();
-      if(existing.exists) return;
+      if(await alreadyAnswered(room.questionIndex)) return;
 
       await answersRef().doc(`${room.questionIndex}_${uid}`).set({
         id: `${room.questionIndex}_${uid}`,
@@ -331,8 +332,10 @@
 
     async function claim20(){
       const roomSnap = await roomRef().get();
-      const room = roomSnap.data();
       const meSnap = await playersRef().doc(uid).get();
+      if(!roomSnap.exists || !meSnap.exists) return;
+
+      const room = roomSnap.data();
       const me = meSnap.data();
       if(!isPausedForMe(room, me)) return;
 
@@ -345,26 +348,32 @@
 
       await roomRef().update({ pause: null, updatedAtMs: nowMs() });
       pickingTarget = false;
+      show($("targetBox"), false);
     }
 
-    async function openSabotagePicker(){
+    async function openSabotage(){
       const roomSnap = await roomRef().get();
-      const room = roomSnap.data();
       const meSnap = await playersRef().doc(uid).get();
+      if(!roomSnap.exists || !meSnap.exists) return;
+
+      const room = roomSnap.data();
       const me = meSnap.data();
       if(!isPausedForMe(room, me)) return;
+
       pickingTarget = true;
-      renderTargets();
+      show($("targetBox"), true);
+      await renderTargets();
     }
 
     async function applySabotage(targetId){
       const roomSnap = await roomRef().get();
-      const room = roomSnap.data();
       const meSnap = await playersRef().doc(uid).get();
+      if(!roomSnap.exists || !meSnap.exists) return;
+
+      const room = roomSnap.data();
       const me = meSnap.data();
       if(!isPausedForMe(room, me)) return;
 
-      // sabotage next question
       await roomRef().update({
         sabotage: {
           activeForQuestionIndex: room.questionIndex + 1,
@@ -376,7 +385,6 @@
         updatedAtMs: nowMs()
       });
 
-      // consume reward
       await playersRef().doc(uid).update({
         rewardPending: false,
         rewardEarnedAtQuestionIndex: null,
@@ -389,17 +397,17 @@
 
     async function cheat(){
       const roomSnap = await roomRef().get();
+      const meSnap = await playersRef().doc(uid).get();
+      if(!roomSnap.exists || !meSnap.exists) return;
+
       const room = roomSnap.data();
+      const me = meSnap.data();
+
       if(room.status !== "question") return;
       if(isSabotaged(room)) return;
-
-      const meSnap = await playersRef().doc(uid).get();
-      const me = meSnap.data();
+      if(me.rewardPending) return;
       if((me.cheatLeft||0) <= 0) return;
-
-      // already answered?
-      const existing = await answersRef().doc(`${room.questionIndex}_${uid}`).get();
-      if(existing.exists) return;
+      if(await alreadyAnswered(room.questionIndex)) return;
 
       await playersRef().doc(uid).update({ cheatLeft: (me.cheatLeft||0) - 1 });
       await submitAnswer(room.currentQuestion.correctIndex);
@@ -407,38 +415,66 @@
 
     async function help5050(){
       const roomSnap = await roomRef().get();
+      const meSnap = await playersRef().doc(uid).get();
+      if(!roomSnap.exists || !meSnap.exists) return;
+
       const room = roomSnap.data();
+      const me = meSnap.data();
+
       if(room.status !== "question") return;
       if(isSabotaged(room)) return;
-
-      const meSnap = await playersRef().doc(uid).get();
-      const me = meSnap.data();
+      if(me.rewardPending) return;
       if((me.helpLeft||0) <= 0) return;
-
-      // already answered?
-      const existing = await answersRef().doc(`${room.questionIndex}_${uid}`).get();
-      if(existing.exists) return;
+      if(await alreadyAnswered(room.questionIndex)) return;
 
       const key = `${roomId}|${room.questionIndex}`;
       if(localHelpRemoved.has(key)) return;
 
       const correct = room.currentQuestion.correctIndex;
       const wrong = [];
-      for(let i=0;i<room.currentQuestion.options.length;i++) if(i!==correct) wrong.push(i);
-      // pick 2
+      for(let i=0;i<room.currentQuestion.options.length;i++){
+        if(i !== correct) wrong.push(i);
+      }
       wrong.sort(()=>Math.random()-0.5);
       localHelpRemoved.set(key, wrong.slice(0,2));
 
       await playersRef().doc(uid).update({ helpLeft: (me.helpLeft||0) - 1 });
     }
 
+    async function renderTargets(){
+      const list = $("targetList");
+      list.innerHTML = "";
+
+      const pSnap = await playersRef().get();
+      const players = pSnap.docs.map(d => ({ id:d.id, ...d.data() }))
+        .filter(p => p.id !== uid)
+        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
+
+      if(players.length === 0){
+        const div = document.createElement("div");
+        div.style.padding = "12px";
+        div.className = "small";
+        div.textContent = "No players available.";
+        list.appendChild(div);
+        return;
+      }
+
+      players.forEach((p, i) => {
+        const btn = document.createElement("button");
+        btn.className = "targetBtn";
+        btn.innerHTML = `<div class="tLine"><div><strong>${p.name}</strong> <span class="small mono" style="opacity:.75">#${i+1}</span></div><span class="mono">${p.score||0}</span></div>`;
+        btn.onclick = () => applySabotage(p.id);
+        list.appendChild(btn);
+      });
+    }
+
     function listenRoom(){
       if(unsubRoom) unsubRoom();
-      unsubRoom = roomRef().onSnapshot(async (snap)=>{
+
+      unsubRoom = roomRef().onSnapshot(async (snap) => {
         if(!snap.exists) return;
         const room = snap.data();
 
-        // show correct card
         show($("joinCard"), !joined);
         show($("waitCard"), joined && room.status === "lobby");
         show($("playCard"), joined && (room.status === "question" || room.status === "reveal"));
@@ -446,7 +482,6 @@
 
         $("status").textContent = room.status;
 
-        // load me
         const meSnap = await playersRef().doc(uid).get();
         const me = meSnap.exists ? meSnap.data() : null;
         if(me){
@@ -462,58 +497,62 @@
         }
 
         if(room.status === "question" || room.status === "reveal"){
-          // timer UI
           if(timerUI) clearInterval(timerUI);
-          timerUI = setInterval(()=> $("timer").textContent = String(fmtTimeLeft(room.questionEndsAt)), 150);
+          timerUI = setInterval(() => {
+            $("timer").textContent = String(fmtTimeLeft(room.questionEndsAt));
+          }, 150);
 
-          // question text
           $("qText").textContent = room.currentQuestion?.text || "Question";
 
-          // answers
+          // render answers
           const ansBox = $("answers");
           ansBox.innerHTML = "";
           const q = room.currentQuestion;
-          if(q){
-            const key = `${roomId}|${room.questionIndex}`;
-            const removed = localHelpRemoved.get(key) || [];
-            q.options.forEach((opt, idx)=>{
-              const b = document.createElement("button");
-              b.className = "answer";
-              b.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
 
-              const locked = (room.status !== "question") || isSabotaged(room) || (me && me.rewardPending);
-              if(locked) { b.classList.add("locked"); b.disabled = true; }
-
-              if(removed.includes(idx)){
-                b.disabled = true;
-                b.style.borderColor = "rgba(255,59,92,.60)";
-                b.style.background = "rgba(255,59,92,.12)";
-                b.style.opacity = ".55";
-              }
-
-              b.onclick = () => submitAnswer(idx);
-              ansBox.appendChild(b);
-            });
-          }
-
-          // streak pause buttons
           const pausedForMe = (me && isPausedForMe(room, me));
+          const lockedGlobal = (room.status !== "question") || pausedForMe || isSabotaged(room);
+
+          // claim/sabotage buttons
           $("btnClaim").disabled = !pausedForMe;
           $("btnSabotage").disabled = !pausedForMe;
 
           // cheat/help buttons
-          const inQuestion = room.status === "question";
-          const canAct = inQuestion && !isSabotaged(room) && me && !me.rewardPending;
-
+          const canAct = (room.status === "question") && !pausedForMe && !isSabotaged(room);
           $("btnCheat").disabled = !(canAct && (me?.cheatLeft||0) > 0);
           $("btnHelp").disabled  = !(canAct && (me?.helpLeft||0) > 0);
           $("btnCheat").textContent = `CHEAT (${me?.cheatLeft||0})`;
           $("btnHelp").textContent  = `HELP (${me?.helpLeft||0})`;
 
-          // target picker
+          const key = `${roomId}|${room.questionIndex}`;
+          const removed = localHelpRemoved.get(key) || [];
+
+          if(q){
+            q.options.forEach((opt, idx)=>{
+              const b = document.createElement("button");
+              b.className = "answer";
+              b.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
+
+              let locked = lockedGlobal;
+              if(removed.includes(idx)){
+                locked = true;
+                b.style.borderColor = "rgba(255,59,92,.60)";
+                b.style.background = "rgba(255,59,92,.12)";
+                b.style.opacity = ".55";
+              }
+
+              if(locked){
+                b.classList.add("locked");
+                b.disabled = true;
+              }else{
+                b.onclick = () => submitAnswer(idx);
+              }
+              ansBox.appendChild(b);
+            });
+          }
+
+          // streak UI toasts / target picker
           show($("targetBox"), pausedForMe && pickingTarget);
           if(pausedForMe && pickingTarget){
-            renderTargets();
             setToast($("playToast"), "Pick a player to sabotage.");
           }else if(pausedForMe){
             setToast($("playToast"), "5-streak unlocked! Claim +20 or Sabotage.");
@@ -531,46 +570,18 @@
           $("finalSpark").textContent = isWinner ? "✦ ✧ ✦ ✧ ✦" : "☹";
           $("finalSub").textContent = `Final score: ${me.score||0}`;
         }
-      });
+      }, (err) => console.error("Player room listener error:", err));
     }
 
-    async function renderTargets(){
-      const list = $("targetList");
-      list.innerHTML = "";
-
-      const pSnap = await playersRef().get();
-      const players = pSnap.docs.map(d=>({id:d.id, ...d.data()}))
-        .filter(p=>p.id!==uid)
-        .sort((a,b)=> (b.score-a.score) || a.name.localeCompare(b.name));
-
-      if(players.length === 0){
-        const div = document.createElement("div");
-        div.style.padding="12px";
-        div.className="small";
-        div.textContent="No players available.";
-        list.appendChild(div);
-        return;
-      }
-
-      players.forEach((p,i)=>{
-        const btn = document.createElement("button");
-        btn.className = "targetBtn";
-        btn.innerHTML = `<div class="tLine"><div><strong>${p.name}</strong> <span class="small mono" style="opacity:.75">#${i+1}</span></div><span class="mono">${p.score||0}</span></div>`;
-        btn.onclick = () => applySabotage(p.id);
-        list.appendChild(btn);
-      });
-    }
-
-    /************** UI **************/
-    $("btnJoin").onclick = join;
+    $("btnJoin").onclick = joinGame;
     $("btnClaim").onclick = claim20;
-    $("btnSabotage").onclick = openSabotagePicker;
-    $("btnCancelTarget").onclick = () => { pickingTarget=false; show($("targetBox"), false); };
+    $("btnSabotage").onclick = openSabotage;
+    $("btnCancelTarget").onclick = () => { pickingTarget = false; show($("targetBox"), false); };
     $("btnCheat").onclick = cheat;
     $("btnHelp").onclick = help5050;
 
     (async function init(){
-      await signIn();
+      await signInPlayer();
       if(roomId) $("roomInput").value = roomId;
     })();
   </script>
