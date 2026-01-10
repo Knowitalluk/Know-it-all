@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Know It All? — Host</title>
 
-  <!-- QR generator (tiny CDN lib) -->
+  <!-- QR generator -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-  <!-- Firebase (Compat CDN - easiest for plain HTML) -->
+  <!-- Firebase (Compat CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -22,7 +22,7 @@
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0; color:var(--text);
+      margin:0; color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:
         radial-gradient(900px 500px at 20% 10%, rgba(255,106,0,.14), transparent 60%),
@@ -34,15 +34,15 @@
     .container{ max-width:1200px; margin:0 auto; padding:22px; }
     .topbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
     .brand h1{ margin:0; font-weight:1000; font-size:36px; letter-spacing:.5px; }
-    .brand h1 span{ color:var(--orange); text-shadow:0 0 20px var(--glow); }
+    .brand h1 span{ color: var(--orange); text-shadow:0 0 20px var(--glow); }
     .brand .tag{ color:var(--muted); font-size:13px; letter-spacing:.18em; text-transform:uppercase; margin-top:6px; }
     .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
 
     .card{
       background: linear-gradient(180deg, rgba(15,17,23,.92), rgba(10,12,16,.92));
-      border:1px solid var(--line);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding:16px;
+      padding: 16px;
       box-shadow: 0 15px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,106,0,.06) inset;
       backdrop-filter: blur(10px);
     }
@@ -52,69 +52,80 @@
 
     .badge{
       display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:999px;
-      border:1px solid rgba(255,106,0,.35);
+      padding: 8px 12px; border-radius:999px;
+      border: 1px solid rgba(255,106,0,.35);
       background: rgba(255,106,0,.10);
       color: var(--orange2);
       box-shadow: 0 0 22px rgba(255,106,0,.12);
-      font-weight:1000; letter-spacing:.04em;
+      font-weight: 1000; letter-spacing:.04em;
     }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
     .big-code{
       font-size:54px; font-weight:1000; letter-spacing:10px;
-      text-align:center; margin:12px 0 6px; text-shadow: 0 0 24px var(--glow);
+      text-align:center; margin:12px 0 6px;
+      text-shadow: 0 0 24px var(--glow);
     }
-    .small{ color:var(--muted); font-size:13px; }
-    input, button{
-      font:inherit; border-radius:14px; padding:12px 12px; outline:none;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      color: var(--text);
-    }
+    .small{ color: var(--muted); font-size:13px; }
+
     button{
-      cursor:pointer; font-weight:1000;
-      border-color: rgba(255,106,0,.55);
+      font: inherit;
+      cursor:pointer;
+      border-radius: 14px;
+      border: 1px solid rgba(255,106,0,.55);
       background: linear-gradient(180deg, rgba(255,106,0,.35), rgba(255,106,0,.12));
+      color: var(--text);
+      padding: 12px 12px;
       box-shadow: 0 10px 30px rgba(255,106,0,.10);
+      font-weight: 1000;
     }
-    button:hover{ filter:brightness(1.12); }
+    button:hover{ filter: brightness(1.12); }
     button:disabled{ opacity:.35; cursor:not-allowed; filter:none; }
+
     .btn-ghost{
       border-color: rgba(255,255,255,.14);
       background: rgba(255,255,255,.04);
-      box-shadow:none;
-      font-weight:900;
+      box-shadow: none;
+      font-weight: 900;
     }
 
-    .qtext{ font-size:32px; font-weight:1000; margin:8px 0 6px; }
-    .answers{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
-    @media (max-width:520px){ .answers{ grid-template-columns: 1fr; } }
-    .answer{
-      text-align:left; padding:14px; border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      opacity:.75;
-    }
-    .answer.correct{ border-color: rgba(44,255,154,.70); background: rgba(44,255,154,.12); opacity:1; }
     .list{ list-style:none; margin:0; padding:0; }
     .list li{
       display:flex; justify-content:space-between; gap:10px;
-      padding:10px; border-bottom:1px solid rgba(255,255,255,.07);
-      color:var(--muted); align-items:center;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      color: var(--muted);
+      align-items:center;
     }
-    .list li strong{ color:var(--text); }
+    .list li strong{ color: var(--text); }
     .list li:last-child{ border-bottom:none; }
     .rank{
       width:26px; height:26px; border-radius:10px;
       display:inline-flex; align-items:center; justify-content:center;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
-      color:var(--muted); font-weight:1000;
+      color: var(--muted);
+      font-weight: 1000;
     }
     .nameRow{ display:flex; gap:10px; align-items:center; }
+
+    .qtext{ font-size:32px; font-weight:1000; margin:8px 0 6px; }
+    .answers{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
+    @media (max-width:520px){ .answers{ grid-template-columns:1fr; } }
+    .answer{
+      text-align:left;
+      padding: 14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      opacity:.75;
+    }
+    .answer.correct{ opacity:1; border-color: rgba(44,255,154,.70); background: rgba(44,255,154,.12); }
+
     .toast{
-      margin-top:10px; padding:10px 12px; border-radius:14px;
-      border:1px solid rgba(255,106,0,.25);
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,106,0,.25);
       background: rgba(255,106,0,.08);
       color: var(--orange2);
     }
@@ -124,13 +135,9 @@
       color: rgba(255,220,228,.92);
     }
 
-    .qrWrap{
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-      margin-top: 10px;
-    }
+    .qrWrap{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:10px; }
     #qr{
-      width:128px; height:128px;
-      padding:10px;
+      width:128px; height:128px; padding:10px;
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.03);
@@ -146,7 +153,7 @@
         <div class="tag">HOST MODE • PLAYERS JOIN BY QR</div>
       </div>
       <div class="actions">
-        <button class="btn-ghost" id="btnHardReset">Hard Reset Room</button>
+        <button class="btn-ghost" id="btnForgetRoom">Forget Room (Local)</button>
       </div>
     </div>
 
@@ -252,7 +259,9 @@
     ];
 
     const QUESTION_SECONDS = 20;
+
     function nowMs(){ return Date.now(); }
+    function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
     function randomCode(len=4){
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
       let out = "";
@@ -263,7 +272,6 @@
       const t = Math.max(0, Math.min(QUESTION_SECONDS, remainingSeconds));
       return 20 + Math.floor(80 * (t / QUESTION_SECONDS));
     }
-    function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
     function $(id){ return document.getElementById(id); }
     function show(el,on=true){ el.style.display = on ? "" : "none"; }
     function setToast(el,msg){ if(!msg){ el.style.display="none"; el.textContent=""; } else { el.style.display=""; el.textContent=msg; } }
@@ -271,54 +279,47 @@
 
     let hostUid = null;
     let roomId = null;
+
     let unsubRoom = null;
     let unsubPlayers = null;
 
-let latestRoom = null;
-let latestPlayers = [];
+    let latestRoom = null;
+    let latestPlayers = [];
 
     let timerUI = null;
-    let qrObj = null;
-    let joinLink = "";
 
-    async function signIn(){
-      const cred = await auth.signInAnonymously();
-      hostUid = cred.user.uid;
-      console.log("HOST UID:", hostUid);
-    }
+    let joinLink = "";
+    let qrObj = null;
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
     function playersRef(){ return roomRef().collection("players"); }
     function answersRef(){ return roomRef().collection("answers"); }
 
+    async function signInHost(){
+      const cred = await auth.signInAnonymously();
+      hostUid = cred.user.uid;
+      console.log("HOST UID:", hostUid);
+    }
+
     function baseRoomState(id){
       return {
         roomId: id,
-        hostUid,
+        hostUid: hostUid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        status: "lobby", // lobby | question | reveal | final
+        status: "lobby",          // lobby | question | reveal | final
         questionIndex: 0,
         questionEndsAt: 0,
         currentQuestion: null,
         reveal: null,
-        pause: null,
-        sabotage: null,
+        pause: null,             // { type:"streak", playerId, playerName, earnedAtQuestionIndex }
+        sabotage: null,          // { activeForQuestionIndex, targetPlayerId, byName }
         winners: [],
         updatedAtMs: nowMs()
       };
     }
 
-    async function createRoom(){
-      roomId = randomCode(4);
-      await roomRef().set(baseRoomState(roomId));
-      // store host presence as a player-like doc is optional; we won't.
-      listenRoom();
-      renderQRCode();
-      setToast($("hostToast"), "Room created. Players can join now.");
-    }
-
     function getJoinLink(){
-      // host.html and player.html in same folder (GitHub Pages)
+      // Works on GitHub pages because host.html and player.html live in the same folder
       const base = location.href.replace(/host\.html.*$/i, "");
       return base + "player.html?room=" + encodeURIComponent(roomId);
     }
@@ -328,96 +329,41 @@ let latestPlayers = [];
       $("joinLinkText").textContent = joinLink;
       show($("qrArea"), true);
       $("qr").innerHTML = "";
-      qrObj = new QRCode(document.getElementById("qr"), {
-        text: joinLink,
-        width: 128,
-        height: 128
-      });
+      qrObj = new QRCode(document.getElementById("qr"), { text: joinLink, width: 128, height: 128 });
       $("roomCode").textContent = roomId;
       $("hint").textContent = "Players scan the QR or use the join link.";
     }
 
-   function listenRoom(){
-  // stop old listeners
-  if(unsubRoom) unsubRoom();
-  if(unsubPlayers) unsubPlayers();
+    function listenLive(){
+      if(unsubRoom) unsubRoom();
+      if(unsubPlayers) unsubPlayers();
 
-  // listen to ROOM document
-  unsubRoom = roomRef().onSnapshot((snap) => {
-    if(!snap.exists) return;
-    latestRoom = snap.data();
-    render(latestRoom, latestPlayers);
-  }, (err) => {
-    console.error("Room listener error:", err);
-  });
+      unsubRoom = roomRef().onSnapshot((snap) => {
+        if(!snap.exists) return;
+        latestRoom = snap.data();
+        render(latestRoom, latestPlayers);
+      }, (err) => console.error("Room listener error:", err));
 
-  // 🔥 listen to PLAYERS subcollection live
-  unsubPlayers = playersRef().onSnapshot((snap) => {
-    latestPlayers = snap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
-      .sort((a,b) =>
-        (b.score - a.score) ||
-        (a.name || "").localeCompare(b.name || "")
-      );
-
-    if(latestRoom){
-      render(latestRoom, latestPlayers);
-    }
-  }, (err) => {
-    console.error("Players listener error:", err);
-  });
-}
-
-
-        // players list
-        const pSnap = await playersRef().get();
-        const players = pSnap.docs.map(d => d.data()).sort((a,b)=> (b.score-a.score) || a.name.localeCompare(b.name));
-
-        render(room, players);
-      });
+      unsubPlayers = playersRef().onSnapshot((snap) => {
+        latestPlayers = snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .sort((a,b) => (b.score - a.score) || (a.name || "").localeCompare(b.name || ""));
+        if(latestRoom) render(latestRoom, latestPlayers);
+      }, (err) => console.error("Players listener error:", err));
     }
 
-    async function resetGame(){
-      const roomSnap = await roomRef().get();
-      if(!roomSnap.exists) return;
-      const room = roomSnap.data();
-      if(room.hostUid !== hostUid) return;
-
-      // reset room
-      await roomRef().update({
-        status: "lobby",
-        questionIndex: 0,
-        questionEndsAt: 0,
-        currentQuestion: null,
-        reveal: null,
-        pause: null,
-        sabotage: null,
-        winners: [],
-        updatedAtMs: nowMs()
-      });
-
-      // reset players + delete answers
-      const p = await playersRef().get();
-      const batch = db.batch();
-      p.docs.forEach(doc => {
-        batch.update(doc.ref, {
-          score: 0,
-          streak: 0,
-          rewardPending: false,
-          rewardEarnedAtQuestionIndex: null,
-          lastAnswer: null,
-          cheatLeft: 1,
-          helpLeft: 3
-        });
-      });
-      const a = await answersRef().get();
-      a.docs.forEach(doc => batch.delete(doc.ref));
-      await batch.commit();
+    async function createRoom(){
+      roomId = randomCode(4);
+      await roomRef().set(baseRoomState(roomId));
+      localStorage.setItem("KIA_LAST_ROOM_HOST", roomId);
+      renderQRCode();
+      listenLive();
+      setToast($("hostToast"), "Room created. Players can join now.");
     }
 
     async function startGame(){
-      const pSnap = await playersRef().get();
-      if(pSnap.empty){
+      if(!roomId) return;
+      if(latestPlayers.length === 0){
         setToast($("hostToast"), "At least 1 player must join.");
         return;
       }
@@ -437,30 +383,32 @@ let latestPlayers = [];
       });
     }
 
-    async function reveal(){
+    async function revealNow(){
+      if(!roomId) return;
       const roomSnap = await roomRef().get();
+      if(!roomSnap.exists) return;
+
       const room = roomSnap.data();
       if(room.status !== "question") return;
 
       const qIdx = room.questionIndex;
       const correctIndex = room.currentQuestion.correctIndex;
 
-      // read all answers
       const aSnap = await answersRef().where("questionIndex", "==", qIdx).get();
       const ansMap = new Map();
       aSnap.docs.forEach(d => ansMap.set(d.data().uid, d.data()));
 
-      // read players
       const pSnap = await playersRef().get();
       const players = pSnap.docs.map(d => ({ id:d.id, ref:d.ref, ...d.data() }));
 
       let pause = null;
 
-      // score + streak
       const batch = db.batch();
+
       players.forEach(p => {
         const ans = ansMap.get(p.id);
-        let isCorrect = false, points = 0;
+        let isCorrect = false;
+        let points = 0;
 
         if(ans && typeof ans.choiceIndex === "number"){
           isCorrect = ans.choiceIndex === correctIndex;
@@ -468,26 +416,25 @@ let latestPlayers = [];
           if(isCorrect) points = calcPoints(remaining);
         }
 
-        let streak = isCorrect ? (p.streak||0) + 1 : 0;
-        let score = (p.score||0) + (isCorrect ? points : 0);
+        const newScore = (p.score || 0) + (isCorrect ? points : 0);
+        const newStreak = isCorrect ? (p.streak || 0) + 1 : 0;
 
-        const rewardPending = (p.rewardPending === true);
-        let newRewardPending = rewardPending;
-        let newRewardEarnedAt = p.rewardEarnedAtQuestionIndex ?? null;
+        let rewardPending = (p.rewardPending === true);
+        let rewardEarnedAt = p.rewardEarnedAtQuestionIndex ?? null;
 
-        if(streak === 5 && !rewardPending){
-          newRewardPending = true;
-          newRewardEarnedAt = qIdx;
+        if(newStreak === 5 && !rewardPending){
+          rewardPending = true;
+          rewardEarnedAt = qIdx;
           if(!pause){
             pause = { type:"streak", playerId:p.id, playerName:p.name, earnedAtQuestionIndex:qIdx };
           }
         }
 
         batch.update(p.ref, {
-          score,
-          streak,
-          rewardPending: newRewardPending,
-          rewardEarnedAtQuestionIndex: newRewardEarnedAt,
+          score: newScore,
+          streak: newStreak,
+          rewardPending,
+          rewardEarnedAtQuestionIndex: rewardEarnedAt,
           lastAnswer: {
             questionIndex: qIdx,
             choiceIndex: ans ? ans.choiceIndex : null,
@@ -509,13 +456,17 @@ let latestPlayers = [];
     }
 
     async function nextQuestion(){
-      const roomSnap = await roomRef().get();
-      const room = roomSnap.data();
+      if(!roomId) return;
+      const snap = await roomRef().get();
+      if(!snap.exists) return;
+      const room = snap.data();
+
       if(room.status !== "reveal") return;
       if(room.pause){
         setToast($("pauseToast"), `GAME PAUSED: ${room.pause.playerName} must Claim or Sabotage.`);
         return;
       }
+
       const next = room.questionIndex + 1;
       if(next >= QUESTIONS.length){
         await finishGame();
@@ -526,10 +477,11 @@ let latestPlayers = [];
 
     async function finishGame(){
       const pSnap = await playersRef().get();
-      const players = pSnap.docs.map(d => ({ id:d.id, ...d.data() }));
-      players.sort((a,b)=> (b.score-a.score) || a.name.localeCompare(b.name));
-      const topScore = players.length ? players[0].score : 0;
-      const winners = players.filter(p=>p.score===topScore).map(p=>p.id);
+      const players = pSnap.docs.map(d => ({ id:d.id, ...d.data() }))
+        .sort((a,b) => (b.score - a.score) || (a.name || "").localeCompare(b.name || ""));
+
+      const topScore = players.length ? (players[0].score || 0) : 0;
+      const winners = players.filter(p => (p.score||0) === topScore).map(p => p.id);
 
       await roomRef().update({
         status: "final",
@@ -542,19 +494,54 @@ let latestPlayers = [];
       });
     }
 
-    function render(room, players){
-      // lobby/qr
-      if(roomId){
-        $("roomCode").textContent = roomId;
-        show($("qrArea"), true);
-        $("btnReset").disabled = room.status !== "lobby";
-        $("btnStart").disabled = (players.length === 0) || room.status !== "lobby";
-      }else{
-        $("roomCode").textContent = "----";
-        show($("qrArea"), false);
-      }
+    async function resetGame(){
+      if(!roomId) return;
 
-      // players list
+      // reset room
+      await roomRef().update({
+        status: "lobby",
+        questionIndex: 0,
+        questionEndsAt: 0,
+        currentQuestion: null,
+        reveal: null,
+        pause: null,
+        sabotage: null,
+        winners: [],
+        updatedAtMs: nowMs()
+      });
+
+      // reset players
+      const pSnap = await playersRef().get();
+      const batch = db.batch();
+      pSnap.docs.forEach(doc => {
+        batch.update(doc.ref, {
+          score: 0,
+          streak: 0,
+          rewardPending: false,
+          rewardEarnedAtQuestionIndex: null,
+          lastAnswer: null,
+          cheatLeft: 1,
+          helpLeft: 3
+        });
+      });
+
+      // delete answers (may be 0..lots)
+      const aSnap = await answersRef().get();
+      aSnap.docs.forEach(doc => batch.delete(doc.ref));
+
+      await batch.commit();
+    }
+
+    function render(room, players){
+      // Top/lobby buttons
+      show($("lobby"), room.status === "lobby");
+      show($("question"), room.status === "question" || room.status === "reveal");
+      show($("final"), room.status === "final");
+
+      $("btnReset").disabled = room.status !== "lobby";
+      $("btnStart").disabled = (players.length === 0) || room.status !== "lobby";
+
+      // Players list
       const ul = $("playersList");
       ul.innerHTML = "";
       if(players.length === 0){
@@ -562,51 +549,44 @@ let latestPlayers = [];
       }else{
         players.forEach((p,i)=>{
           const li = document.createElement("li");
-          li.innerHTML = `<div class="nameRow"><span class="rank mono">${i+1}</span><strong>${p.name}</strong></div><span class="mono">${p.score||0}</span>`;
+          li.innerHTML = `<div class="nameRow"><span class="rank mono">${i+1}</span><strong>${p.name || "Player"}</strong></div><span class="mono">${p.score||0}</span>`;
           ul.appendChild(li);
         });
       }
 
-      // show correct section
-      show($("lobby"), room.status === "lobby");
-      show($("question"), room.status === "question" || room.status === "reveal");
-      show($("final"), room.status === "final");
-
       if(room.status === "question" || room.status === "reveal"){
+        $("phaseBadge").textContent = room.status === "question" ? "Host • Question" : "Host • Reveal";
         $("qText").textContent = room.currentQuestion?.text || "Question";
 
-        // timer UI
         if(timerUI) clearInterval(timerUI);
-        timerUI = setInterval(()=>{
+        timerUI = setInterval(() => {
           $("timer").textContent = String(fmtTimeLeft(room.questionEndsAt));
         }, 150);
 
-        // answers UI
         $("answers").innerHTML = "";
         const q = room.currentQuestion;
         if(q){
-          q.options.forEach((opt, idx)=>{
-            const b = document.createElement("div");
-            b.className = "answer";
-            b.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
+          q.options.forEach((opt, idx) => {
+            const div = document.createElement("div");
+            div.className = "answer";
+            div.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
             if(room.status === "reveal" && room.reveal && idx === room.reveal.correctIndex){
-              b.classList.add("correct");
+              div.classList.add("correct");
             }
-            $("answers").appendChild(b);
+            $("answers").appendChild(div);
           });
         }
 
-        // leaderboard
         const lb = $("leaderboard");
         lb.innerHTML = "";
-        players.sort((a,b)=> (b.score-a.score) || a.name.localeCompare(b.name));
-        players.forEach((p,i)=>{
-          const li = document.createElement("li");
-          li.innerHTML = `<div class="nameRow"><span class="rank mono">${i+1}</span><strong>${p.name}</strong><span class="small mono" style="opacity:.75">streak ${p.streak||0}</span></div><span class="mono">${p.score||0}</span>`;
-          lb.appendChild(li);
-        });
+        const sorted = players.slice().sort((a,b)=> (b.score-b.score) || (a.name||"").localeCompare(b.name||""));
+        players.slice().sort((a,b)=> (b.score-a.score) || (a.name||"").localeCompare(b.name||""))
+          .forEach((p,i)=>{
+            const li = document.createElement("li");
+            li.innerHTML = `<div class="nameRow"><span class="rank mono">${i+1}</span><strong>${p.name}</strong><span class="small mono" style="opacity:.75">streak ${p.streak||0}</span></div><span class="mono">${p.score||0}</span>`;
+            lb.appendChild(li);
+          });
 
-        $("phaseBadge").textContent = room.status === "question" ? "Host • Question" : "Host • Reveal";
         $("btnReveal").disabled = room.status !== "question";
         $("btnNext").disabled = room.status !== "reveal" || !!room.pause;
 
@@ -625,32 +605,27 @@ let latestPlayers = [];
 
       if(room.status === "final"){
         const winners = room.winners || [];
-        const names = winners.map(id => (players.find(p=>p.id===id)?.name)).filter(Boolean);
-        const topScore = names.length ? (players.find(p=>p.id===winners[0])?.score||0) : 0;
-        $("finalSub").textContent = names.length
-          ? `${names.join(" & ")} • ${topScore} points`
-          : "No players found.";
+        const names = winners.map(id => players.find(p=>p.id===id)?.name).filter(Boolean);
+        const topScore = winners.length ? (players.find(p=>p.id===winners[0])?.score||0) : 0;
+        $("finalSub").textContent = names.length ? `${names.join(" & ")} • ${topScore} points` : "No players found.";
       }
     }
 
-    // Auto reveal when timer ends
-    setInterval(async ()=>{
-      if(!roomId) return;
-      const snap = await roomRef().get();
-      if(!snap.exists) return;
-      const room = snap.data();
-      if(room.status === "question" && fmtTimeLeft(room.questionEndsAt) <= 0){
-        await reveal();
+    // Auto reveal when timer hits 0 (host only)
+    setInterval(async () => {
+      if(!roomId || !latestRoom) return;
+      if(latestRoom.status === "question" && fmtTimeLeft(latestRoom.questionEndsAt) <= 0){
+        await revealNow();
       }
     }, 500);
 
-    /************** UI WIRING **************/
+    /************** UI **************/
     $("btnCreate").onclick = createRoom;
     $("btnStart").onclick = startGame;
     $("btnReset").onclick = resetGame;
     $("btnResetFromQ").onclick = resetGame;
     $("btnResetFinal").onclick = resetGame;
-    $("btnReveal").onclick = reveal;
+    $("btnReveal").onclick = revealNow;
     $("btnNext").onclick = nextQuestion;
 
     $("btnCopy").onclick = async () => {
@@ -658,37 +633,31 @@ let latestPlayers = [];
         await navigator.clipboard.writeText(joinLink);
         setToast($("hostToast"), "Join link copied!");
       }catch{
-        setToast($("hostToast"), "Could not copy. Select the link and copy manually.");
+        setToast($("hostToast"), "Could not copy. Copy manually from the link.");
       }
     };
     $("btnOpen").onclick = () => window.open(joinLink, "_blank");
 
-    $("btnHardReset").onclick = async () => {
-      if(!roomId) return;
-      // delete room doc + subcollections (basic way: just create a new room; real deletion needs functions)
-      setToast($("hostToast"), "Tip: Use Create Room again for a fresh code. (Full delete can be added later.)");
+    $("btnForgetRoom").onclick = () => {
+      localStorage.removeItem("KIA_LAST_ROOM_HOST");
+      location.reload();
     };
 
+    /************** Init **************/
     (async function init(){
-      await signIn();
-      // If host refreshes, keep last room if stored
+      await signInHost();
+
       const last = localStorage.getItem("KIA_LAST_ROOM_HOST");
       if(last){
-        const s = await db.collection("rooms").doc(last).get();
-        if(s.exists){
+        const snap = await db.collection("rooms").doc(last).get();
+        if(snap.exists){
           roomId = last;
-          listenRoom();
           renderQRCode();
+          listenLive();
+          setToast($("hostToast"), "Restored last room.");
         }
       }
     })();
-
-    // store last room when created
-    const _createRoom = createRoom;
-    createRoom = async function(){
-      await _createRoom();
-      localStorage.setItem("KIA_LAST_ROOM_HOST", roomId);
-    }
   </script>
 </body>
 </html>
