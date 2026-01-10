@@ -272,6 +272,11 @@
     let hostUid = null;
     let roomId = null;
     let unsubRoom = null;
+    let unsubPlayers = null;
+
+let latestRoom = null;
+let latestPlayers = [];
+
     let timerUI = null;
     let qrObj = null;
     let joinLink = "";
@@ -332,11 +337,37 @@
       $("hint").textContent = "Players scan the QR or use the join link.";
     }
 
-    function listenRoom(){
-      if(unsubRoom) unsubRoom();
-      unsubRoom = roomRef().onSnapshot(async (snap) => {
-        if(!snap.exists) return;
-        const room = snap.data();
+   function listenRoom(){
+  // stop old listeners
+  if(unsubRoom) unsubRoom();
+  if(unsubPlayers) unsubPlayers();
+
+  // listen to ROOM document
+  unsubRoom = roomRef().onSnapshot((snap) => {
+    if(!snap.exists) return;
+    latestRoom = snap.data();
+    render(latestRoom, latestPlayers);
+  }, (err) => {
+    console.error("Room listener error:", err);
+  });
+
+  // 🔥 listen to PLAYERS subcollection live
+  unsubPlayers = playersRef().onSnapshot((snap) => {
+    latestPlayers = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) =>
+        (b.score - a.score) ||
+        (a.name || "").localeCompare(b.name || "")
+      );
+
+    if(latestRoom){
+      render(latestRoom, latestPlayers);
+    }
+  }, (err) => {
+    console.error("Players listener error:", err);
+  });
+}
+
 
         // players list
         const pSnap = await playersRef().get();
