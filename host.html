@@ -296,11 +296,9 @@
         currentQuestion: null,
         reveal: null,
 
-        // NEW: pause contains pending streak decisions
-        // pause: { type:"streak", pendingPlayerIds:[uid,uid], earnedAtQuestionIndex:number }
+        // pause: { type:"streak", pendingPlayerIds:[uid,...], earnedAtQuestionIndex:number }
         pause: null,
 
-        // NEW: sabotage supports multiple blocks for next question
         // sabotage: { activeForQuestionIndex:number, blocks:[{targetPlayerId, byName}] }
         sabotage: null,
 
@@ -363,14 +361,11 @@
     async function startQuestion(qIdx){
       const q = QUESTIONS[qIdx];
 
-      // Clear sabotage when moving to a new question (unless it applies to this qIdx)
-      // Keep sabotage only if sabotage.activeForQuestionIndex === qIdx
+      // keep sabotage only if it applies to this qIdx
       const snap = await roomRef().get();
       const room = snap.data();
-      let sabotage = room.sabotage || null;
-      if(!sabotage || sabotage.activeForQuestionIndex !== qIdx){
-        sabotage = null;
-      }
+      let sabotage = room?.sabotage || null;
+      if(!sabotage || sabotage.activeForQuestionIndex !== qIdx) sabotage = null;
 
       await roomRef().update({
         status: "question",
@@ -403,7 +398,6 @@
       const players = pSnap.docs.map(d => ({ id:d.id, ref:d.ref, ...d.data() }));
 
       const pendingStreakIds = [];
-
       const batch = db.batch();
 
       players.forEach(p => {
@@ -423,7 +417,6 @@
         let rewardPending = (p.rewardPending === true);
         let rewardEarnedAt = p.rewardEarnedAtQuestionIndex ?? null;
 
-        // NEW: collect all players who hit 5-streak this reveal
         if(newStreak === 5 && !rewardPending){
           rewardPending = true;
           rewardEarnedAt = qIdx;
@@ -464,11 +457,9 @@
       const snap = await roomRef().get();
       if(!snap.exists) return;
       const room = snap.data();
-
       if(room.status !== "reveal") return;
 
-      // NEW: must wait until ALL pending streak players finish decisions
-      if(room.pause && room.pause.type==="streak" && (room.pause.pendingPlayerIds||[]).length > 0){
+      if(room.pause && room.pause.type==="streak" && (room.pause.pendingPlayerIds||[]).length>0){
         setToast($("pauseToast"), `GAME PAUSED: waiting for ${room.pause.pendingPlayerIds.length} streak decision(s).`);
         return;
       }
@@ -544,7 +535,7 @@
       $("btnReset").disabled = room.status !== "lobby";
       $("btnStart").disabled = (players.length === 0) || room.status !== "lobby";
 
-      // players list
+      // players joined list
       const ul = $("playersList");
       ul.innerHTML = "";
       if(players.length === 0){
@@ -590,16 +581,17 @@
           });
 
         $("btnReveal").disabled = room.status !== "question";
-        $("btnNext").disabled = room.status !== "reveal" || (room.pause && (room.pause.pendingPlayerIds||[]).length>0);
+        const pendingCount = (room.pause?.pendingPlayerIds||[]).length;
+        $("btnNext").disabled = room.status !== "reveal" || pendingCount > 0;
 
         if(room.status === "reveal" && room.reveal){
-          setToast($("revealToast"), `Correct answer: ${labelAnswer(room.reveal.correctIndex)} • ${room.pause ? "Paused…" : "Click Next Question."}`);
+          setToast($("revealToast"), `Correct answer: ${labelAnswer(room.reveal.correctIndex)} • ${pendingCount>0 ? "Paused…" : "Click Next Question."}`);
         }else{
           setToast($("revealToast"), "");
         }
 
-        if(room.pause && room.pause.type==="streak" && (room.pause.pendingPlayerIds||[]).length>0){
-          setToast($("pauseToast"), `GAME PAUSED: waiting for ${room.pause.pendingPlayerIds.length} streak decision(s).`);
+        if(pendingCount > 0){
+          setToast($("pauseToast"), `GAME PAUSED: waiting for ${pendingCount} streak decision(s).`);
         }else{
           setToast($("pauseToast"), "");
         }
@@ -621,13 +613,13 @@
       }
     }, 500);
 
-    $("btnCreate").onclick = createRoom;
-    $("btnStart").onclick = startGame;
-    $("btnReset").onclick = resetGame;
-    $("btnResetFromQ").onclick = resetGame;
-    $("btnResetFinal").onclick = resetGame;
-    $("btnReveal").onclick = revealNow;
-    $("btnNext").onclick = nextQuestion;
+    $("btnCreate").onclick = () => createRoom();
+    $("btnStart").onclick = () => startGame();
+    $("btnReset").onclick = () => resetGame();
+    $("btnResetFromQ").onclick = () => resetGame();
+    $("btnResetFinal").onclick = () => resetGame();
+    $("btnReveal").onclick = () => revealNow();
+    $("btnNext").onclick = () => nextQuestion();
 
     $("btnCopy").onclick = async () => {
       try{ await navigator.clipboard.writeText(joinLink); setToast($("hostToast"), "Join link copied!"); }
@@ -652,7 +644,7 @@
           setToast($("hostToast"), "Restored last room.");
         }
       }
-  
+    })();
   </script>
 </body>
 </html>
