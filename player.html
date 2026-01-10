@@ -249,16 +249,20 @@
     </div>
   </div>
 
-  <!-- Reveal Modal -->
+  <!-- Reveal Modal (everyone sees this on reveal) -->
   <div class="modal" id="revealModal">
     <div class="modalCard">
       <div class="modalTop">
         <div class="modalTitle">Reveal • Leaderboard</div>
         <div class="badge mono" id="revealRoomMini">----</div>
       </div>
+
       <div class="toast" id="revealResultToast" style="display:none;"></div>
       <div class="lb" id="revealLB"></div>
-      <div class="small" style="margin-top:10px; opacity:.85;">Host will start the next question…</div>
+
+      <div class="small" style="margin-top:10px; opacity:.85;" id="revealHint">
+        Host will start the next question…
+      </div>
     </div>
   </div>
 
@@ -275,6 +279,7 @@
   </div>
 
   <script>
+    /************** FIREBASE **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
       authDomain: "knowitall-a47a1.firebaseapp.com",
@@ -300,12 +305,12 @@
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
     function modalOn(id, on){
       const m = $(id);
-      if(on) m.classList.add("on"); else m.classList.remove("on");
+      if(on) m.classList.add("on");
+      else m.classList.remove("on");
     }
 
     let uid = null;
     let joined = false;
-
     let roomId = (qparam("room") || "").toUpperCase();
 
     let unsubRoom = null;
@@ -316,8 +321,13 @@
 
     let timerUI = null;
 
-    const localHelpRemoved = new Map();   // key `${room}|${qIdx}` -> [idx,idx]
-    const localSelected = new Map();      // key `${room}|${qIdx}` -> idx
+    // local per-question UI state
+    const localHelpRemoved = new Map();   // `${room}|${qIdx}` -> [idx, idx]
+    const localSelected = new Map();      // `${room}|${qIdx}` -> idx
+
+    // reveal auto-close for streak players
+    let revealAutoCloseTimer = null;
+    let revealAutoCloseForQ = null;
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
     function playersRef(){ return roomRef().collection("players"); }
@@ -406,7 +416,7 @@
 
       const key = keyForRoomQ(latestRoom);
 
-      // LOCK: once chosen, can't change
+      // LOCK selection (can’t change)
       if(localSelected.has(key)) return;
 
       localSelected.set(key, choiceIndex);
@@ -459,7 +469,6 @@
       const me = meSnap.data();
       if(!isPendingStreakDecision(latestRoom, me)) return;
 
-      // ensure list exists even if snapshot lagged
       if(!latestPlayers || latestPlayers.length === 0){
         const pSnap = await playersRef().get();
         latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
@@ -510,6 +519,7 @@
 
         const pending = (room.pause?.pendingPlayerIds || []).slice();
         if(!pending.includes(uid)) return;
+
         const newPending = pending.filter(x => x !== uid);
 
         const nextQ = room.questionIndex + 1;
@@ -548,8 +558,7 @@
       const me = meSnap.data();
 
       const key = keyForRoomQ(latestRoom);
-      if(localSelected.has(key)) return; // can't after selecting
-
+      if(localSelected.has(key)) return;
       if(me.rewardPending) return;
       if((me.cheatLeft||0) <= 0) return;
 
@@ -557,7 +566,6 @@
 
       const correctIndex = latestRoom.currentQuestion.correctIndex;
 
-      // lock selection immediately
       localSelected.set(key, correctIndex);
       renderAnswers();
 
@@ -575,7 +583,7 @@
       const me = meSnap.data();
 
       const key = keyForRoomQ(latestRoom);
-      if(localSelected.has(key)) return; // can't after selecting
+      if(localSelected.has(key)) return;
       if(me.rewardPending) return;
       if((me.helpLeft||0) <= 0) return;
       if(localHelpRemoved.has(key)) return;
@@ -590,7 +598,7 @@
 
       await playersRef().doc(uid).update({ helpLeft: (me.helpLeft||0) - 1 });
 
-      // immediate visual change
+      // immediate red-out
       renderAnswers();
       setToast($("playToast"), "HELP used.");
     }
@@ -658,6 +666,33 @@
       }
     }
 
+    function clearRevealAutoClose(){
+      if(revealAutoCloseTimer){
+        clearTimeout(revealAutoCloseTimer);
+        revealAutoCloseTimer = null;
+      }
+      revealAutoCloseForQ = null;
+    }
+
+    function maybeAutoCloseReveal(room, pendingForMe){
+      // Only for streak decision players, only once per reveal question
+      if(!pendingForMe) { clearRevealAutoClose(); return; }
+      if(room.status !== "reveal") { clearRevealAutoClose(); return; }
+
+      if(revealAutoCloseForQ === room.questionIndex) return; // already scheduled
+      revealAutoCloseForQ = room.questionIndex;
+
+      $("revealHint").textContent = "You unlocked a 5-streak! Closing in 3 seconds so you can choose Claim or Sabotage…";
+
+      clearRevealAutoClose();
+      revealAutoCloseTimer = setTimeout(() => {
+        // only close if still in reveal
+        if(latestRoom && latestRoom.status === "reveal" && latestRoom.questionIndex === room.questionIndex){
+          modalOn("revealModal", false);
+        }
+      }, 3000);
+    }
+
     function listenLive(){
       if(unsubRoom) unsubRoom();
       if(unsubPlayers) unsubPlayers();
@@ -700,7 +735,7 @@
           setToast($("blockedToast"), "", "bad");
         }
 
-        // me info
+        // get me (fresh)
         const meSnap = await playersRef().doc(uid).get();
         const me = meSnap.exists ? meSnap.data() : null;
 
@@ -712,6 +747,7 @@
         }
 
         const pendingForMe = isPendingStreakDecision(latestRoom, me);
+
         $("btnClaim").disabled = !pendingForMe;
         $("btnSabotage").disabled = !pendingForMe;
 
@@ -726,23 +762,30 @@
 
         renderAnswers();
 
-        // reveal popup for everyone
+        // Reveal popup for everyone
         if(joined && latestRoom.status === "reveal"){
           modalOn("revealModal", true);
+
+          // ensure players loaded at least once
           if(!latestPlayers || latestPlayers.length === 0){
             const pSnap = await playersRef().get();
             latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
           }
           renderRevealLeaderboard(me);
 
-          setToast($("playToast"), pendingForMe ? "5-streak unlocked! Claim +20 or Sabotage." : "Waiting for next question…");
+          // NEW: auto-close reveal after 3s if you need to choose claim/sabotage
+          maybeAutoCloseReveal(latestRoom, pendingForMe);
+
+          setToast($("playToast"), pendingForMe ? "5-streak unlocked! Use Claim or Sabotage." : "Waiting for next question…");
         }else{
           modalOn("revealModal", false);
           modalOn("sabotageModal", false);
           setToast($("playToast"), "");
+          clearRevealAutoClose();
+          $("revealHint").textContent = "Host will start the next question…";
         }
 
-        // final screen
+        // final
         if(latestRoom.status === "final" && me){
           const winners = latestRoom.winners || [];
           const isWinner = winners.includes(uid);
