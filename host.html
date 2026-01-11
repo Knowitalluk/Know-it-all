@@ -4,16 +4,15 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Know It All? — Host</title>
+
   <style>
     :root{
       --bg:#070707;
       --panel:#0e0e0e;
-      --panel2:#111;
       --border:#232323;
       --text:#f3f3f3;
       --muted:#bdbdbd;
       --orange:#ff7a18;
-      --orange2:#ff9a3d;
       --good:#29d17d;
       --bad:#ff4b4b;
       --shadow: 0 20px 60px rgba(0,0,0,.45);
@@ -21,46 +20,57 @@
     }
     *{box-sizing:border-box}
     body{
-      margin:0; background:radial-gradient(1200px 700px at 30% -10%, rgba(255,122,24,.18), transparent 60%),
-               radial-gradient(900px 600px at 90% 0%, rgba(255,122,24,.10), transparent 65%),
-               var(--bg);
+      margin:0;
+      background:
+        radial-gradient(1200px 700px at 30% -10%, rgba(255,122,24,.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(255,122,24,.10), transparent 65%),
+        var(--bg);
       color:var(--text);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       min-height:100vh;
     }
-    .wrap{max-width:1200px;margin:0 auto;padding:18px 16px 30px}
+
+    .wrap{
+      max-width: 1920px;
+      margin:0 auto;
+      padding: 14px 14px 22px;
+    }
+
     .topbar{
       display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:10px 12px;border:1px solid var(--border);border-radius:18px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:18px;
       background:linear-gradient(180deg, rgba(17,17,17,.85), rgba(10,10,10,.65));
       box-shadow:var(--shadow);
-      position:sticky; top:12px; z-index:10; backdrop-filter: blur(10px);
+      position:sticky; top:12px; z-index:10;
+      backdrop-filter: blur(10px);
     }
-    .brand{
-      display:flex;align-items:center;gap:12px;
-      font-weight:900; letter-spacing:.5px;
-    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:950}
     .logo{
       width:40px;height:40px;border-radius:14px;
-      background: radial-gradient(circle at 30% 30%, rgba(255,154,61,.9), rgba(255,122,24,.35) 40%, rgba(0,0,0,.5) 75%),
-                  linear-gradient(180deg, rgba(255,122,24,.25), rgba(255,122,24,.06));
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,154,61,.9), rgba(255,122,24,.35) 40%, rgba(0,0,0,.5) 75%),
+        linear-gradient(180deg, rgba(255,122,24,.25), rgba(255,122,24,.06));
       border:1px solid rgba(255,122,24,.35);
       box-shadow: 0 12px 30px rgba(255,122,24,.12);
     }
     .brand .t1{font-size:18px}
     .brand .t2{font-size:12px;color:var(--muted);font-weight:700;margin-top:-2px}
+
     .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
     .pill{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 12px;border-radius:999px;border:1px solid var(--border);
-      background:rgba(10,10,10,.6); color:var(--muted); font-weight:800;
+      background:rgba(10,10,10,.6); color:var(--muted); font-weight:900;
     }
+
     .btn{
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(20,20,20,.9), rgba(10,10,10,.85));
       color:var(--text);
       padding:10px 14px;border-radius:14px;
-      font-weight:900; cursor:pointer;
+      font-weight:950; cursor:pointer;
       box-shadow: 0 10px 30px rgba(0,0,0,.3);
       transition: transform .08s ease, filter .12s ease, border-color .12s ease;
       user-select:none;
@@ -77,11 +87,19 @@
       background: linear-gradient(180deg, rgba(255,75,75,.20), rgba(10,10,10,.88));
     }
     .btn:disabled{opacity:.45;cursor:not-allowed;filter:saturate(.6)}
-    .grid{
-      display:grid;gap:14px;margin-top:14px;
-      grid-template-columns: 420px 1fr;
+
+    /* 1080p host layout: left main + right always-leaderboard */
+    .layout{
+      display:grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap:14px;
+      margin-top:14px;
+      align-items:start;
     }
-    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    @media(max-width:1100px){
+      .layout{grid-template-columns:1fr}
+    }
+
     .card{
       border:1px solid var(--border);
       border-radius: var(--radius);
@@ -91,22 +109,9 @@
     }
     .card h2{margin:6px 0 10px;font-size:16px}
     .muted{color:var(--muted)}
-    .divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
-    .qrWrap{
-      display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;
-    }
-    #qr{
-      width:188px;height:188px;
-      border-radius:18px;
-      background:#fff;
-      padding:10px;
-      border:2px solid rgba(255,122,24,.85); /* border to help scanning */
-      box-shadow: 0 12px 35px rgba(255,122,24,.18);
-      overflow:hidden;
-    }
     .small{font-size:12px}
+    .divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .row > *{flex: 1 1 auto}
     input, select{
       width:100%;
       padding:11px 12px;border-radius:14px;
@@ -114,78 +119,54 @@
       background:rgba(8,8,8,.65);
       color:var(--text);
       outline:none;
-      font-weight:800;
+      font-weight:900;
     }
 
-    /* Game view */
-    .qTitle{
-      font-size:22px;font-weight:950;letter-spacing:.3px;line-height:1.25;margin:8px 0 10px;
+    /* QR block */
+    .qrWrap{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+    #qr{
+      width:188px;height:188px;border-radius:18px;background:#fff;padding:10px;
+      border:2px solid rgba(255,122,24,.85);
+      box-shadow: 0 12px 35px rgba(255,122,24,.18);
+      overflow:hidden;
     }
+
+    /* Game panel */
+    .qTitle{font-size:22px;font-weight:950;letter-spacing:.3px;line-height:1.25;margin:8px 0 10px}
     .answers{display:grid;gap:10px;grid-template-columns:1fr 1fr}
     @media(max-width:720px){.answers{grid-template-columns:1fr}}
     .ansBtn{
-      text-align:left;
-      border-radius:16px;
-      padding:12px 12px;
+      text-align:left;border-radius:16px;padding:12px 12px;
       border:1px solid var(--border);
       background: linear-gradient(180deg, rgba(16,16,16,.85), rgba(8,8,8,.8));
-      cursor:default;
-      font-weight:900;
-      color:var(--text);
-      position:relative;
+      font-weight:950;color:var(--text);
       min-height:50px;
+      opacity:.95;
     }
     .ansBtn.correct{
       border-color: rgba(41,209,125,.35);
       background: linear-gradient(180deg, rgba(41,209,125,.18), rgba(8,8,8,.85));
     }
-    .ansBtn.wrong{
-      opacity:.6;
-    }
-    .timerBig{
-      font-size:28px;font-weight:950;color:var(--orange);letter-spacing:1px;
-    }
+    .ansBtn.wrong{opacity:.55}
+
+    .timerBig{font-size:28px;font-weight:950;color:var(--orange);letter-spacing:1px}
     .hostControls{display:flex;gap:10px;flex-wrap:wrap}
     .hostControls .btn{flex:1 1 160px}
 
-    /* Players list */
-    .plist{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto;padding-right:6px}
+    /* Players list / leaderboard */
+    .plist{display:flex;flex-direction:column;gap:8px;max-height: calc(100vh - 210px); overflow:auto; padding-right:6px}
     .pitem{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       padding:10px 12px;border-radius:16px;
       border:1px solid rgba(255,255,255,.06);
       background:rgba(10,10,10,.5);
     }
-    .pname{font-weight:900}
+    .pname{font-weight:950}
     .psub{font-size:12px;color:var(--muted);font-weight:800}
-    .pscore{font-weight:950;color:var(--orange)}
-    .tag{font-size:12px;font-weight:900;color:#000;background:var(--orange);padding:4px 8px;border-radius:999px}
+    .pscore{font-weight:980;color:var(--orange)}
+    .tag{font-size:12px;font-weight:950;color:#000;background:var(--orange);padding:4px 8px;border-radius:999px}
     .tag.bad{background:var(--bad); color:#fff}
     .tag.good{background:var(--good); color:#000}
-
-    /* Modals */
-    .modalBack{
-      position:fixed;inset:0;background:rgba(0,0,0,.6);
-      display:none;align-items:center;justify-content:center;z-index:999;
-      padding:18px;
-    }
-    .modal{
-      width:min(720px, 100%);
-      border-radius:22px;
-      border:1px solid rgba(255,122,24,.35);
-      background: linear-gradient(180deg, rgba(16,16,16,.92), rgba(8,8,8,.90));
-      box-shadow: 0 25px 80px rgba(0,0,0,.6);
-      padding:14px;
-    }
-    .modal h3{margin:6px 0 6px;font-size:18px}
-    .modal .modalTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .modal .close{width:auto}
-    .lbTable{width:100%;border-collapse:collapse;margin-top:8px}
-    .lbTable th,.lbTable td{padding:10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
-    .lbTable th{color:var(--muted);font-size:12px;letter-spacing:.5px}
-    .note{
-      margin-top:10px;color:var(--muted);font-weight:800;font-size:12px;line-height:1.45
-    }
 
     /* Rules floating button */
     .rulesBtn{
@@ -193,11 +174,29 @@
       border-radius:999px;padding:10px 14px;
       background:linear-gradient(180deg, rgba(255,122,24,.25), rgba(10,10,10,.85));
       border:1px solid rgba(255,122,24,.45);
-      font-weight:950;cursor:pointer;
+      font-weight:980;cursor:pointer;
       box-shadow: 0 14px 44px rgba(255,122,24,.12);
     }
+
+    /* Modal */
+    .modalBack{
+      position:fixed;inset:0;background:rgba(0,0,0,.6);
+      display:none;align-items:center;justify-content:center;z-index:999;
+      padding:18px;
+    }
+    .modal{
+      width:min(740px, 100%);
+      border-radius:22px;
+      border:1px solid rgba(255,122,24,.35);
+      background: linear-gradient(180deg, rgba(16,16,16,.92), rgba(8,8,8,.90));
+      box-shadow: 0 25px 80px rgba(0,0,0,.6);
+      padding:14px;
+    }
+    .modal .modalTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .note{margin-top:10px;color:var(--muted);font-weight:850;font-size:12px;line-height:1.45}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="topbar">
@@ -209,21 +208,21 @@
         </div>
       </div>
       <div class="actions">
-        <span class="pill" id="roomPill">Room: <b id="roomCode">—</b></span>
+        <span class="pill">Room: <b id="roomCode">—</b></span>
         <span class="pill">Players: <b id="playerCount">0</b></span>
-        <button class="btn" id="btnOpenLeaderboard">Leaderboard</button>
         <button class="btn danger" id="btnResetAll" disabled>Reset Game</button>
       </div>
     </div>
 
-    <div class="grid">
-      <div class="card" id="lobbyCard">
+    <div class="layout">
+      <!-- LEFT: Main host content -->
+      <div class="card">
         <h2>Startup</h2>
         <div class="muted small">Create a room, share the QR/link, then start.</div>
         <div class="divider"></div>
 
         <div class="row">
-          <div>
+          <div style="flex:1;min-width:220px">
             <label class="small muted">Game length</label>
             <select id="gameLength">
               <option value="50">50 questions</option>
@@ -231,9 +230,9 @@
               <option value="150">150 questions</option>
             </select>
           </div>
-          <div style="max-width:220px">
-            <label class="small muted">Timer per question</label>
-            <input id="qTime" type="text" value="20 seconds" disabled />
+          <div style="flex:1;min-width:220px">
+            <label class="small muted">Room status</label>
+            <input id="roomStatus" value="Not created" disabled/>
           </div>
         </div>
 
@@ -258,70 +257,62 @@
               <button class="btn" id="btnShareMessenger" disabled>Share Messenger</button>
             </div>
             <div class="note">
-              If “Share” doesn’t open an app, just use Copy Link and paste it into WhatsApp / Messenger.
+              If “Share” doesn’t open an app, use Copy Link and paste into WhatsApp / Messenger.
             </div>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <h2>Players Joined</h2>
-        <div class="plist" id="playersList"></div>
+        <!-- GAME PANEL -->
+        <div id="gamePanel" style="display:none">
+          <div class="row" style="justify-content:space-between;align-items:flex-start">
+            <div style="flex:1">
+              <div class="muted small">Question</div>
+              <div class="qTitle" id="qText">—</div>
+            </div>
+            <div style="text-align:right;min-width:160px">
+              <div class="muted small">Timer</div>
+              <div class="timerBig"><span id="timeLeft">20</span>s</div>
+              <div class="muted small">Q <span id="qNum">0</span>/<span id="qTotal">0</span></div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="answers" id="answersHost"></div>
+
+          <div class="divider"></div>
+          <div class="hostControls">
+            <button class="btn orange" id="btnReveal" disabled>Reveal Answer</button>
+            <button class="btn orange" id="btnNext" disabled>Next Question</button>
+            <button class="btn danger" id="btnResetRoom" disabled>Reset Room</button>
+          </div>
+
+          <div class="note">
+            Reveal triggers the leaderboard popup on all phones.
+            If anyone hits a 5-streak perk, the game pauses until they choose Claim or Sabotage.
+          </div>
+        </div>
       </div>
 
-      <div class="card" id="gameCard" style="display:none">
-        <div class="row" style="align-items:flex-start">
-          <div style="flex:1">
-            <div class="muted small">Question</div>
-            <div class="qTitle" id="qText">—</div>
-          </div>
-          <div style="text-align:right;min-width:140px">
-            <div class="muted small">Timer</div>
-            <div class="timerBig"><span id="timeLeft">20</span>s</div>
-            <div class="muted small">Q <span id="qNum">0</span>/<span id="qTotal">0</span></div>
-          </div>
-        </div>
-
+      <!-- RIGHT: Always-on leaderboard -->
+      <div class="card">
+        <h2>Leaderboard (Live)</h2>
+        <div class="muted small">Always visible for the host.</div>
         <div class="divider"></div>
-
-        <div class="answers" id="answersHost"></div>
-
-        <div class="divider"></div>
-
-        <div class="hostControls">
-          <button class="btn orange" id="btnReveal" disabled>Reveal Answer</button>
-          <button class="btn orange" id="btnNext" disabled>Next Question</button>
-          <button class="btn danger" id="btnResetGame" disabled>Reset Room</button>
-        </div>
-
-        <div class="note">
-          Tip: Reveal will show correct answer + trigger leaderboard popup on all phones.
-          If someone earned a 5-streak perk, the game will pause until they choose Claim/Sabotage.
-        </div>
+        <div class="plist" id="playersList"></div>
       </div>
     </div>
   </div>
 
   <button class="rulesBtn" id="btnRules">Rules</button>
 
-  <!-- Leaderboard Modal -->
-  <div class="modalBack" id="lbModalBack">
-    <div class="modal">
-      <div class="modalTop">
-        <h3>Leaderboard</h3>
-        <button class="btn close" id="lbClose">Close</button>
-      </div>
-      <table class="lbTable" id="lbTable"></table>
-      <div class="note">Scores update live. Sabotaged players can’t answer the next question.</div>
-    </div>
-  </div>
-
   <!-- Rules Modal -->
   <div class="modalBack" id="rulesBack">
     <div class="modal">
       <div class="modalTop">
         <h3>Rules & How to Play</h3>
-        <button class="btn close" id="rulesClose">Close</button>
+        <button class="btn" id="rulesClose">Close</button>
       </div>
       <div class="note" style="font-size:13px;line-height:1.55;color:#e9e9e9">
         <b>Know It All?</b> is a fast-paced live quiz for up to <b>20 players</b> per room.<br><br>
@@ -329,26 +320,21 @@
         <b>How it works</b><br>
         1) Host creates a room and shares the QR/link.<br>
         2) Players join with a nickname and wait.<br>
-        3) Each question has <b>20 seconds</b>. Players pick one answer (locked in).<br>
+        3) Each question has <b>20 seconds</b>. Players pick one answer (locked).<br>
         4) Host presses <b>Reveal</b> to show the correct answer and update scores.<br>
-        5) A quick <b>Leaderboard popup</b> appears after each reveal.<br><br>
+        5) A leaderboard popup appears on all phones after each reveal.<br><br>
 
         <b>Points</b><br>
-        • Speed scoring: up to <b>100 points</b> for a correct answer.<br>
-        • Faster answers score higher.<br><br>
+        • Correct answers earn up to <b>100 points</b> depending on speed.<br><br>
 
         <b>Streak Perk (5 correct in a row)</b><br>
-        When a player reaches a 5-correct streak, the game pauses after the reveal until they choose:<br>
-        • <b>Claim +20 points</b> OR<br>
+        When a player reaches a 5-correct streak, the game pauses after reveal until they choose:<br>
+        • <b>Claim +20</b> OR<br>
         • <b>Sabotage</b> one player (they can’t answer the next question).<br><br>
 
-        <b>Power Buttons (Player screen)</b><br>
+        <b>Power Buttons (Players)</b><br>
         • <b>CHEAT</b> (1 use per game): instantly selects the correct answer.<br>
-        • <b>HELP</b> (3 uses per game): removes 2 wrong answers (like 50/50).<br>
-        • <b>CLAIM</b> / <b>SABOTAGE</b> only light up when earned by streak.<br><br>
-
-        <b>Winning</b><br>
-        After the last question, the game shows the winner(s). Host can reset the room.
+        • <b>HELP</b> (3 uses per game): removes 2 wrong answers immediately (50/50).<br><br>
       </div>
     </div>
   </div>
@@ -401,10 +387,7 @@
       }
       return a;
     }
-    function hashSeed(seed, idx){
-      // deterministic per question
-      return (seed * 1000003 + idx * 9176) >>> 0;
-    }
+    function hashSeed(seed, idx){ return (seed * 1000003 + idx * 9176) >>> 0; }
 
     // Fetch 2000 bank (4 files)
     let BANK = null;
@@ -429,7 +412,6 @@
     }
 
     function buildChoices(question, bank, seed, qIndex){
-      // pick 3 decoys from bank answers, avoid duplicates
       const r = mulberry32(hashSeed(seed, qIndex));
       const correct = String(question.answer);
       const pool = bank.filter(q => String(q.answer) !== correct).map(q => String(q.answer));
@@ -439,7 +421,6 @@
         if(cand && cand !== correct) decoys.add(cand);
       }
       const choices = [correct, ...Array.from(decoys).slice(0,3)];
-      // shuffle choices deterministically
       for(let i=choices.length-1;i>0;i--){
         const j = Math.floor(r()*(i+1));
         [choices[i], choices[j]] = [choices[j], choices[i]];
@@ -452,18 +433,17 @@
     const playerCountEl = document.getElementById("playerCount");
     const playersListEl = document.getElementById("playersList");
 
-    const lobbyCard = document.getElementById("lobbyCard");
-    const gameCard = document.getElementById("gameCard");
-
     const btnCreateRoom = document.getElementById("btnCreateRoom");
     const btnStartGame = document.getElementById("btnStartGame");
     const btnReveal = document.getElementById("btnReveal");
     const btnNext = document.getElementById("btnNext");
-    const btnResetGame = document.getElementById("btnResetGame");
+    const btnResetRoom = document.getElementById("btnResetRoom");
     const btnResetAll = document.getElementById("btnResetAll");
 
+    const roomStatusEl = document.getElementById("roomStatus");
     const gameLengthSel = document.getElementById("gameLength");
 
+    const gamePanel = document.getElementById("gamePanel");
     const qTextEl = document.getElementById("qText");
     const answersHostEl = document.getElementById("answersHost");
     const timeLeftEl = document.getElementById("timeLeft");
@@ -475,11 +455,6 @@
     const btnShareWhatsApp = document.getElementById("btnShareWhatsApp");
     const btnShareMessenger = document.getElementById("btnShareMessenger");
 
-    const lbModalBack = document.getElementById("lbModalBack");
-    const lbTable = document.getElementById("lbTable");
-    document.getElementById("btnOpenLeaderboard").onclick = ()=> openLeaderboardModal();
-    document.getElementById("lbClose").onclick = ()=> closeLeaderboardModal();
-
     const rulesBack = document.getElementById("rulesBack");
     document.getElementById("btnRules").onclick = ()=> rulesBack.style.display="flex";
     document.getElementById("rulesClose").onclick = ()=> rulesBack.style.display="none";
@@ -490,20 +465,19 @@
     let playersUnsub = null;
     let roomDocRef = null;
     let playersColRef = null;
-    let playersCache = []; // sorted
-    let tickTimer = null;
 
-    function setLobby(enabled){
-      lobbyCard.style.display = enabled ? "" : "none";
-      gameCard.style.display = enabled ? "none" : "";
-    }
+    let playersCache = [];
+    let currentRoom = null;
+    let tickTimer = null;
 
     function baseUrl(){
       return window.location.href.replace(/host\.html.*$/,"");
     }
-
     function makeJoinUrl(code){
       return baseUrl() + "player.html?room=" + encodeURIComponent(code);
+    }
+    function shareMessage(url){
+      return `Just started a quiz game “Know It All?” — fancy joining in?\n${url}`;
     }
 
     function renderQR(code){
@@ -513,14 +487,52 @@
       new QRCode(qrEl, { text:url, width:168, height:168, correctLevel: QRCode.CorrectLevel.H });
     }
 
-    // ---------- Firestore ----------
+    function updateStartButton(){
+      // ✅ Fix: always re-evaluate using the latest room + latest players
+      const canStart = !!currentRoom
+        && currentRoom.status === "lobby"
+        && playersCache.length >= 1;
+
+      btnStartGame.disabled = !canStart;
+    }
+
+    function renderPlayersList(players){
+      playersListEl.innerHTML = "";
+      if(players.length === 0){
+        const d = document.createElement("div");
+        d.className="muted small";
+        d.textContent="No players yet. Share the QR/link.";
+        playersListEl.appendChild(d);
+        return;
+      }
+      players.forEach((p, idx)=>{
+        const row = document.createElement("div");
+        row.className = "pitem";
+        const left = document.createElement("div");
+        left.innerHTML = `<div class="pname">#${idx+1} ${escapeHtml(p.nick||"Player")}</div>
+                          <div class="psub">Streak: ${p.streak||0} • Cheat: ${(p.cheatUsed? "used":"ready")} • Help: ${p.helpUsed||0}/3</div>`;
+        const right = document.createElement("div");
+        const sabotaged = p.sabotagedNext ? `<span class="tag bad">SABOTAGED</span>` : `<span class="tag good">OK</span>`;
+        right.innerHTML = `<div class="pscore">${p.score||0}</div>${sabotaged}`;
+        row.appendChild(left);
+        row.appendChild(right);
+        playersListEl.appendChild(row);
+      });
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
     async function createRoom(){
       const code = makeRoomCode();
       const seed = randInt(1, 2_000_000_000);
       const gameLen = parseInt(gameLengthSel.value,10);
 
-      const bank = await loadBank(); // ensures files exist
-      if(bank.length < 2000) throw new Error("Question bank not loaded (need 2000).");
+      const bank = await loadBank();
+      if(bank.length < 1000) throw new Error("Question bank not loaded.");
 
       roomCode = code;
       roomDocRef = doc(db, "rooms", roomCode);
@@ -528,29 +540,32 @@
 
       await setDoc(roomDocRef, {
         createdAt: serverTimestamp(),
-        status: "lobby",                // lobby | question | reveal | awaitingPerks | final
-        questionCount: gameLen,         // 50/100/150
+        status: "lobby",
+        questionCount: gameLen,
         seed,
         qIndex: 0,
         qStartMs: null,
         revealAtMs: null,
-        awaitingPerkFor: [],            // array of playerIds who must choose claim/sabotage
-        lastRevealSummary: null,        // { qIndex, correctAnswer, choices, revealedAtMs }
-        sabotageNext: {},               // map playerId -> true (means cannot answer next)
+        awaitingPerkFor: [],
+        lastRevealSummary: null,
+        sabotageNext: {},
         finishedAt: null
       });
 
       // UI
       roomCodeEl.textContent = roomCode;
+      roomStatusEl.value = "Lobby (waiting for players)";
       renderQR(roomCode);
+
       const url = makeJoinUrl(roomCode);
       joinLinkEl.value = url;
       btnCopyLink.disabled = false;
       btnShareWhatsApp.disabled = false;
       btnShareMessenger.disabled = false;
-      btnResetAll.disabled = false;
 
-      // Listen
+      btnResetAll.disabled = false;
+      btnResetRoom.disabled = false;
+
       bindRoomListeners();
     }
 
@@ -560,40 +575,37 @@
 
       roomUnsub = onSnapshot(roomDocRef, async (snap)=>{
         if(!snap.exists()) return;
-        const room = snap.data();
+        currentRoom = snap.data();
 
-        // Show correct UI
-        setLobby(room.status === "lobby");
+        roomStatusEl.value = currentRoom.status;
+        qTotalEl.textContent = String(currentRoom.questionCount || 0);
 
-        qTotalEl.textContent = String(room.questionCount || 0);
-        qNumEl.textContent = String((room.qIndex||0) + (room.status==="final"?0:1));
+        // show/hide game panel
+        const inGame = currentRoom.status !== "lobby";
+        gamePanel.style.display = inGame ? "" : "none";
 
-        // Start button enable only if players >= 1
-        btnStartGame.disabled = !(playersCache.length >= 1 && room.status === "lobby");
+        btnReveal.disabled = !(currentRoom.status === "question");
+        btnNext.disabled = !(currentRoom.status === "reveal");
+        btnResetRoom.disabled = false;
 
-        btnResetGame.disabled = false;
-        btnReveal.disabled = !(room.status === "question");
-        btnNext.disabled = !(room.status === "reveal" || room.status === "awaitingPerks");
+        updateStartButton();
 
-        // render game question if in question/reveal/awaitingPerks
-        if(room.status !== "lobby"){
-          await renderHostQuestion(room);
+        if(inGame){
+          await renderHostQuestion(currentRoom);
+          syncHostTimer(currentRoom);
+        } else {
+          if(tickTimer) clearInterval(tickTimer);
+          timeLeftEl.textContent = "20";
         }
-
-        // timer UI (host uses qStartMs as source)
-        syncHostTimer(room);
       });
 
       playersUnsub = onSnapshot(query(playersColRef, orderBy("score","desc")), (snap)=>{
         playersCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
         playerCountEl.textContent = String(playersCache.length);
         renderPlayersList(playersCache);
-        renderLeaderboardTable(playersCache);
-        // update start button condition
-        if(roomCode && roomDocRef){
-          // room listener handles state, but keep start enabled fresh:
-          // (it will be set properly when room snapshot arrives)
-        }
+
+        // ✅ Fix: also re-check Start Game when players change
+        updateStartButton();
       });
     }
 
@@ -605,32 +617,24 @@
       if(!q){ qTextEl.textContent = "No question loaded."; return; }
 
       qTextEl.textContent = q.text;
+      qNumEl.textContent = String(qIndex + 1);
 
       const choices = buildChoices(q, order, room.seed, qIndex);
-      answersHostEl.innerHTML = "";
-
       const reveal = (room.status === "reveal" || room.status === "awaitingPerks" || room.status === "final");
       const correct = String(q.answer);
 
+      answersHostEl.innerHTML = "";
       choices.forEach((choice)=>{
         const div = document.createElement("div");
         div.className = "ansBtn";
         div.textContent = choice;
 
         if(reveal){
-          if(choice === correct){
-            div.classList.add("correct");
-          } else {
-            div.classList.add("wrong");
-          }
+          if(choice === correct) div.classList.add("correct");
+          else div.classList.add("wrong");
         }
         answersHostEl.appendChild(div);
       });
-
-      // if final, show winner card in lobby modal style? (handled via leaderboard modal)
-      if(room.status === "final"){
-        openLeaderboardModal(true);
-      }
     }
 
     function syncHostTimer(room){
@@ -647,71 +651,15 @@
       }
     }
 
-    function renderPlayersList(players){
-      playersListEl.innerHTML = "";
-      if(players.length === 0){
-        const d = document.createElement("div");
-        d.className="muted small";
-        d.textContent="No players yet. Share the QR/link.";
-        playersListEl.appendChild(d);
-        return;
-      }
-      players.forEach(p=>{
-        const row = document.createElement("div");
-        row.className = "pitem";
-        const left = document.createElement("div");
-        left.innerHTML = `<div class="pname">${escapeHtml(p.nick||"Player")}</div>
-                          <div class="psub">Streak: ${p.streak||0} • Cheat: ${(p.cheatUsed? "used":"ready")} • Help: ${p.helpUsed||0}/3</div>`;
-        const right = document.createElement("div");
-        const sabotaged = p.sabotagedNext ? `<span class="tag bad">SABOTAGED</span>` : "";
-        right.innerHTML = `<div class="pscore">${p.score||0}</div>${sabotaged}`;
-        row.appendChild(left);
-        row.appendChild(right);
-        playersListEl.appendChild(row);
-      });
-    }
-
-    function openLeaderboardModal(isFinal=false){
-      lbModalBack.style.display="flex";
-      // Title tweak if final
-      lbModalBack.querySelector("h3").textContent = isFinal ? "Final Leaderboard" : "Leaderboard";
-    }
-    function closeLeaderboardModal(){
-      lbModalBack.style.display="none";
-    }
-
-    function renderLeaderboardTable(players){
-      const rows = [];
-      rows.push(`<tr><th>Rank</th><th>Player</th><th>Score</th><th>Status</th></tr>`);
-      players.forEach((p,i)=>{
-        const st = p.sabotagedNext ? `<span class="tag bad">Sabotaged</span>` : (p.pendingPerk ? `<span class="tag">Perk</span>` : `<span class="tag good">OK</span>`);
-        rows.push(`<tr>
-          <td>${i+1}</td>
-          <td>${escapeHtml(p.nick||"Player")}</td>
-          <td><b style="color:var(--orange)">${p.score||0}</b></td>
-          <td>${st}</td>
-        </tr>`);
-      });
-      lbTable.innerHTML = rows.join("");
-    }
-
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-
-    // ---------- Game flow ----------
     async function startGame(){
-      if(!roomDocRef) return;
       const snap = await getDoc(roomDocRef);
       if(!snap.exists()) return;
       const room = snap.data();
       if(room.status !== "lobby") return;
 
-      // clear scores/streaks for clean start
-      const batch = writeBatch(db);
+      // Clear all players for a clean start
       const pSnap = await getDocs(playersColRef);
+      const batch = writeBatch(db);
       pSnap.forEach(d=>{
         batch.update(d.ref, {
           score: 0,
@@ -736,11 +684,11 @@
         sabotageNext: {},
         finishedAt: null
       });
+
       await batch.commit();
     }
 
     async function revealAnswer(){
-      // Host reveals current question, awards points, triggers perk pause if needed
       const snap = await getDoc(roomDocRef);
       if(!snap.exists()) return;
       const room = snap.data();
@@ -751,20 +699,18 @@
       const qIndex = room.qIndex || 0;
       const q = order[qIndex];
       const correct = String(q.answer);
-      const choices = buildChoices(q, order, room.seed, qIndex);
 
-      // Read all players
       const pSnap = await getDocs(playersColRef);
       const batch = writeBatch(db);
-
       const awaiting = [];
 
       pSnap.forEach(docSnap=>{
         const pid = docSnap.id;
         const p = docSnap.data();
-        const answer = p.lastAnswer;        // chosen option text
-        const answerMs = p.lastAnswerMs;    // ms timestamp when clicked
+
         const sabotaged = !!p.sabotagedNext;
+        const answer = p.lastAnswer;
+        const answerMs = p.lastAnswerMs;
 
         let lastCorrect = false;
         let scoreAdd = 0;
@@ -773,8 +719,6 @@
         if(!sabotaged && answer != null){
           lastCorrect = (String(answer) === correct);
           if(lastCorrect){
-            // Speed points: max 100, based on time left at click
-            // timeLeft = clamp(0..20)
             const start = room.qStartMs || Date.now();
             const elapsed = Math.max(0, Math.min(20000, (answerMs||Date.now()) - start));
             const timeLeft = Math.max(0, 20000 - elapsed);
@@ -784,7 +728,6 @@
             newStreak = 0;
           }
         } else {
-          // no answer or sabotaged => streak reset
           lastCorrect = false;
           newStreak = 0;
         }
@@ -793,37 +736,23 @@
           lastCorrect,
           score: (p.score||0) + scoreAdd,
           streak: newStreak,
-          pendingPerk: false, // set below if needed
+          pendingPerk: false,
+          lastAnswer: null,
+          lastAnswerMs: null,
+          sabotagedNext: false
         };
 
-        // If hit 5-streak now, mark pending perk
         if(newStreak > 0 && newStreak % 5 === 0 && lastCorrect){
           updates.pendingPerk = true;
           awaiting.push(pid);
         }
 
-        // Clear answer for next question
-        updates.lastAnswer = null;
-        updates.lastAnswerMs = null;
-
-        // Clear sabotage flag AFTER it took effect this question (we block answering on player side; host also treats it)
-        updates.sabotagedNext = false;
-
         batch.update(docSnap.ref, updates);
       });
 
-      // Move room to reveal, and if perks exist => awaitingPerks
-      const nextStatus = awaiting.length ? "awaitingPerks" : "reveal";
-
       batch.update(roomDocRef, {
-        status: nextStatus,
+        status: awaiting.length ? "awaitingPerks" : "reveal",
         revealAtMs: Date.now(),
-        lastRevealSummary: {
-          qIndex,
-          correctAnswer: correct,
-          choices,
-          revealedAtMs: Date.now()
-        },
         awaitingPerkFor: awaiting
       });
 
@@ -835,48 +764,25 @@
       if(!snap.exists()) return;
       const room = snap.data();
 
-      if(room.status !== "reveal" && room.status !== "awaitingPerks") return;
-
-      // if awaitingPerks, host cannot proceed until all resolved
-      if(room.status === "awaitingPerks" && (room.awaitingPerkFor||[]).length){
-        alert("Waiting for streak selection(s) before continuing.");
-        return;
-      }
+      if(room.status !== "reveal") return;
 
       const nextIndex = (room.qIndex||0) + 1;
       if(nextIndex >= (room.questionCount||0)){
         await updateDoc(roomDocRef, { status:"final", finishedAt: Date.now() });
-        openLeaderboardModal(true);
         return;
       }
 
-      // sabotageNext map applies to next question
-      // room.sabotageNext is map of playerId->true that should be applied to player doc flags
-      const sabotageNext = room.sabotageNext || {};
-
-      // apply sabotage to target players
-      const pSnap = await getDocs(playersColRef);
-      const batch = writeBatch(db);
-      pSnap.forEach(d=>{
-        if(sabotageNext[d.id]){
-          batch.update(d.ref, { sabotagedNext: true });
-        }
-      });
-
-      batch.update(roomDocRef, {
+      await updateDoc(roomDocRef, {
         status: "question",
         qIndex: nextIndex,
         qStartMs: Date.now(),
-        revealAtMs: null,
-        lastRevealSummary: null,
-        sabotageNext: {} // consumed
+        revealAtMs: null
       });
-      await batch.commit();
     }
 
     async function resetRoom(){
       if(!roomDocRef) return;
-      if(!confirm("Reset the room? This clears scores and returns to lobby.")) return;
+      if(!confirm("Reset room back to lobby and clear scores?")) return;
 
       const pSnap = await getDocs(playersColRef);
       const batch = writeBatch(db);
@@ -899,41 +805,23 @@
         finishedAt:null
       });
       await batch.commit();
-
-      setLobby(true);
     }
 
-    async function hardResetAll(){
-      if(!roomDocRef) return;
-      if(!confirm("Hard reset: remove room and all players?")) return;
-
-      // simplest: reset room only (delete requires more rules). We'll reset.
-      await resetRoom();
-    }
-
-    // ---------- Share ----------
-    function shareMessage(url){
-      return `Just started a quiz game “Know It All?” — fancy joining in?\n${url}`;
-    }
+    // Share
     btnCopyLink.onclick = async ()=>{
-      const url = joinLinkEl.value;
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(joinLinkEl.value);
       alert("Link copied!");
     };
     btnShareWhatsApp.onclick = ()=>{
-      const url = joinLinkEl.value;
-      const msg = encodeURIComponent(shareMessage(url));
+      const msg = encodeURIComponent(shareMessage(joinLinkEl.value));
       window.open(`https://wa.me/?text=${msg}`, "_blank");
     };
     btnShareMessenger.onclick = ()=>{
-      const url = joinLinkEl.value;
-      // Messenger share (web). If it doesn't open app, users can copy link.
-      const shareUrl = encodeURIComponent(url);
-      window.open(`https://www.facebook.com/dialog/send?link=${shareUrl}`, "_blank");
-      // Note: FB dialog may require app params in some cases; copy link is always fallback.
+      const shareUrl = encodeURIComponent(joinLinkEl.value);
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, "_blank");
     };
 
-    // ---------- Buttons ----------
+    // Buttons
     btnCreateRoom.onclick = async ()=>{
       try{
         btnCreateRoom.disabled = true;
@@ -945,11 +833,12 @@
         btnCreateRoom.disabled = false;
       }
     };
+
     btnStartGame.onclick = ()=> startGame().catch(e=>alert(e.message));
     btnReveal.onclick = ()=> revealAnswer().catch(e=>alert(e.message));
     btnNext.onclick = ()=> nextQuestion().catch(e=>alert(e.message));
-    btnResetGame.onclick = ()=> resetRoom().catch(e=>alert(e.message));
-    btnResetAll.onclick = ()=> hardResetAll().catch(e=>alert(e.message));
+    btnResetRoom.onclick = ()=> resetRoom().catch(e=>alert(e.message));
+    btnResetAll.onclick = ()=> resetRoom().catch(e=>alert(e.message));
   </script>
 </body>
 </html>
