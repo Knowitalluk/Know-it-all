@@ -7,15 +7,9 @@
 
   <style>
     :root{
-      --bg:#070707;
-      --border:#232323;
-      --text:#f3f3f3;
-      --muted:#bdbdbd;
-      --orange:#ff7a18;
-      --good:#29d17d;
-      --bad:#ff4b4b;
-      --shadow: 0 20px 60px rgba(0,0,0,.45);
-      --radius:20px;
+      --bg:#070707; --border:#232323; --text:#f3f3f3; --muted:#bdbdbd;
+      --orange:#ff7a18; --good:#29d17d; --bad:#ff4b4b;
+      --shadow: 0 20px 60px rgba(0,0,0,.45); --radius:20px;
     }
     *{box-sizing:border-box}
     body{
@@ -52,14 +46,12 @@
       background:rgba(10,10,10,.6); color:var(--muted); font-weight:900;
     }
     .pill b{color:var(--text)}
-
     .btnSmall{
       border:1px solid rgba(255,122,24,.35);
       background:linear-gradient(180deg, rgba(255,122,24,.20), rgba(10,10,10,.85));
       color:#fff;
       padding:8px 10px;border-radius:12px;
       font-weight:950; cursor:pointer;
-      box-shadow: 0 10px 30px rgba(0,0,0,.3);
       user-select:none;
     }
     .btnSmall:disabled{opacity:.45;cursor:not-allowed}
@@ -88,16 +80,11 @@
       color:var(--text);
       padding:10px 14px;border-radius:14px;
       font-weight:950; cursor:pointer;
-      box-shadow: 0 10px 30px rgba(0,0,0,.3);
-      transition: transform .08s ease, filter .12s ease, border-color .12s ease;
       user-select:none;
     }
-    .btn:hover{filter:brightness(1.12);border-color:rgba(255,122,24,.35)}
-    .btn:active{transform:translateY(1px)}
     .btn.orange{
       border-color:rgba(255,122,24,.45);
       background:linear-gradient(180deg, rgba(255,122,24,.22), rgba(10,10,10,.88));
-      box-shadow: 0 14px 40px rgba(255,122,24,.12);
     }
     .btn:disabled{opacity:.45;cursor:not-allowed}
 
@@ -111,17 +98,13 @@
       border:1px solid var(--border);
       background: linear-gradient(180deg, rgba(16,16,16,.85), rgba(8,8,8,.8));
       cursor:pointer;
-      font-weight:950;
-      color:var(--text);
+      font-weight:950;color:var(--text);
       min-height:52px;
-      transition: filter .12s ease, border-color .12s ease, transform .08s ease;
       user-select:none;
     }
-    .ans:hover{filter:brightness(1.10);border-color:rgba(255,122,24,.30)}
-    .ans:active{transform:translateY(1px)}
     .ans.selected{
-      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(8,8,8,.85));
-      border-color: rgba(255,255,255,.35);
+      background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(8,8,8,.85));
+      border-color: rgba(255,255,255,.45);
     }
     .ans.disabled{cursor:not-allowed;opacity:.35}
     .ans.wrongNow{border-color: rgba(255,75,75,.35); background: linear-gradient(180deg, rgba(255,75,75,.16), rgba(8,8,8,.85));}
@@ -143,6 +126,24 @@
       background: linear-gradient(180deg, rgba(255,122,24,.14), rgba(10,10,10,.60));
     }
 
+    .promptBar{
+      margin-top:12px;
+      padding:12px 12px;
+      border-radius:16px;
+      border:2px solid rgba(255,122,24,.75);
+      background: linear-gradient(180deg, rgba(255,122,24,.25), rgba(8,8,8,.78));
+      font-weight:990;
+      letter-spacing:1px;
+      text-align:center;
+      display:none;
+      box-shadow: 0 18px 50px rgba(255,122,24,.10);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1);filter:brightness(1)}
+      50%{transform:scale(1.02);filter:brightness(1.12)}
+    }
+
     .powerGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -158,29 +159,14 @@
       color: rgba(255,255,255,.85);
       cursor:pointer;
       user-select:none;
-      transition: filter .12s ease, transform .08s ease, border-color .12s ease;
       text-align:center;
     }
-    .powerBtn:hover{filter:brightness(1.08); border-color: rgba(255,122,24,.25)}
-    .powerBtn:active{transform:translateY(1px)}
     .powerBtn.on{
-      border-color: rgba(255,122,24,.55);
-      background: linear-gradient(180deg, rgba(255,122,24,.18), rgba(10,10,10,.70));
+      border-color: rgba(255,122,24,.60);
+      background: linear-gradient(180deg, rgba(255,122,24,.22), rgba(10,10,10,.70));
       color:#fff;
     }
     .powerBtn.disabled{opacity:.38; cursor:not-allowed; filter:saturate(.6);}
-
-    .promptBar{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:16px;
-      border:1px solid rgba(255,122,24,.55);
-      background: linear-gradient(180deg, rgba(255,122,24,.22), rgba(8,8,8,.78));
-      font-weight:990;
-      letter-spacing:.8px;
-      text-align:center;
-      display:none;
-    }
 
     .rulesBtn{
       position:fixed;right:16px;bottom:16px;z-index:1000;
@@ -219,7 +205,6 @@
       font-weight:950;
     }
     .lbRow .score{color:var(--orange);font-weight:990}
-    .lbRow .mini{font-size:12px;color:var(--muted);font-weight:850}
 
     .pickRow{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -294,6 +279,7 @@
       <div class="divider"></div>
       <div class="answers" id="answers"></div>
 
+      <!-- ✅ PROMPT (fixed) -->
       <div class="promptBar" id="perkPrompt">MAKE A SELECTION</div>
 
       <div class="powerGrid">
@@ -329,7 +315,7 @@
         Sabotage blocks a player from answering the next question.<br><br>
         <b>CHEAT</b> (1): instantly selects the correct answer.<br>
         <b>HELP</b> (3): removes 2 wrong answers immediately (50/50).<br><br>
-        <b>Voice chat</b>: tap <b>Voice</b> to open the room on Jitsi (audio on, video off).
+        <b>Voice chat</b>: tap <b>Voice</b> to open the room on Jitsi.
       </div>
     </div>
   </div>
@@ -396,6 +382,38 @@
     function sReveal(){ beep(740, 0.06, "sawtooth", 0.06); setTimeout(()=>beep(980,0.08,"sawtooth",0.06), 70); }
     function sTick(left){ beep(220 + (20-left)*45, 0.03, "sine", 0.03); }
 
+    // Jitsi voice
+    function jitsiRoomName(code){
+      return `KnowItAll-${String(code||"").toUpperCase().replace(/[^A-Z0-9-]/g,"")}`;
+    }
+    const btnVoice = document.getElementById("btnVoice");
+    function openVoiceChat(){
+      if(!roomCode) return;
+      sClick();
+      const url = `https://meet.jit.si/${encodeURIComponent(jitsiRoomName(roomCode))}#config.startWithAudioMuted=false&config.startWithVideoMuted=true`;
+      window.open(url, "_blank");
+    }
+    btnVoice.onclick = openVoiceChat;
+
+    // Bank loader (we’ll replace question files next)
+    let BANK=null;
+    async function loadBank(){
+      if(BANK) return BANK;
+      const files = ["./question_bank_part1.json","./question_bank_part2.json","./question_bank_part3.json","./question_bank_part4.json"];
+      const parts=[];
+      for(const f of files){
+        const res = await fetch(f, { cache:"no-store" });
+        if(!res.ok) throw new Error("Missing file: " + f);
+        parts.push(await res.json());
+      }
+      BANK = parts.flat().map(q=>({
+        question: q.question ?? q.text ?? "",
+        answer: q.answer ?? "",
+        choices: q.choices ?? q.options ?? null
+      })).filter(q=>q.question && q.answer);
+      return BANK;
+    }
+
     // RNG
     function mulberry32(seed){
       return function(){
@@ -414,94 +432,10 @@
       }
       return a;
     }
-    function isNumericAnswer(ans){
-      const s = String(ans).trim();
-      return /^-?\d+(\.\d+)?$/.test(s);
-    }
 
-    // Jitsi voice
-    function jitsiRoomName(code){
-      return `KnowItAll-${String(code||"").toUpperCase().replace(/[^A-Z0-9-]/g,"")}`;
-    }
-    const btnVoice = document.getElementById("btnVoice");
-    function openVoiceChat(){
-      if(!roomCode) return;
-      sClick();
-      const url = `https://meet.jit.si/${encodeURIComponent(jitsiRoomName(roomCode))}#config.startWithAudioMuted=false&config.startWithVideoMuted=true`;
-      window.open(url, "_blank");
-    }
-    btnVoice.onclick = openVoiceChat;
-
-    // Bank
-    let BANK=null;
-    async function loadBank(){
-      if(BANK) return BANK;
-      const files = [
-        "./question_bank_part1.json",
-        "./question_bank_part2.json",
-        "./question_bank_part3.json",
-        "./question_bank_part4.json"
-      ];
-      const parts=[];
-      for(const f of files){
-        const res = await fetch(f, { cache:"no-store" });
-        if(!res.ok) throw new Error("Missing file: " + f);
-        parts.push(await res.json());
-      }
-      BANK = parts.flat().map((q)=>({
-        question: q.question ?? q.text ?? "",
-        answer: q.answer ?? "",
-        choices: q.choices ?? q.options ?? null
-      })).filter(q=>q.question && q.answer);
-      return BANK;
-    }
-
-    function buildChoices(q, bank, seed, idx){
-      if(Array.isArray(q.choices) && q.choices.length === 4){
-        const set = new Set(q.choices.map(x=>String(x).trim()));
-        if(set.has(String(q.answer).trim())) return seededShuffle(q.choices.map(String), seed + idx*17 + 9);
-      }
-
-      const correct = String(q.answer).trim();
-      const wantNumber = isNumericAnswer(correct);
-      const r = mulberry32(seed + idx*1000 + 77);
-
-      let pool = bank
-        .map(x => String(x.answer).trim())
-        .filter(a => a && a !== correct)
-        .filter(a => isNumericAnswer(a) === wantNumber);
-
-      pool = Array.from(new Set(pool));
-
-      function scoreDecoy(a){
-        if(wantNumber){
-          const c = Number(correct), n = Number(a);
-          if(!Number.isFinite(c) || !Number.isFinite(n)) return 999999;
-          return Math.abs(c - n);
-        }
-        return Math.abs(a.length - correct.length);
-      }
-      pool.sort((a,b)=>scoreDecoy(a)-scoreDecoy(b));
-      const top = pool.slice(0, Math.min(200, pool.length));
-
-      const choices = [correct];
-      while(choices.length < 4){
-        if(top.length){
-          const pick = top.splice(Math.floor(r()*top.length),1)[0];
-          if(!choices.includes(pick)) choices.push(pick);
-        } else {
-          if(wantNumber){
-            const c = Number(correct);
-            const delta = (Math.floor(r()*9)+1) * (r() < 0.5 ? -1 : 1);
-            const gen = String(Number.isFinite(c) ? (c + delta) : (Math.floor(r()*200)+1));
-            if(!choices.includes(gen)) choices.push(gen);
-          } else {
-            const gen = "I don't know";
-            if(!choices.includes(gen)) choices.push(gen);
-          }
-        }
-      }
-      return seededShuffle(choices, seed + idx*17 + 123);
+    function buildChoices(q){
+      if(Array.isArray(q.choices) && q.choices.length === 4) return q.choices.map(String);
+      return [String(q.answer), "Option B", "Option C", "Option D"];
     }
 
     // UI refs
@@ -539,7 +473,7 @@
     const lbBack = document.getElementById("lbBack");
     const lbList = document.getElementById("lbList");
     const lbNote = document.getElementById("lbNote");
-    document.getElementById("lbClose").onclick = ()=>{ sClick(); hideLeaderboard(); };
+    document.getElementById("lbClose").onclick = ()=>{ sClick(); hideLeaderboard(true); };
 
     const pickBack = document.getElementById("pickBack");
     const pickList = document.getElementById("pickList");
@@ -580,11 +514,10 @@
     let currentChoices = [];
     let lbAutoTimer = null;
 
-    function setBtnState(btn, on, disabledText=null){
+    function setBtnState(btn, on){
       btn.classList.toggle("on", !!on);
       btn.classList.toggle("disabled", !on);
       btn.disabled = !on;
-      if(disabledText) btn.title = on ? "" : disabledText;
     }
     function setStatus(text, kind="orange"){
       statusMsg.style.display = "";
@@ -605,23 +538,19 @@
       sorted.forEach((p, i)=>{
         const row = document.createElement("div");
         row.className="lbRow";
-        const left = document.createElement("div");
-        left.innerHTML = `<div>#${i+1} ${escapeHtml(p.nick||"Player")}</div><div class="mini">Streak: ${p.streak||0}</div>`;
-        const right = document.createElement("div");
-        right.className="score";
-        right.textContent = String(p.score||0);
-        row.appendChild(left); row.appendChild(right);
+        row.innerHTML = `<div>#${i+1} ${escapeHtml(p.nick||"Player")}</div><div class="score">${p.score||0}</div>`;
         lbList.appendChild(row);
       });
       lbBack.style.display = "flex";
       lbNote.textContent = "Auto closes in 3 seconds. (Use Close if needed.)";
 
       if(lbAutoTimer) clearTimeout(lbAutoTimer);
-      lbAutoTimer = setTimeout(()=>hideLeaderboard(), 3000);
+      lbAutoTimer = setTimeout(()=>hideLeaderboard(false), 3000);
     }
-    function hideLeaderboard(){
+    function hideLeaderboard(force){
       if(lbAutoTimer) clearTimeout(lbAutoTimer);
       lbBack.style.display = "none";
+      if(force) lbAutoTimer = null;
     }
 
     async function joinGame(){
@@ -676,7 +605,7 @@
         sabotageMsg: null
       }, { merge:true });
 
-      btnVoice.disabled = false; // ✅ enable voice once joined
+      btnVoice.disabled = false;
       joinStatus.style.display="none";
       bindListeners();
       show("wait");
@@ -716,12 +645,11 @@
 
     function renderAnswers(room, me, q, choices){
       answersEl.innerHTML = "";
+      const correct = String(q.answer).trim();
 
       const inQuestion = room.status === "question";
-      const correct = String(q.answer).trim();
-      lockedChoice = me.lastAnswer ?? lockedChoice;
-
       const sabotaged = !!me.sabotagedNext;
+      lockedChoice = me.lastAnswer ?? lockedChoice;
 
       const masks = me.helpMasks || {};
       const maskForThis = masks[String(room.qIndex||0)] || [];
@@ -735,14 +663,11 @@
           btn.classList.add("selected");
         }
 
-        // HELP elimination shown immediately
         if(maskForThis.includes(String(choice))){
-          btn.classList.add("wrongNow");
-          btn.classList.add("disabled");
+          btn.classList.add("wrongNow","disabled");
           btn.disabled = true;
         }
 
-        // reveal UI
         if(room.status === "reveal" || room.status === "awaitingPerks"){
           if(String(choice).trim() === correct) btn.classList.add("correctNow");
           else btn.classList.add("wrongNow");
@@ -759,7 +684,6 @@
           if(sabotaged) return;
           if(lockedChoice) return;
           sClick();
-
           lockedChoice = choice;
           await updateDoc(playerRef, { lastAnswer: choice, lastAnswerMs: Date.now() });
           renderAnswers(room, { ...me, lastAnswer: choice }, q, choices);
@@ -771,16 +695,20 @@
 
     function updatePowersUI(room, me){
       const pending = !!me.pendingPerk;
+
+      // ✅ PROMPT FIX: show during awaitingPerks OR reveal if perk still pending
       perkPrompt.style.display = pending ? "" : "none";
 
-      setBtnState(btnClaim, pending, "Unlock by getting 5 correct in a row");
-      setBtnState(btnSabotage, pending, "Unlock by getting 5 correct in a row");
+      // Claim/Sabotage only usable when pending perk is true
+      setBtnState(btnClaim, pending);
+      setBtnState(btnSabotage, pending);
 
+      // Cheat/Help only usable in question phase
       const cheatOk = !me.cheatUsed && room.status === "question" && !me.sabotagedNext && !me.lastAnswer;
-      setBtnState(btnCheat, cheatOk, "Used already (1 per game)");
+      setBtnState(btnCheat, cheatOk);
 
       const helpOk = (me.helpUsed||0) < 3 && room.status === "question" && !me.sabotagedNext;
-      setBtnState(btnHelp, helpOk, "No helps left (3 per game)");
+      setBtnState(btnHelp, helpOk);
     }
 
     function hashString(s){
@@ -797,7 +725,15 @@
       const correct = String(currentQ.answer).trim();
       const wrongs = currentChoices.filter(c => String(c).trim() !== correct);
 
-      const r = mulberry32((room.seed + 555) + qIndex * 999 + hashString(playerId));
+      const r = (function(seed){
+        return function(){
+          let t = seed += 0x6D2B79F5;
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      })((room.seed + 555) + qIndex * 999 + hashString(playerId));
+
       const shuffled = wrongs.slice();
       for(let i=shuffled.length-1;i>0;i--){
         const j = Math.floor(r()*(i+1));
@@ -805,7 +741,7 @@
       }
       const elim = shuffled.slice(0,2).map(String);
 
-      // Apply immediately locally
+      // Apply instantly locally
       const newMasks = { ...(me.helpMasks||{}) };
       newMasks[String(qIndex)] = elim;
       currentMe = { ...me, helpUsed:(me.helpUsed||0)+1, helpMasks:newMasks };
@@ -813,13 +749,10 @@
       renderAnswers(room, currentMe, currentQ, currentChoices);
       updatePowersUI(room, currentMe);
 
-      await updateDoc(playerRef, {
-        helpUsed: (me.helpUsed||0) + 1,
-        helpMasks: newMasks
-      });
+      await updateDoc(playerRef, { helpUsed:(me.helpUsed||0)+1, helpMasks:newMasks });
 
       setStatus("HELP used — two wrong answers removed.", "orange");
-      setTimeout(clearStatus, 1400);
+      setTimeout(clearStatus, 1200);
     }
 
     async function applyCheat(room, me){
@@ -828,24 +761,20 @@
       if(me.cheatUsed || me.sabotagedNext || me.lastAnswer) return;
 
       const correct = String(currentQ.answer).trim();
-
       currentMe = { ...me, cheatUsed:true, lastAnswer:correct, lastAnswerMs:Date.now() };
       lockedChoice = correct;
+
       renderAnswers(room, currentMe, currentQ, currentChoices);
       updatePowersUI(room, currentMe);
 
-      await updateDoc(playerRef, {
-        cheatUsed: true,
-        lastAnswer: correct,
-        lastAnswerMs: Date.now()
-      });
+      await updateDoc(playerRef, { cheatUsed:true, lastAnswer:correct, lastAnswerMs:Date.now() });
 
       setStatus("CHEAT used — answer locked in.", "orange");
-      setTimeout(clearStatus, 1400);
+      setTimeout(clearStatus, 1200);
     }
 
-    async function claim2x(room, me){
-      if(!me.pendingPerk) return;
+    async function claim2x(){
+      if(!currentMe?.pendingPerk) return;
 
       await runTransaction(db, async (tx)=>{
         const roomSnap = await tx.get(roomRef);
@@ -856,22 +785,17 @@
         const p = meSnap.data();
         if(!p.pendingPerk) return;
 
-        const newScore = (p.score||0) * 2;
-
-        tx.update(playerRef, { score:newScore, pendingPerk:false });
+        tx.update(playerRef, { score:(p.score||0)*2, pendingPerk:false });
 
         const awaiting = Array.isArray(r.awaitingPerkFor) ? r.awaitingPerkFor.slice() : [];
         const idx = awaiting.indexOf(playerId);
         if(idx >= 0) awaiting.splice(idx,1);
 
-        tx.update(roomRef, {
-          awaitingPerkFor: awaiting,
-          status: awaiting.length ? "awaitingPerks" : "reveal"
-        });
+        tx.update(roomRef, { awaitingPerkFor:awaiting, status: awaiting.length ? "awaitingPerks" : "reveal" });
       });
 
       setStatus("2× SCORE claimed!", "good");
-      setTimeout(clearStatus, 1500);
+      setTimeout(clearStatus, 1200);
     }
 
     function openSabotagePicker(){
@@ -880,12 +804,8 @@
       sorted.forEach(p=>{
         if(p.id === playerId) return;
         const row = document.createElement("div");
-        row.className = "pickRow";
-        row.innerHTML = `<div>
-            <div style="font-weight:990">${escapeHtml(p.nick||"Player")}</div>
-            <div class="small muted">Score: ${p.score||0}</div>
-          </div>
-          <div class="score">${p.score||0}</div>`;
+        row.className="pickRow";
+        row.innerHTML = `<div><div style="font-weight:990">${escapeHtml(p.nick||"Player")}</div></div><div class="score">${p.score||0}</div>`;
         row.onclick = async ()=>{
           sClick();
           await sabotagePlayer(p.id, p.nick||"Player");
@@ -896,7 +816,7 @@
       pickBack.style.display = "flex";
     }
 
-    async function sabotagePlayer(victimId, victimNick){
+    async function sabotagePlayer(victimId){
       if(!currentMe?.pendingPerk) return;
 
       await runTransaction(db, async (tx)=>{
@@ -912,8 +832,8 @@
         if(!p.pendingPerk) return;
 
         tx.update(victimRef, {
-          sabotagedNext: true,
-          sabotageMsg: `You have been sabotaged by ${p.nick || "a player"} — you cannot answer the next question.`
+          sabotagedNext:true,
+          sabotageMsg:`You have been sabotaged by ${p.nick || "a player"} — you cannot answer the next question.`
         });
 
         tx.update(playerRef, { pendingPerk:false });
@@ -922,19 +842,16 @@
         const idx = awaiting.indexOf(playerId);
         if(idx >= 0) awaiting.splice(idx,1);
 
-        tx.update(roomRef, {
-          awaitingPerkFor: awaiting,
-          status: awaiting.length ? "awaitingPerks" : "reveal"
-        });
+        tx.update(roomRef, { awaitingPerkFor:awaiting, status: awaiting.length ? "awaitingPerks" : "reveal" });
       });
 
-      setStatus(`Sabotaged ${victimNick}!`, "good");
-      setTimeout(clearStatus, 1600);
+      setStatus("Sabotage used!", "good");
+      setTimeout(clearStatus, 1200);
     }
 
     btnHelp.onclick = async ()=>{ if(btnHelp.disabled) return; sClick(); await applyHelp(currentRoom, currentMe); };
     btnCheat.onclick = async ()=>{ if(btnCheat.disabled) return; sClick(); await applyCheat(currentRoom, currentMe); };
-    btnClaim.onclick = async ()=>{ if(btnClaim.disabled) return; sClick(); await claim2x(currentRoom, currentMe); };
+    btnClaim.onclick = async ()=>{ if(btnClaim.disabled) return; sClick(); await claim2x(); };
     btnSabotage.onclick = async ()=>{ if(btnSabotage.disabled) return; sClick(); openSabotagePicker(); };
 
     function runConfetti(){
@@ -999,30 +916,45 @@
           lastQIndex = qIndex;
           lockedChoice = me.lastAnswer;
           clearStatus();
-          hideLeaderboard();
+          hideLeaderboard(false);
         }
 
         currentQ = order[qIndex];
         qTextEl.textContent = currentQ?.question || "Question missing";
 
-        currentChoices = buildChoices(currentQ, order, room.seed, qIndex);
+        currentChoices = buildChoices(currentQ);
         renderAnswers(room, me, currentQ, currentChoices);
         syncTimer(room);
         updatePowersUI(room, me);
 
+        // Sabotage message
         if(me.sabotageMsg){
           setStatus(me.sabotageMsg, "bad");
           await updateDoc(playerRef, { sabotageMsg: null });
         }
 
+        // Reveal/awaiting UI
         if(room.status === "reveal" || room.status === "awaitingPerks"){
           sReveal();
           if(me.lastCorrect === true) setStatus("Correct ✅", "good");
           else if(me.lastCorrect === false) setStatus("Incorrect ❌", "bad");
+
+          // ✅ Show leaderboard but ensure it never blocks perk selection
           showLeaderboard(currentPlayers);
+
+          // ✅ If you have a pending perk, force-close leaderboard earlier (1.5s)
+          if(me.pendingPerk){
+            setTimeout(()=>hideLeaderboard(false), 1500);
+          }
         }
       });
     }
+
+    // Rules modal
+    document.getElementById("btnRules").onclick = ()=>{ sClick(); rulesBack.style.display="flex"; };
+    document.getElementById("rulesClose").onclick = ()=>{ sClick(); rulesBack.style.display="none"; };
+
+    bindListeners(); // safe if room not joined yet (won’t do anything until join)
   </script>
 </body>
 </html>
