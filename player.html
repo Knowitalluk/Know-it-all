@@ -45,17 +45,24 @@
       border:1px solid rgba(255,122,24,.35);
       box-shadow: 0 12px 30px rgba(255,122,24,.12);
     }
-    .title{
-      font-size:22px; /* slightly bigger */
-      letter-spacing:.3px;
-      line-height:1.05;
-    }
+    .title{font-size:22px;letter-spacing:.3px;line-height:1.05}
     .pill{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 12px;border-radius:999px;border:1px solid var(--border);
       background:rgba(10,10,10,.6); color:var(--muted); font-weight:900;
     }
     .pill b{color:var(--text)}
+
+    .btnSmall{
+      border:1px solid rgba(255,122,24,.35);
+      background:linear-gradient(180deg, rgba(255,122,24,.20), rgba(10,10,10,.85));
+      color:#fff;
+      padding:8px 10px;border-radius:12px;
+      font-weight:950; cursor:pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+      user-select:none;
+    }
+    .btnSmall:disabled{opacity:.45;cursor:not-allowed}
 
     .card{
       margin-top:14px;
@@ -161,16 +168,14 @@
       background: linear-gradient(180deg, rgba(255,122,24,.18), rgba(10,10,10,.70));
       color:#fff;
     }
-    .powerBtn.disabled{
-      opacity:.38; cursor:not-allowed; filter:saturate(.6);
-    }
+    .powerBtn.disabled{opacity:.38; cursor:not-allowed; filter:saturate(.6);}
 
     .promptBar{
       margin-top:12px;
       padding:10px 12px;
       border-radius:16px;
-      border:1px solid rgba(255,122,24,.45);
-      background: linear-gradient(180deg, rgba(255,122,24,.18), rgba(8,8,8,.78));
+      border:1px solid rgba(255,122,24,.55);
+      background: linear-gradient(180deg, rgba(255,122,24,.22), rgba(8,8,8,.78));
       font-weight:990;
       letter-spacing:.8px;
       text-align:center;
@@ -205,7 +210,6 @@
     .modal .modalTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .note{margin-top:10px;color:var(--muted);font-weight:850;font-size:12px;line-height:1.45}
 
-    /* Leaderboard popup */
     .lbList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
     .lbRow{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -217,7 +221,6 @@
     .lbRow .score{color:var(--orange);font-weight:990}
     .lbRow .mini{font-size:12px;color:var(--muted);font-weight:850}
 
-    /* Sabotage selection */
     .pickRow{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       padding:10px 12px;border-radius:16px;
@@ -230,7 +233,6 @@
     .pickRow .score{color:var(--orange);font-weight:990}
   </style>
 </head>
-
 <body>
   <div class="wrap">
     <div class="top">
@@ -241,12 +243,14 @@
           <div class="small muted">Player Screen</div>
         </div>
       </div>
-      <span class="pill">Room: <b id="roomCode">—</b></span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="pill">Room: <b id="roomCode">—</b></span>
+        <button class="btnSmall" id="btnVoice" disabled>Voice</button>
+      </div>
     </div>
 
     <div class="card" id="joinCard">
       <h2 style="margin:6px 0 8px">Join Game</h2>
-
       <div class="muted small">Enter a nickname, then join the room.</div>
       <div class="divider"></div>
 
@@ -290,12 +294,10 @@
       <div class="divider"></div>
       <div class="answers" id="answers"></div>
 
-      <!-- prompt above claim/sabotage -->
       <div class="promptBar" id="perkPrompt">MAKE A SELECTION</div>
 
-      <!-- Powers (all buttons restored) -->
       <div class="powerGrid">
-        <button class="powerBtn" id="btnClaim">CLAIM +20</button>
+        <button class="powerBtn" id="btnClaim">2× SCORE</button>
         <button class="powerBtn" id="btnSabotage">SABOTAGE</button>
         <button class="powerBtn" id="btnCheat">CHEAT (1)</button>
         <button class="powerBtn" id="btnHelp">HELP (3)</button>
@@ -307,12 +309,12 @@
     <div class="card" id="finalCard" style="display:none">
       <h2 style="margin:6px 0 8px" id="finalTitle">—</h2>
       <div class="muted" id="finalSub">—</div>
+      <div class="note">🎉 Confetti time!</div>
     </div>
   </div>
 
   <button class="rulesBtn" id="btnRules">Rules</button>
 
-  <!-- Rules modal -->
   <div class="modalBack" id="rulesBack">
     <div class="modal">
       <div class="modalTop">
@@ -321,28 +323,17 @@
       </div>
       <div class="note" style="font-size:13px;line-height:1.55;color:#e9e9e9">
         <b>Know It All?</b> is a fast-paced live quiz for up to <b>20 players</b> per room.<br><br>
-
-        <b>How it works</b><br>
-        • Join with a nickname and wait for the host.<br>
-        • Each question is <b>20 seconds</b>. Tap one answer (it locks).<br>
-        • Host reveals the correct answer and a leaderboard popup appears.<br><br>
-
-        <b>Points</b><br>
-        • Up to <b>100 points</b> per question based on speed.<br><br>
-
-        <b>Streak Perk</b><br>
-        • Every 5 correct in a row unlocks a perk: <b>Claim +20</b> or <b>Sabotage</b>.<br>
-        • Sabotage stops the victim answering the <b>next question</b>.<br>
-        • The game pauses until all perk players choose.<br><br>
-
-        <b>Powers</b><br>
-        • <b>CHEAT</b> (once per game): selects correct answer instantly.<br>
-        • <b>HELP</b> (3 uses): removes 2 wrong answers immediately.
+        • 20 seconds per question. Tap one answer (locked).<br>
+        • Correct answers earn up to 100 points based on speed.<br><br>
+        <b>Streak perk</b> (every 5 correct): choose <b>2× Score</b> or <b>Sabotage</b>.<br>
+        Sabotage blocks a player from answering the next question.<br><br>
+        <b>CHEAT</b> (1): instantly selects the correct answer.<br>
+        <b>HELP</b> (3): removes 2 wrong answers immediately (50/50).<br><br>
+        <b>Voice chat</b>: tap <b>Voice</b> to open the room on Jitsi (audio on, video off).
       </div>
     </div>
   </div>
 
-  <!-- Leaderboard modal -->
   <div class="modalBack" id="lbBack">
     <div class="modal">
       <div class="modalTop">
@@ -354,7 +345,6 @@
     </div>
   </div>
 
-  <!-- Sabotage pick modal -->
   <div class="modalBack" id="pickBack">
     <div class="modal">
       <div class="modalTop">
@@ -365,6 +355,8 @@
       <div class="lbList" id="pickList"></div>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
@@ -386,7 +378,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ---------- Sound (no background music) ----------
+    // Sounds (no background music)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     function ctx(){ if(!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
@@ -402,13 +394,9 @@
     }
     function sClick(){ beep(560, 0.03, "square", 0.04); }
     function sReveal(){ beep(740, 0.06, "sawtooth", 0.06); setTimeout(()=>beep(980,0.08,"sawtooth",0.06), 70); }
-    function sTick(left){
-      // higher pitch nearer to 0
-      const freq = 220 + (20-left) * 45;
-      beep(freq, 0.03, "sine", 0.03);
-    }
+    function sTick(left){ beep(220 + (20-left)*45, 0.03, "sine", 0.03); }
 
-    // ---------- RNG ----------
+    // RNG
     function mulberry32(seed){
       return function(){
         let t = seed += 0x6D2B79F5;
@@ -426,8 +414,25 @@
       }
       return a;
     }
+    function isNumericAnswer(ans){
+      const s = String(ans).trim();
+      return /^-?\d+(\.\d+)?$/.test(s);
+    }
 
-    // ---------- Bank ----------
+    // Jitsi voice
+    function jitsiRoomName(code){
+      return `KnowItAll-${String(code||"").toUpperCase().replace(/[^A-Z0-9-]/g,"")}`;
+    }
+    const btnVoice = document.getElementById("btnVoice");
+    function openVoiceChat(){
+      if(!roomCode) return;
+      sClick();
+      const url = `https://meet.jit.si/${encodeURIComponent(jitsiRoomName(roomCode))}#config.startWithAudioMuted=false&config.startWithVideoMuted=true`;
+      window.open(url, "_blank");
+    }
+    btnVoice.onclick = openVoiceChat;
+
+    // Bank
     let BANK=null;
     async function loadBank(){
       if(BANK) return BANK;
@@ -443,71 +448,63 @@
         if(!res.ok) throw new Error("Missing file: " + f);
         parts.push(await res.json());
       }
-      BANK = parts.flat();
+      BANK = parts.flat().map((q)=>({
+        question: q.question ?? q.text ?? "",
+        answer: q.answer ?? "",
+        choices: q.choices ?? q.options ?? null
+      })).filter(q=>q.question && q.answer);
       return BANK;
     }
 
-    function isMathQuestion(q){
-      const cat = String(q.category||"").toLowerCase();
-      if(cat === "math" || cat === "maths") return true;
-      const t = String(q.text||"").toLowerCase();
-      const hasDigits = /\d/.test(t);
-      const hasOps = /[+\-*/=]|×|÷|\bplus\b|\bminus\b|\btimes\b|\bdivid(ed|e)\b|\bsolve\b|\bcalculate\b/.test(t);
-      const looksLikeEquation = /(\d+\s*[+\-*/×÷]\s*\d+)/.test(t);
-      return (hasDigits && (hasOps || looksLikeEquation));
-    }
-
-    function buildQuestionSet(bank, total, seed){
-      const mathsCap = Math.floor(total / 5);
-      const maths = [];
-      const non = [];
-      for(const q of bank){
-        (isMathQuestion(q) ? maths : non).push(q);
+    function buildChoices(q, bank, seed, idx){
+      if(Array.isArray(q.choices) && q.choices.length === 4){
+        const set = new Set(q.choices.map(x=>String(x).trim()));
+        if(set.has(String(q.answer).trim())) return seededShuffle(q.choices.map(String), seed + idx*17 + 9);
       }
-      const m = seededShuffle(maths, seed + 11).slice(0, mathsCap);
-      const n = seededShuffle(non, seed + 22).slice(0, total - m.length);
-      return seededShuffle([...m, ...n], seed + 33);
-    }
 
-    function isNumericAnswer(ans){
-      const s = String(ans).trim();
-      return /^-?\d+(\.\d+)?$/.test(s);
-    }
-
-    function buildChoices(question, bank, seed, qIndex){
-      const r = mulberry32(seed + qIndex * 1000 + 77);
-      const correct = String(question.answer).trim();
+      const correct = String(q.answer).trim();
       const wantNumber = isNumericAnswer(correct);
+      const r = mulberry32(seed + idx*1000 + 77);
 
       let pool = bank
-        .map(q => String(q.answer).trim())
+        .map(x => String(x.answer).trim())
         .filter(a => a && a !== correct)
         .filter(a => isNumericAnswer(a) === wantNumber);
 
       pool = Array.from(new Set(pool));
-      const choices = [correct];
 
+      function scoreDecoy(a){
+        if(wantNumber){
+          const c = Number(correct), n = Number(a);
+          if(!Number.isFinite(c) || !Number.isFinite(n)) return 999999;
+          return Math.abs(c - n);
+        }
+        return Math.abs(a.length - correct.length);
+      }
+      pool.sort((a,b)=>scoreDecoy(a)-scoreDecoy(b));
+      const top = pool.slice(0, Math.min(200, pool.length));
+
+      const choices = [correct];
       while(choices.length < 4){
-        if(pool.length){
-          const idx = Math.floor(r() * pool.length);
-          const pick = pool.splice(idx,1)[0];
+        if(top.length){
+          const pick = top.splice(Math.floor(r()*top.length),1)[0];
           if(!choices.includes(pick)) choices.push(pick);
         } else {
           if(wantNumber){
-            const n = Number(correct);
+            const c = Number(correct);
             const delta = (Math.floor(r()*9)+1) * (r() < 0.5 ? -1 : 1);
-            const gen = String(Number.isFinite(n) ? (n + delta) : (Math.floor(r()*200)+1));
+            const gen = String(Number.isFinite(c) ? (c + delta) : (Math.floor(r()*200)+1));
             if(!choices.includes(gen)) choices.push(gen);
           } else {
-            const gen = "None of the above";
+            const gen = "I don't know";
             if(!choices.includes(gen)) choices.push(gen);
           }
         }
       }
-      return seededShuffle(choices, seed + qIndex * 17 + 123);
+      return seededShuffle(choices, seed + idx*17 + 123);
     }
 
-    // ---------- UI ----------
+    // UI refs
     const joinCard = document.getElementById("joinCard");
     const waitCard = document.getElementById("waitCard");
     const gameCard = document.getElementById("gameCard");
@@ -535,18 +532,15 @@
     const finalTitle = document.getElementById("finalTitle");
     const finalSub = document.getElementById("finalSub");
 
-    // Rules modal
     const rulesBack = document.getElementById("rulesBack");
     document.getElementById("btnRules").onclick = ()=>{ sClick(); rulesBack.style.display="flex"; };
     document.getElementById("rulesClose").onclick = ()=>{ sClick(); rulesBack.style.display="none"; };
 
-    // Leaderboard modal
     const lbBack = document.getElementById("lbBack");
     const lbList = document.getElementById("lbList");
     const lbNote = document.getElementById("lbNote");
     document.getElementById("lbClose").onclick = ()=>{ sClick(); hideLeaderboard(); };
 
-    // Sabotage pick modal
     const pickBack = document.getElementById("pickBack");
     const pickList = document.getElementById("pickList");
     document.getElementById("pickClose").onclick = ()=>{ sClick(); pickBack.style.display="none"; };
@@ -560,7 +554,6 @@
     show("join");
 
     function qs(name){ return new URLSearchParams(location.search).get(name); }
-
     let roomCode = (qs("room")||"").toUpperCase();
     if(roomCode){
       roomInputEl.value = roomCode;
@@ -580,13 +573,11 @@
     let lastQIndex = null;
     let lockedChoice = null;
 
-    let lastTickSecond = null;
     let currentRoom = null;
     let currentMe = null;
     let currentPlayers = [];
     let currentQ = null;
     let currentChoices = [];
-
     let lbAutoTimer = null;
 
     function setBtnState(btn, on, disabledText=null){
@@ -595,13 +586,18 @@
       btn.disabled = !on;
       if(disabledText) btn.title = on ? "" : disabledText;
     }
-
     function setStatus(text, kind="orange"){
       statusMsg.style.display = "";
       statusMsg.className = "statusBox " + kind;
       statusMsg.textContent = text;
     }
     function clearStatus(){ statusMsg.style.display="none"; statusMsg.textContent=""; }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
 
     function showLeaderboard(players){
       lbList.innerHTML = "";
@@ -626,12 +622,6 @@
     function hideLeaderboard(){
       if(lbAutoTimer) clearTimeout(lbAutoTimer);
       lbBack.style.display = "none";
-    }
-
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
     }
 
     async function joinGame(){
@@ -686,38 +676,35 @@
         sabotageMsg: null
       }, { merge:true });
 
+      btnVoice.disabled = false; // ✅ enable voice once joined
       joinStatus.style.display="none";
       bindListeners();
       show("wait");
     }
 
     btnJoin.onclick = async ()=>{
-      try{
-        sClick();
-        btnJoin.disabled = true;
-        await joinGame();
-      } finally {
-        btnJoin.disabled = false;
-      }
+      try{ sClick(); btnJoin.disabled = true; await joinGame(); }
+      finally{ btnJoin.disabled = false; }
     };
 
     async function getOrder(room){
       const bank = await loadBank();
-      return buildQuestionSet(bank, room.questionCount || 50, room.seed);
+      const total = room.questionCount || 50;
+      const seed = room.seed || 1;
+      const shuffled = seededShuffle(bank, seed + 101);
+      return shuffled.slice(0, Math.min(total, shuffled.length));
     }
 
+    let lastTickSecond = null;
     function syncTimer(room){
       if(tickTimer) clearInterval(tickTimer);
-
       lastTickSecond = null;
 
       if(room.status === "question" && room.qStartMs){
         tickTimer = setInterval(()=>{
           const left = Math.max(0, Math.ceil((room.qStartMs + 20000 - Date.now())/1000));
           timeLeftEl.textContent = String(left);
-
           if(left !== lastTickSecond){
-            // start ticking immediately from 20
             sTick(left);
             lastTickSecond = left;
           }
@@ -732,26 +719,23 @@
 
       const inQuestion = room.status === "question";
       const correct = String(q.answer).trim();
-
-      // lock choice once set
       lockedChoice = me.lastAnswer ?? lockedChoice;
 
-      // sabotage blocks answers this question
       const sabotaged = !!me.sabotagedNext;
+
+      const masks = me.helpMasks || {};
+      const maskForThis = masks[String(room.qIndex||0)] || [];
 
       choices.forEach(choice=>{
         const btn = document.createElement("button");
         btn.className="ans";
         btn.textContent = choice;
 
-        // selected highlight (white look)
         if(lockedChoice && String(lockedChoice).trim() === String(choice).trim()){
           btn.classList.add("selected");
         }
 
-        // help mask: immediately show two wrong answers as red/disabled
-        const masks = me.helpMasks || {};
-        const maskForThis = masks[String(room.qIndex||0)] || [];
+        // HELP elimination shown immediately
         if(maskForThis.includes(String(choice))){
           btn.classList.add("wrongNow");
           btn.classList.add("disabled");
@@ -765,7 +749,6 @@
           btn.disabled = true;
         }
 
-        // in-question clicking
         if(!inQuestion || sabotaged){
           btn.classList.add("disabled");
           btn.disabled = true;
@@ -774,12 +757,11 @@
         btn.onclick = async ()=>{
           if(!inQuestion) return;
           if(sabotaged) return;
-          if(lockedChoice) return; // cannot change once chosen
+          if(lockedChoice) return;
           sClick();
 
           lockedChoice = choice;
           await updateDoc(playerRef, { lastAnswer: choice, lastAnswerMs: Date.now() });
-          // re-render for selection highlight
           renderAnswers(room, { ...me, lastAnswer: choice }, q, choices);
         };
 
@@ -789,19 +771,22 @@
 
     function updatePowersUI(room, me){
       const pending = !!me.pendingPerk;
-
-      // prompt bar and claim/sabotage
       perkPrompt.style.display = pending ? "" : "none";
+
       setBtnState(btnClaim, pending, "Unlock by getting 5 correct in a row");
       setBtnState(btnSabotage, pending, "Unlock by getting 5 correct in a row");
 
-      // CHEAT once per game
       const cheatOk = !me.cheatUsed && room.status === "question" && !me.sabotagedNext && !me.lastAnswer;
       setBtnState(btnCheat, cheatOk, "Used already (1 per game)");
 
-      // HELP up to 3 per game
       const helpOk = (me.helpUsed||0) < 3 && room.status === "question" && !me.sabotagedNext;
       setBtnState(btnHelp, helpOk, "No helps left (3 per game)");
+    }
+
+    function hashString(s){
+      let h = 0;
+      for(let i=0;i<s.length;i++) h = Math.imul(31,h) + s.charCodeAt(i) | 0;
+      return Math.abs(h);
     }
 
     async function applyHelp(room, me){
@@ -810,9 +795,8 @@
 
       const qIndex = room.qIndex || 0;
       const correct = String(currentQ.answer).trim();
-
-      // pick 2 wrong answers to eliminate deterministically
       const wrongs = currentChoices.filter(c => String(c).trim() !== correct);
+
       const r = mulberry32((room.seed + 555) + qIndex * 999 + hashString(playerId));
       const shuffled = wrongs.slice();
       for(let i=shuffled.length-1;i>0;i--){
@@ -821,8 +805,13 @@
       }
       const elim = shuffled.slice(0,2).map(String);
 
+      // Apply immediately locally
       const newMasks = { ...(me.helpMasks||{}) };
       newMasks[String(qIndex)] = elim;
+      currentMe = { ...me, helpUsed:(me.helpUsed||0)+1, helpMasks:newMasks };
+
+      renderAnswers(room, currentMe, currentQ, currentChoices);
+      updatePowersUI(room, currentMe);
 
       await updateDoc(playerRef, {
         helpUsed: (me.helpUsed||0) + 1,
@@ -833,20 +822,18 @@
       setTimeout(clearStatus, 1400);
     }
 
-    function hashString(s){
-      let h = 0;
-      for(let i=0;i<s.length;i++) h = Math.imul(31,h) + s.charCodeAt(i) | 0;
-      return Math.abs(h);
-    }
-
     async function applyCheat(room, me){
       if(!currentQ) return;
       if(room.status !== "question") return;
-      if(me.cheatUsed) return;
-      if(me.sabotagedNext) return;
-      if(me.lastAnswer) return;
+      if(me.cheatUsed || me.sabotagedNext || me.lastAnswer) return;
 
       const correct = String(currentQ.answer).trim();
+
+      currentMe = { ...me, cheatUsed:true, lastAnswer:correct, lastAnswerMs:Date.now() };
+      lockedChoice = correct;
+      renderAnswers(room, currentMe, currentQ, currentChoices);
+      updatePowersUI(room, currentMe);
+
       await updateDoc(playerRef, {
         cheatUsed: true,
         lastAnswer: correct,
@@ -857,10 +844,9 @@
       setTimeout(clearStatus, 1400);
     }
 
-    async function claimPerk(room, me){
+    async function claim2x(room, me){
       if(!me.pendingPerk) return;
 
-      // +20 points, clear pendingPerk, remove from awaiting list transactionally
       await runTransaction(db, async (tx)=>{
         const roomSnap = await tx.get(roomRef);
         const meSnap = await tx.get(playerRef);
@@ -868,13 +854,11 @@
 
         const r = roomSnap.data();
         const p = meSnap.data();
-
         if(!p.pendingPerk) return;
 
-        tx.update(playerRef, {
-          score: (p.score||0) + 20,
-          pendingPerk: false
-        });
+        const newScore = (p.score||0) * 2;
+
+        tx.update(playerRef, { score:newScore, pendingPerk:false });
 
         const awaiting = Array.isArray(r.awaitingPerkFor) ? r.awaitingPerkFor.slice() : [];
         const idx = awaiting.indexOf(playerId);
@@ -886,18 +870,15 @@
         });
       });
 
-      setStatus("Claimed +20 points!", "good");
+      setStatus("2× SCORE claimed!", "good");
       setTimeout(clearStatus, 1500);
     }
 
-    function openSabotagePicker(me){
+    function openSabotagePicker(){
       pickList.innerHTML = "";
-      // show players sorted by score
       const sorted = currentPlayers.slice().sort((a,b)=>(b.score||0)-(a.score||0));
       sorted.forEach(p=>{
-        // cannot pick self
         if(p.id === playerId) return;
-
         const row = document.createElement("div");
         row.className = "pickRow";
         row.innerHTML = `<div>
@@ -907,17 +888,16 @@
           <div class="score">${p.score||0}</div>`;
         row.onclick = async ()=>{
           sClick();
-          await sabotagePlayer(me, p.id, p.nick||"Player");
+          await sabotagePlayer(p.id, p.nick||"Player");
           pickBack.style.display = "none";
         };
         pickList.appendChild(row);
       });
-
       pickBack.style.display = "flex";
     }
 
-    async function sabotagePlayer(me, victimId, victimNick){
-      if(!me.pendingPerk) return;
+    async function sabotagePlayer(victimId, victimNick){
+      if(!currentMe?.pendingPerk) return;
 
       await runTransaction(db, async (tx)=>{
         const roomSnap = await tx.get(roomRef);
@@ -929,17 +909,13 @@
 
         const r = roomSnap.data();
         const p = meSnap.data();
-        const v = vSnap.data();
-
         if(!p.pendingPerk) return;
 
-        // apply sabotage to victim for NEXT question
         tx.update(victimRef, {
           sabotagedNext: true,
           sabotageMsg: `You have been sabotaged by ${p.nick || "a player"} — you cannot answer the next question.`
         });
 
-        // clear perk and remove from awaiting
         tx.update(playerRef, { pendingPerk:false });
 
         const awaiting = Array.isArray(r.awaitingPerkFor) ? r.awaitingPerkFor.slice() : [];
@@ -948,8 +924,7 @@
 
         tx.update(roomRef, {
           awaitingPerkFor: awaiting,
-          status: awaiting.length ? "awaitingPerks" : "reveal",
-          sabotage: { victimId, byId: playerId, byNick: p.nick || "Player", qIndex: r.qIndex ?? null }
+          status: awaiting.length ? "awaitingPerks" : "reveal"
         });
       });
 
@@ -957,36 +932,23 @@
       setTimeout(clearStatus, 1600);
     }
 
-    btnHelp.onclick = async ()=>{
-      if(!currentRoom || !currentMe) return;
-      if(btnHelp.disabled) return;
-      sClick();
-      await applyHelp(currentRoom, currentMe);
-    };
+    btnHelp.onclick = async ()=>{ if(btnHelp.disabled) return; sClick(); await applyHelp(currentRoom, currentMe); };
+    btnCheat.onclick = async ()=>{ if(btnCheat.disabled) return; sClick(); await applyCheat(currentRoom, currentMe); };
+    btnClaim.onclick = async ()=>{ if(btnClaim.disabled) return; sClick(); await claim2x(currentRoom, currentMe); };
+    btnSabotage.onclick = async ()=>{ if(btnSabotage.disabled) return; sClick(); openSabotagePicker(); };
 
-    btnCheat.onclick = async ()=>{
-      if(!currentRoom || !currentMe) return;
-      if(btnCheat.disabled) return;
-      sClick();
-      await applyCheat(currentRoom, currentMe);
-    };
+    function runConfetti(){
+      try{
+        const end = Date.now() + 2200;
+        (function frame(){
+          confetti({ particleCount: 6, spread: 60, origin: { x: 0.2, y: 0.7 }});
+          confetti({ particleCount: 6, spread: 60, origin: { x: 0.8, y: 0.7 }});
+          if(Date.now() < end) requestAnimationFrame(frame);
+        })();
+      }catch(e){}
+    }
 
-    btnClaim.onclick = async ()=>{
-      if(!currentRoom || !currentMe) return;
-      if(btnClaim.disabled) return;
-      sClick();
-      await claimPerk(currentRoom, currentMe);
-    };
-
-    btnSabotage.onclick = async ()=>{
-      if(!currentRoom || !currentMe) return;
-      if(btnSabotage.disabled) return;
-      sClick();
-      openSabotagePicker(currentMe);
-    };
-
-    function renderFinal(room, me){
-      // determine winner(s)
+    function renderFinal(me){
       const sorted = currentPlayers.slice().sort((a,b)=>(b.score||0)-(a.score||0));
       const top = sorted[0]?.score || 0;
       const winners = sorted.filter(p=>(p.score||0)===top).map(p=>p.nick);
@@ -994,6 +956,7 @@
 
       finalTitle.textContent = iWin ? "You Know It All! 🎉" : "Not too bad! 🙂";
       finalSub.textContent = iWin ? "You finished top!" : "Good effort — try again!";
+      runConfetti();
     }
 
     function bindListeners(){
@@ -1007,13 +970,11 @@
         const me = meSnap.data();
         currentMe = me;
 
-        // players list (also used for leaderboard popup and sabotage picker)
         const pSnap = await getDocs(query(playersCol, orderBy("score","desc")));
         currentPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
 
         if(room.status === "lobby"){
           show("wait");
-          // list players joined in wait screen
           const byJoin = currentPlayers.slice().sort((a,b)=>{
             const aT = a.joinedAt?.seconds || 0;
             const bT = b.joinedAt?.seconds || 0;
@@ -1025,60 +986,40 @@
 
         if(room.status === "final"){
           show("final");
-          renderFinal(room, me);
+          renderFinal(me);
           return;
         }
 
-        // question/reveal/awaitingPerks
         show("game");
 
         const order = await getOrder(room);
         const qIndex = room.qIndex || 0;
 
-        // detect new question -> clear selection lock + clear status
         if(lastQIndex !== qIndex){
           lastQIndex = qIndex;
-          lockedChoice = me.lastAnswer; // should be null at start of question
+          lockedChoice = me.lastAnswer;
           clearStatus();
+          hideLeaderboard();
         }
 
         currentQ = order[qIndex];
-        qTextEl.textContent = currentQ?.text || "Question missing";
+        qTextEl.textContent = currentQ?.question || "Question missing";
 
         currentChoices = buildChoices(currentQ, order, room.seed, qIndex);
         renderAnswers(room, me, currentQ, currentChoices);
         syncTimer(room);
         updatePowersUI(room, me);
 
-        // show sabotage message if present
         if(me.sabotageMsg){
           setStatus(me.sabotageMsg, "bad");
-          // clear it so it doesn't spam
           await updateDoc(playerRef, { sabotageMsg: null });
         }
 
-        // On reveal or awaitingPerks: show result + leaderboard popup
         if(room.status === "reveal" || room.status === "awaitingPerks"){
           sReveal();
-
-          // result line
-          const got = me.lastCorrect === true;
-          if(got) setStatus("Correct ✅", "good");
+          if(me.lastCorrect === true) setStatus("Correct ✅", "good");
           else if(me.lastCorrect === false) setStatus("Incorrect ❌", "bad");
-
-          // show leaderboard popup, but it auto-closes after 3 seconds
-          // If player needs to pick a perk, we still auto-close so they can choose.
           showLeaderboard(currentPlayers);
-        } else {
-          // if question screen, do not show leaderboard modal
-          // (but allow manual closing if it was open)
-        }
-
-        // If pending perk, ensure leaderboard doesn't block selection
-        // (auto close timer will handle, but we also nudge close if still open after 3s)
-        if(me.pendingPerk){
-          // the prompt bar + claim/sabotage is already shown by updatePowersUI
-          // ensure leaderboard will disappear soon
         }
       });
     }
