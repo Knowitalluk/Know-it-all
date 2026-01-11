@@ -139,9 +139,66 @@
       background: rgba(255,255,255,.03);
     }
     .copyRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+    /* floating rules btn */
+    .rulesBtn{
+      position:fixed;
+      right:14px;
+      bottom:14px;
+      z-index:9998;
+      border-radius:999px;
+      padding:10px 14px;
+      border:1px solid rgba(255,106,0,.55);
+      background: rgba(255,106,0,.14);
+      box-shadow: 0 10px 30px rgba(255,106,0,.12);
+      font-weight:1000;
+    }
+
+    /* modal */
+    .modal{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      padding:18px;
+      background: rgba(0,0,0,.68);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+    }
+    .modal.on{ display:flex; }
+    .modalCard{
+      width:min(760px, 100%);
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(15,17,23,.96), rgba(10,12,16,.96));
+      box-shadow: 0 20px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,106,0,.06) inset;
+      padding: 16px;
+    }
+    .modalTop{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      margin-bottom: 10px;
+    }
+    .modalTitle{
+      font-size: 20px;
+      font-weight: 1000;
+      letter-spacing: .02em;
+    }
+    .rulesText{
+      color: rgba(245,247,255,.90);
+      line-height: 1.5;
+    }
+    .rulesText h3{
+      margin: 14px 0 6px;
+      font-size: 16px;
+      letter-spacing: .02em;
+      color: var(--orange2);
+    }
+    .rulesText ul{ margin: 8px 0 0 18px; padding:0; }
+    .rulesText li{ margin: 6px 0; color: rgba(245,247,255,.86); }
   </style>
 </head>
 <body>
+  <button class="rulesBtn" id="btnRules">Rules</button>
+
   <div class="container">
     <div class="topbar">
       <div class="brand">
@@ -182,9 +239,6 @@
             </div>
 
             <div class="small mono" id="joinLinkText" style="margin-top:10px; word-break:break-all;"></div>
-            <div class="small" style="margin-top:8px;">
-              Messenger share uses your phone share sheet when available (best). WhatsApp share works everywhere.
-            </div>
           </div>
         </div>
 
@@ -234,7 +288,42 @@
     </div>
   </div>
 
+  <!-- Rules Modal -->
+  <div class="modal" id="rulesModal">
+    <div class="modalCard">
+      <div class="modalTop">
+        <div class="modalTitle">Rules • How to Play</div>
+        <button class="btn-ghost" id="btnCloseRules">Close</button>
+      </div>
+      <div class="rulesText" id="rulesContent"></div>
+    </div>
+  </div>
+
   <script>
+    /************** SOUNDS (WebAudio) **************/
+    const SFX = (() => {
+      let ctx = null;
+      function getCtx(){
+        if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        return ctx;
+      }
+      function ensureUnlocked(){ try{ getCtx().resume(); }catch{} }
+      function tone(freq=440, dur=0.06, type="sine", vol=0.06){
+        const c = getCtx();
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.value = vol;
+        o.connect(g); g.connect(c.destination);
+        o.start();
+        o.stop(c.currentTime + dur);
+      }
+      function click(){ tone(900,0.03,"square",0.04); }
+      function reveal(){ tone(660,0.09,"sine",0.06); setTimeout(()=>tone(990,0.10,"sine",0.06), 90); setTimeout(()=>tone(1320,0.12,"sine",0.06), 200); }
+      return { ensureUnlocked, click, reveal };
+    })();
+
     /************** FIREBASE **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
@@ -274,24 +363,27 @@
     }
     function calcPoints(remainingSeconds){
       const t = Math.max(0, Math.min(QUESTION_SECONDS, remainingSeconds));
-      return 20 + Math.floor(80 * (t / QUESTION_SECONDS));
+      return 20 + Math.floor(80 * (t / QUESTION_SECONDS)); // 20..100
     }
     function $(id){ return document.getElementById(id); }
     function show(el,on=true){ el.style.display = on ? "" : "none"; }
     function setToast(el,msg){ if(!msg){ el.style.display="none"; el.textContent=""; } else { el.style.display=""; el.textContent=msg; } }
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
+    function modalOn(id, on){
+      const m = $(id);
+      if(on) m.classList.add("on");
+      else m.classList.remove("on");
+    }
 
     /************** STATE **************/
     let hostUid = null;
     let roomId = null;
-
     let unsubRoom = null;
     let unsubPlayers = null;
-
     let latestRoom = null;
     let latestPlayers = [];
-
     let timerUI = null;
+
     let joinLink = "";
     let shareText = "";
     let qrObj = null;
@@ -315,10 +407,8 @@
         questionEndsAt: 0,
         currentQuestion: null,
         reveal: null,
-        // pause: { type:"streak", pendingPlayerIds:[...], earnedAtQuestionIndex:number }
-        pause: null,
-        // sabotage: { activeForQuestionIndex:number, blocks:[{targetPlayerId, byName}] }
-        sabotage: null,
+        pause: null,     // { type:"streak", pendingPlayerIds:[...], earnedAtQuestionIndex }
+        sabotage: null,  // { activeForQuestionIndex, blocks:[{targetPlayerId, byName}] }
         winners: [],
         updatedAtMs: nowMs()
       };
@@ -328,7 +418,6 @@
       const base = location.href.replace(/host\.html.*$/i, "");
       return base + "player.html?room=" + encodeURIComponent(roomId);
     }
-
     function updateShareText(){
       shareText = `Just started a quiz game fancy joining in? ${joinLink}`;
     }
@@ -348,15 +437,12 @@
     }
 
     async function shareViaWebShare(preferText){
-      // phone share sheet (best: includes WhatsApp + Messenger)
       if(navigator.share){
         try{
           await navigator.share({ title: "Know It All?", text: preferText, url: joinLink });
           setToast($("hostToast"), "Share opened.");
           return true;
-        }catch(e){
-          // user cancelled or not allowed
-        }
+        }catch(e){}
       }
       return false;
     }
@@ -365,8 +451,7 @@
       if(!joinLink) return;
       const usedShare = await shareViaWebShare(shareText);
       if(usedShare) return;
-      const url = "https://wa.me/?text=" + encodeURIComponent(shareText);
-      window.open(url, "_blank");
+      window.open("https://wa.me/?text=" + encodeURIComponent(shareText), "_blank");
     }
 
     async function shareMessenger(){
@@ -374,11 +459,7 @@
       const usedShare = await shareViaWebShare(shareText);
       if(usedShare) return;
 
-      // Mobile deep link (works on many phones that have Messenger installed)
-      const deep = "fb-messenger://share?link=" + encodeURIComponent(joinLink);
-      window.open(deep, "_blank");
-
-      // Helpful fallback (copy)
+      window.open("fb-messenger://share?link=" + encodeURIComponent(joinLink), "_blank");
       try{
         await navigator.clipboard.writeText(shareText);
         setToast($("hostToast"), "Copied message + link. Paste into Messenger.");
@@ -426,7 +507,6 @@
     async function startQuestion(qIdx){
       const q = QUESTIONS[qIdx];
 
-      // keep sabotage only if it applies to this qIdx
       const snap = await roomRef().get();
       const room = snap.data();
       let sabotage = room?.sabotage || null;
@@ -669,7 +749,7 @@
       }
     }
 
-    // Auto-reveal when timer hits 0
+    // Auto-reveal if timer hits 0
     setInterval(async ()=>{
       if(!roomId || !latestRoom) return;
       if(latestRoom.status === "question" && fmtTimeLeft(latestRoom.questionEndsAt) <= 0){
@@ -677,27 +757,97 @@
       }
     }, 500);
 
-    /************** UI **************/
-    $("btnCreate").onclick = () => createRoom();
-    $("btnStart").onclick = () => startGame();
-    $("btnReset").onclick = () => resetGame();
-    $("btnResetFromQ").onclick = () => resetGame();
-    $("btnResetFinal").onclick = () => resetGame();
-    $("btnReveal").onclick = () => revealNow();
-    $("btnNext").onclick = () => nextQuestion();
+    // Rules content
+    function fillRules(){
+      $("rulesContent").innerHTML = `
+        <h3>Players</h3>
+        <ul>
+          <li><b>Recommended:</b> 2–20 players per game (best experience).</li>
+          <li>One device is the <b>Host</b>. Everyone else joins on their phone.</li>
+        </ul>
 
-    $("btnCopy").onclick = async () => {
+        <h3>How to play</h3>
+        <ul>
+          <li>The host starts the game and controls reveal + next question.</li>
+          <li>Each question lasts <b>20 seconds</b>.</li>
+          <li>Players tap one answer — it locks and cannot be changed.</li>
+          <li>On reveal, everyone sees an updated leaderboard.</li>
+        </ul>
+
+        <h3>Scoring</h3>
+        <ul>
+          <li>Correct answers score more when answered faster.</li>
+          <li>Up to <b>100 points</b> per question.</li>
+        </ul>
+
+        <h3>5-Streak Reward</h3>
+        <ul>
+          <li>Get <b>5 correct in a row</b> to unlock a choice:</li>
+          <li><b>Claim +20</b> or <b>Sabotage</b> another player.</li>
+          <li>The game pauses until all streak players choose.</li>
+        </ul>
+
+        <h3>Sabotage</h3>
+        <ul>
+          <li>Pick a player from the list.</li>
+          <li>They cannot answer the <b>next</b> question.</li>
+        </ul>
+
+        <h3>Power Buttons</h3>
+        <ul>
+          <li><b>CHEAT (1 use per game):</b> auto-picks the correct answer and locks it.</li>
+          <li><b>HELP (3 uses per game):</b> removes 2 wrong answers immediately (red).</li>
+        </ul>
+      `;
+    }
+
+    // Button helper with click sound
+    function hookBtn(id, fn){
+      $(id).addEventListener("click", async ()=>{
+        SFX.ensureUnlocked();
+        SFX.click();
+        await fn();
+      });
+    }
+
+    hookBtn("btnCreate", createRoom);
+    hookBtn("btnStart", startGame);
+    hookBtn("btnReset", resetGame);
+    hookBtn("btnResetFromQ", resetGame);
+    hookBtn("btnResetFinal", resetGame);
+
+    // Reveal button has reveal sound too
+    $("btnReveal").addEventListener("click", async ()=>{
+      SFX.ensureUnlocked();
+      SFX.click();
+      SFX.reveal();
+      await revealNow();
+    });
+
+    hookBtn("btnNext", nextQuestion);
+
+    hookBtn("btnCopy", async ()=>{
       try{ await navigator.clipboard.writeText(joinLink); setToast($("hostToast"), "Join link copied!"); }
       catch{ setToast($("hostToast"), "Could not copy. Copy manually from the link."); }
-    };
-    $("btnOpen").onclick = () => window.open(joinLink, "_blank");
+    });
+    hookBtn("btnOpen", ()=> window.open(joinLink, "_blank"));
 
-    $("btnShareWhatsApp").onclick = () => shareWhatsApp();
-    $("btnShareMessenger").onclick = () => shareMessenger();
+    hookBtn("btnShareWhatsApp", shareWhatsApp);
+    hookBtn("btnShareMessenger", shareMessenger);
 
-    $("btnForgetRoom").onclick = () => {
+    hookBtn("btnForgetRoom", ()=>{
       localStorage.removeItem("KIA_LAST_ROOM_HOST");
       location.reload();
+    });
+
+    $("btnRules").onclick = ()=>{
+      SFX.ensureUnlocked(); SFX.click();
+      fillRules();
+      modalOn("rulesModal", true);
+    };
+    $("btnCloseRules").onclick = ()=>{
+      SFX.ensureUnlocked(); SFX.click();
+      modalOn("rulesModal", false);
     };
 
     (async function init(){
