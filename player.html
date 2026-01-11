@@ -1,360 +1,338 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Know It All? — Player</title>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
   <style>
     :root{
-      --bg0:#050506; --bg1:#0b0b10; --line: rgba(255,255,255,.10);
-      --text:#f5f7ff; --muted: rgba(245,247,255,.70);
-      --orange:#ff6a00; --orange2:#ff9a3d; --glow: rgba(255,106,0,.35);
-      --good:#2cff9a; --bad:#ff3b5c; --radius:18px;
+      --bg:#070707;
+      --panel:#0e0e0e;
+      --border:#232323;
+      --text:#f3f3f3;
+      --muted:#bdbdbd;
+      --orange:#ff7a18;
+      --orange2:#ff9a3d;
+      --good:#29d17d;
+      --bad:#ff4b4b;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius:20px;
     }
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
     body{
-      margin:0; color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(900px 500px at 20% 10%, rgba(255,106,0,.14), transparent 60%),
-        radial-gradient(900px 500px at 80% 20%, rgba(255,154,61,.10), transparent 60%),
-        radial-gradient(1200px 700px at 60% 90%, rgba(255,106,0,.08), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg0));
+      margin:0;
+      background:radial-gradient(1200px 700px at 30% -10%, rgba(255,122,24,.18), transparent 60%),
+               radial-gradient(900px 600px at 90% 0%, rgba(255,122,24,.10), transparent 65%),
+               var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       min-height:100vh;
     }
-    .container{ max-width:900px; margin:0 auto; padding:22px; }
-    .brand h1{ margin:0; font-weight:1000; font-size:36px; letter-spacing:.5px; }
-    .brand h1 span{ color:var(--orange); text-shadow:0 0 20px var(--glow); }
-    .tag{ color:var(--muted); font-size:13px; letter-spacing:.18em; text-transform:uppercase; margin-top:6px; }
+    .wrap{max-width:820px;margin:0 auto;padding:18px 16px 30px}
+    .top{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 12px;border:1px solid var(--border);border-radius:18px;
+      background:linear-gradient(180deg, rgba(17,17,17,.85), rgba(10,10,10,.65));
+      box-shadow:var(--shadow);
+      position:sticky;top:12px;z-index:10;backdrop-filter: blur(10px);
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:950}
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,154,61,.9), rgba(255,122,24,.35) 40%, rgba(0,0,0,.5) 75%),
+                  linear-gradient(180deg, rgba(255,122,24,.25), rgba(255,122,24,.06));
+      border:1px solid rgba(255,122,24,.35);
+      box-shadow: 0 12px 30px rgba(255,122,24,.12);
+    }
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;border:1px solid var(--border);
+      background:rgba(10,10,10,.6); color:var(--muted); font-weight:900;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(20,20,20,.9), rgba(10,10,10,.85));
+      color:var(--text);
+      padding:10px 14px;border-radius:14px;
+      font-weight:950; cursor:pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+      transition: transform .08s ease, filter .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .btn:hover{filter:brightness(1.12);border-color:rgba(255,122,24,.35)}
+    .btn:active{transform:translateY(1px)}
+    .btn.orange{
+      border-color:rgba(255,122,24,.45);
+      background:linear-gradient(180deg, rgba(255,122,24,.22), rgba(10,10,10,.88));
+      box-shadow: 0 14px 40px rgba(255,122,24,.12);
+    }
+    .btn:disabled{opacity:.45;cursor:not-allowed}
 
     .card{
-      background: linear-gradient(180deg, rgba(15,17,23,.92), rgba(10,12,16,.92));
-      border:1px solid var(--line);
+      margin-top:14px;
+      border:1px solid var(--border);
       border-radius: var(--radius);
-      padding:16px;
-      box-shadow: 0 15px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,106,0,.06) inset;
-      backdrop-filter: blur(10px);
-      margin-top: 14px;
+      background:linear-gradient(180deg, rgba(17,17,17,.75), rgba(9,9,9,.65));
+      box-shadow:var(--shadow);
+      padding:14px;
     }
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:999px;
-      border:1px solid rgba(255,106,0,.35);
-      background: rgba(255,106,0,.10);
-      color: var(--orange2);
-      box-shadow: 0 0 22px rgba(255,106,0,.12);
-      font-weight:1000; letter-spacing:.04em;
-    }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-    .small{ color:var(--muted); font-size:13px; }
-
-    input, button{
-      font:inherit; border-radius:14px; padding:12px 12px; outline:none;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      color: var(--text);
-    }
-    input::placeholder{ color: rgba(245,247,255,.45); }
-    button{
-      cursor:pointer; font-weight:1000;
-      border-color: rgba(255,106,0,.55);
-      background: linear-gradient(180deg, rgba(255,106,0,.35), rgba(255,106,0,.12));
-      box-shadow: 0 10px 30px rgba(255,106,0,.10);
-    }
-    button:disabled{ opacity:.35; cursor:not-allowed; }
-
-    .btn-ghost{
-      border-color: rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
-      box-shadow:none;
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    input{
+      width:100%; padding:11px 12px;border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(8,8,8,.65);
+      color:var(--text);
+      outline:none;
       font-weight:900;
     }
-    .btn-cheat{
-      border-color: rgba(255,59,92,.45);
-      background: linear-gradient(180deg, rgba(255,59,92,.18), rgba(255,59,92,.06));
-    }
 
-    .qtext{ font-size:30px; font-weight:1000; margin:10px 0 6px; }
-    .answers{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
-    @media (max-width:520px){ .answers{ grid-template-columns:1fr; } }
-
-    .answer{
-      text-align:left; padding:14px; border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
+    .qTitle{font-size:22px;font-weight:950;letter-spacing:.3px;line-height:1.25;margin:8px 0 10px}
+    .answers{display:grid;gap:10px;grid-template-columns:1fr}
+    .ans{
+      text-align:left;
+      border-radius:16px;
+      padding:12px 12px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(16,16,16,.85), rgba(8,8,8,.8));
       cursor:pointer;
-      transition: transform .08s ease, border-color .08s ease, background .08s ease, box-shadow .08s ease;
+      font-weight:950;
+      color:var(--text);
+      position:relative;
+      min-height:52px;
+      transition: filter .12s ease, border-color .12s ease, transform .08s ease;
+      user-select:none;
     }
-    .answer:active{ transform: scale(.99); }
-    .answer.locked{ opacity:.55; cursor:not-allowed; }
-    .answer.selected{
-      border-color: rgba(255,255,255,.85);
-      background: rgba(255,255,255,.14);
-      box-shadow: 0 0 0 1px rgba(255,255,255,.22) inset, 0 10px 30px rgba(0,0,0,.25);
+    .ans:hover{filter:brightness(1.10);border-color:rgba(255,122,24,.30)}
+    .ans:active{transform:translateY(1px)}
+    .ans.selected{
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(8,8,8,.85));
+      border-color: rgba(255,255,255,.35);
     }
-    .answer.removed{
-      border-color: rgba(255,59,92,.70);
-      background: rgba(255,59,92,.14);
-      opacity:.55;
-      cursor:not-allowed;
-    }
+    .ans.locked{cursor:not-allowed;opacity:.92}
+    .ans.disabled{cursor:not-allowed;opacity:.35}
+    .ans.wrongNow{border-color: rgba(255,75,75,.35); background: linear-gradient(180deg, rgba(255,75,75,.16), rgba(8,8,8,.85));}
+    .ans.correctNow{border-color: rgba(41,209,125,.35); background: linear-gradient(180deg, rgba(41,209,125,.18), rgba(8,8,8,.85));}
 
-    .toast{
-      margin-top:10px; padding:10px 12px; border-radius:14px;
-      border:1px solid rgba(255,106,0,.25);
-      background: rgba(255,106,0,.08);
-      color: var(--orange2);
-      white-space: pre-line;
+    .timerBig{font-size:30px;font-weight:950;color:var(--orange);letter-spacing:1px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
+
+    .powerGrid{
+      display:grid;gap:10px;grid-template-columns:1fr 1fr;
+      margin-top:10px;
     }
-    .toast.good{
-      border-color: rgba(44,255,154,.35);
-      background: rgba(44,255,154,.10);
-      color: rgba(220,255,240,.95);
-    }
-    .toast.bad{
-      border-color: rgba(255,59,92,.28);
-      background: rgba(255,59,92,.10);
-      color: rgba(255,220,228,.92);
-    }
-    .toast.prompt{
-      border-color: rgba(255,106,0,.85);
-      background: rgba(255,106,0,.20);
-      color: rgba(255,240,228,.98);
-      box-shadow: 0 0 0 1px rgba(255,106,0,.14) inset, 0 20px 50px rgba(255,106,0,.10);
-      font-weight:1000;
-      letter-spacing:.03em;
+    .power{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:rgba(8,8,8,.55);
+      font-weight:950;
+      cursor:pointer;
       text-align:center;
     }
-
-    .powerRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
-    .powerRow button{ flex:1; min-width:160px; }
-
-    .kpi{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 8px; }
-    .kpi .pill{
-      padding: 10px 12px; border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      min-width: 150px;
+    .power.on{
+      border-color: rgba(255,122,24,.55);
+      background: linear-gradient(180deg, rgba(255,122,24,.20), rgba(8,8,8,.75));
+      box-shadow: 0 14px 40px rgba(255,122,24,.10);
     }
-    .kpi .pill strong{ color: var(--text); display:block; }
+    .power:disabled{opacity:.4;cursor:not-allowed}
+    .prompt{
+      display:none;
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,122,24,.45);
+      background: linear-gradient(180deg, rgba(255,122,24,.22), rgba(8,8,8,.75));
+      font-weight:950;
+      text-align:center;
+      box-shadow: 0 14px 40px rgba(255,122,24,.10);
+    }
+    .prompt.show{display:block}
 
     .rulesBtn{
-      position:fixed;
-      right:14px;
-      bottom:14px;
-      z-index:9998;
-      border-radius:999px;
-      padding:10px 14px;
-      border:1px solid rgba(255,106,0,.55);
-      background: rgba(255,106,0,.14);
-      box-shadow: 0 10px 30px rgba(255,106,0,.12);
-      font-weight:1000;
+      position:fixed;right:16px;bottom:16px;z-index:1000;
+      border-radius:999px;padding:10px 14px;
+      background:linear-gradient(180deg, rgba(255,122,24,.25), rgba(10,10,10,.85));
+      border:1px solid rgba(255,122,24,.45);
+      font-weight:950;cursor:pointer;
+      box-shadow: 0 14px 44px rgba(255,122,24,.12);
     }
 
-    .modal{
-      position:fixed; inset:0;
-      display:none;
-      align-items:center; justify-content:center;
+    /* Modal */
+    .modalBack{
+      position:fixed;inset:0;background:rgba(0,0,0,.6);
+      display:none;align-items:center;justify-content:center;z-index:999;
       padding:18px;
-      background: rgba(0,0,0,.68);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
     }
-    .modal.on{ display:flex; }
-    .modalCard{
+    .modal{
       width:min(720px, 100%);
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(15,17,23,.96), rgba(10,12,16,.96));
-      box-shadow: 0 20px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,106,0,.06) inset;
-      padding: 16px;
+      border-radius:22px;
+      border:1px solid rgba(255,122,24,.35);
+      background: linear-gradient(180deg, rgba(16,16,16,.92), rgba(8,8,8,.90));
+      box-shadow: 0 25px 80px rgba(0,0,0,.6);
+      padding:14px;
     }
-    .modalTop{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      margin-bottom: 10px;
-    }
-    .modalTitle{
-      font-size: 20px;
-      font-weight: 1000;
-      letter-spacing: .02em;
-    }
-    .lb{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      overflow:hidden;
-      background: rgba(255,255,255,.03);
-    }
-    .lbRow{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      padding:10px 12px;
-      border-bottom:1px solid rgba(255,255,255,.07);
-      color: var(--muted);
-    }
-    .lbRow:last-child{ border-bottom:0; }
-    .lbRow strong{ color: var(--text); }
-    .targetBtn{
-      width:100%;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      border-radius: 16px;
-      box-shadow:none;
-      padding: 12px 12px;
-      margin-top: 10px;
-      text-align:left;
-    }
-    .targetBtn:hover{ filter:brightness(1.12); }
+    .modal h3{margin:6px 0 6px;font-size:18px}
+    .modal .modalTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .lbTable{width:100%;border-collapse:collapse;margin-top:8px}
+    .lbTable th,.lbTable td{padding:10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+    .lbTable th{color:var(--muted);font-size:12px;letter-spacing:.5px}
+    .tag{font-size:12px;font-weight:950;color:#000;background:var(--orange);padding:4px 8px;border-radius:999px}
+    .tag.bad{background:var(--bad); color:#fff}
+    .tag.good{background:var(--good); color:#000}
 
-    .rulesText{
-      color: rgba(245,247,255,.90);
-      line-height: 1.5;
+    .statusBox{
+      margin-top:10px;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(10,10,10,.55);
+      font-weight:900;
     }
-    .rulesText h3{
-      margin: 14px 0 6px;
-      font-size: 16px;
-      letter-spacing: .02em;
-      color: var(--orange2);
-    }
-    .rulesText ul{ margin: 8px 0 0 18px; padding:0; }
-    .rulesText li{ margin: 6px 0; color: rgba(245,247,255,.86); }
+    .statusBox.good{border-color: rgba(41,209,125,.30)}
+    .statusBox.bad{border-color: rgba(255,75,75,.30)}
   </style>
 </head>
 <body>
-  <button class="rulesBtn" id="btnRules">Rules</button>
-
-  <div class="container">
-    <div class="brand">
-      <h1>Know It <span>All?</span></h1>
-      <div class="tag">PLAYER MODE • JOIN VIA QR</div>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div style="font-size:18px">Know It All?</div>
+          <div class="small muted" id="subTitle">Player Screen</div>
+        </div>
+      </div>
+      <span class="pill">Room: <b id="roomCode">—</b></span>
     </div>
 
+    <!-- Join -->
     <div class="card" id="joinCard">
-      <div class="badge">Join Game</div>
-      <p class="small">Enter nickname. Room code is auto-filled from the QR link.</p>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-        <input id="roomInput" class="mono" placeholder="ROOM CODE" style="flex:1; min-width:180px;" />
-        <input id="nameInput" placeholder="Nickname" style="flex:1; min-width:160px;" />
-        <button id="btnJoin">Join</button>
+      <h2 style="margin:6px 0 8px">Join Game</h2>
+      <div class="muted small">Enter a nickname, then join the room.</div>
+      <div class="divider"></div>
+
+      <div class="row">
+        <div style="flex:2">
+          <label class="small muted">Nickname</label>
+          <input id="nick" placeholder="e.g. Jaz, Tom, Mia..." maxlength="16"/>
+        </div>
+        <div style="flex:1;min-width:150px">
+          <label class="small muted">Room code</label>
+          <input id="roomInput" placeholder="ABCDE" maxlength="8"/>
+        </div>
       </div>
-      <div class="toast" id="joinToast" style="display:none;"></div>
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn orange" id="btnJoin">Join Game</button>
+      </div>
+
+      <div class="statusBox" id="joinStatus" style="display:none"></div>
     </div>
 
-    <div class="card" id="waitCard" style="display:none;">
-      <div class="badge">Waiting for Host…</div>
-      <div class="qtext">Get Ready ⚡</div>
-      <p class="small">The host will start the game soon.</p>
-      <div class="kpi">
-        <div class="pill"><strong>Status</strong><span class="mono" id="status">-</span></div>
-        <div class="pill"><strong>Your Score</strong><span class="mono" id="score">0</span></div>
-        <div class="pill"><strong>Your Streak</strong><span class="mono" id="streak">0</span></div>
-      </div>
-      <div class="toast bad" id="blockedToast" style="display:none;"></div>
+    <!-- Waiting -->
+    <div class="card" id="waitCard" style="display:none">
+      <h2 style="margin:6px 0 8px">Waiting for host...</h2>
+      <div class="muted small">Players joined will appear here.</div>
+      <div class="divider"></div>
+      <div id="playersMini" class="muted">—</div>
     </div>
 
-    <div class="card" id="playCard" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-        <div class="badge" id="phaseBadge">Question</div>
-        <div class="badge">Timer: <span class="mono" id="timer">20</span>s</div>
+    <!-- Game -->
+    <div class="card" id="gameCard" style="display:none">
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div style="flex:1">
+          <div class="muted small">Question</div>
+          <div class="qTitle" id="qText">—</div>
+        </div>
+        <div style="text-align:right;min-width:140px">
+          <div class="muted small">Timer</div>
+          <div class="timerBig"><span id="timeLeft">20</span>s</div>
+        </div>
       </div>
 
-      <div class="qtext" id="qText">Question</div>
+      <div id="sabotageMsg" class="statusBox bad" style="display:none;margin-top:10px">
+        You have been sabotaged — you cannot answer this question.
+      </div>
+
+      <div class="divider"></div>
       <div class="answers" id="answers"></div>
 
-      <div class="toast prompt" id="selectionPrompt" style="display:none;">MAKE A SELECTION</div>
+      <div class="prompt" id="perkPrompt">MAKE A SELECTION</div>
 
-      <div class="powerRow">
-        <button id="btnClaim" disabled>Claim +20</button>
-        <button id="btnSabotage" disabled>Sabotage</button>
+      <div class="powerGrid">
+        <button class="power" id="btnClaim" disabled>CLAIM +20</button>
+        <button class="power" id="btnSabotage" disabled>SABOTAGE</button>
+        <button class="power" id="btnCheat">CHEAT (1)</button>
+        <button class="power" id="btnHelp">HELP (3)</button>
       </div>
 
-      <div class="powerRow">
-        <button id="btnCheat" class="btn-cheat" disabled>CHEAT (1)</button>
-        <button id="btnHelp" disabled>HELP (3)</button>
-      </div>
-
-      <div class="toast" id="playToast" style="display:none;"></div>
+      <div class="statusBox" id="revealResult" style="display:none"></div>
     </div>
 
-    <div class="card" id="finalCard" style="display:none;">
-      <div class="badge">Final</div>
-      <div style="font-size:44px; font-weight:1000; text-align:center; margin:12px 0;" id="finalTitle">You Know It All</div>
-      <div style="text-align:center; letter-spacing:6px; color:var(--orange2);" id="finalSpark">✦ ✧ ✦ ✧ ✦</div>
-      <p class="small" id="finalSub" style="text-align:center; margin-top:12px;"></p>
+    <!-- Final -->
+    <div class="card" id="finalCard" style="display:none">
+      <h2 style="margin:6px 0 8px" id="finalTitle">—</h2>
+      <div class="muted" id="finalSub">—</div>
     </div>
   </div>
 
-  <div class="modal" id="revealModal">
-    <div class="modalCard">
+  <button class="rulesBtn" id="btnRules">Rules</button>
+
+  <!-- Leaderboard Modal -->
+  <div class="modalBack" id="lbBack">
+    <div class="modal">
       <div class="modalTop">
-        <div class="modalTitle">Reveal • Leaderboard</div>
-        <button class="btn-ghost" id="btnCloseReveal">Close</button>
+        <h3>Leaderboard</h3>
+        <button class="btn" id="lbClose">Close</button>
       </div>
-
-      <div class="toast" id="revealResultToast" style="display:none;"></div>
-      <div class="lb" id="revealLB"></div>
-
-      <div class="small" style="margin-top:10px; opacity:.85;" id="revealHint">
-        Host will start the next question…
+      <table class="lbTable" id="lbTable"></table>
+      <div class="small muted" style="margin-top:10px">
+        This popup auto-closes after 3 seconds (or you can close it).
       </div>
     </div>
   </div>
 
-  <div class="modal" id="sabotageModal">
-    <div class="modalCard">
+  <!-- Rules Modal -->
+  <div class="modalBack" id="rulesBack">
+    <div class="modal">
       <div class="modalTop">
-        <div class="modalTitle">Sabotage • Choose a player</div>
-        <button class="btn-ghost" id="btnCloseSab">Close</button>
+        <h3>Rules & How to Play</h3>
+        <button class="btn" id="rulesClose">Close</button>
       </div>
-      <div class="small">Tap a player to block them from answering the <b>next</b> question.</div>
-      <div id="sabTargets"></div>
+      <div class="small" style="color:#e9e9e9;line-height:1.55;font-weight:800">
+        <b>Know It All?</b> is a fast-paced live quiz for up to <b>20 players</b> per room.<br><br>
+
+        <b>How it works</b><br>
+        1) Join with a nickname and wait for the host.<br>
+        2) Each question has <b>20 seconds</b>.<br>
+        3) Tap one answer (it locks in and turns lighter).<br>
+        4) When the host reveals the answer, you’ll see if you were correct and the updated leaderboard.<br><br>
+
+        <b>Points</b><br>
+        • Correct answers earn up to <b>100 points</b> depending on speed (faster = more points).<br><br>
+
+        <b>Streak Perk (5 correct in a row)</b><br>
+        When you reach 5 correct answers in a row, the game pauses after reveal until you choose:<br>
+        • <b>CLAIM +20</b> OR<br>
+        • <b>SABOTAGE</b> one player (they can’t answer the next question).<br><br>
+
+        <b>Power Buttons</b><br>
+        • <b>CHEAT</b> (1 use per game): instantly picks the correct answer for you.<br>
+        • <b>HELP</b> (3 uses per game): removes 2 wrong answers immediately (like 50/50).<br><br>
+
+        <b>Sabotaged?</b><br>
+        If someone sabotages you, you’ll see a message and you can’t answer the next question.
+      </div>
     </div>
   </div>
 
-  <div class="modal" id="rulesModal">
-    <div class="modalCard">
-      <div class="modalTop">
-        <div class="modalTitle">Rules • How to Play</div>
-        <button class="btn-ghost" id="btnCloseRules">Close</button>
-      </div>
-      <div class="rulesText" id="rulesContent"></div>
-    </div>
-  </div>
-
-  <script>
-    const SFX = (() => {
-      let ctx = null;
-      function getCtx(){ if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); return ctx; }
-      function ensureUnlocked(){ try{ getCtx().resume(); }catch{} }
-      function tone(freq=440, dur=0.06, type="sine", vol=0.06){
-        const c = getCtx();
-        const o = c.createOscillator();
-        const g = c.createGain();
-        o.type = type; o.frequency.value = freq; g.gain.value = vol;
-        o.connect(g); g.connect(c.destination);
-        o.start(); o.stop(c.currentTime + dur);
-      }
-      function click(){ tone(900,0.03,"square",0.04); }
-      function reveal(){
-        tone(660,0.09,"sine",0.06);
-        setTimeout(()=>tone(990,0.10,"sine",0.06), 90);
-        setTimeout(()=>tone(1320,0.12,"sine",0.06), 200);
-      }
-      let lastTickSec = null;
-      function tick(secLeft){
-        if(secLeft === lastTickSec) return;
-        lastTickSec = secLeft;
-        const s = Math.max(0, Math.min(20, secLeft));
-        const freq = 420 + (20 - s) * 40;
-        tone(freq, 0.03, "square", 0.028);
-      }
-      function resetTick(){ lastTickSec = null; }
-      return { ensureUnlocked, click, reveal, tick, resetTick };
-    })();
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+      getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot,
+      collection, query, orderBy, getDocs, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
@@ -364,599 +342,672 @@
       messagingSenderId: "975815651315",
       appId: "1:975815651315:web:7a5e981548448b382aec86"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
 
-    function nowMs(){ return Date.now(); }
-    function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
-    function $(id){ return document.getElementById(id); }
-    function show(el,on=true){ el.style.display = on ? "" : "none"; }
-    function setToast(el,msg,cls){
-      el.className = "toast" + (cls ? (" " + cls) : "");
-      if(!msg){ el.style.display="none"; el.textContent=""; }
-      else { el.style.display=""; el.textContent=msg; }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ------- Helpers -------
+    function mulberry32(seed){
+      return function(){
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
     }
-    function qparam(name){ return new URL(location.href).searchParams.get(name); }
-    function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
-    function modalOn(id, on){
-      const m = $(id);
-      if(on) m.classList.add("on"); else m.classList.remove("on");
+    function seededShuffle(arr, seed){
+      const r = mulberry32(seed);
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(r()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
     }
+    function hashSeed(seed, idx){ return (seed * 1000003 + idx * 9176) >>> 0; }
 
-    let uid = null;
-    let joined = false;
-    let roomId = (qparam("room") || "").toUpperCase();
-
-    let unsubRoom = null;
-    let unsubPlayers = null;
-
-    let latestRoom = null;
-    let latestPlayers = [];
-
-    let timerUI = null;
-
-    const localHelpRemoved = new Map();
-    const localSelected = new Map();
-
-    let suppressRevealForQ = null;
-    let autoCloseTimer = null;
-    let lastRevealSoundQ = null;
-
-    function roomRef(){ return db.collection("rooms").doc(roomId); }
-    function playersRef(){ return roomRef().collection("players"); }
-    function answersRef(){ return roomRef().collection("answers"); }
-
-    async function signInPlayer(){
-      const cred = await auth.signInAnonymously();
-      uid = cred.user.uid;
+    let BANK=null;
+    async function loadBank(){
+      if(BANK) return BANK;
+      const files = [
+        "./question_bank_part1.json",
+        "./question_bank_part2.json",
+        "./question_bank_part3.json",
+        "./question_bank_part4.json"
+      ];
+      const parts=[];
+      for(const f of files){
+        const res = await fetch(f, { cache:"no-store" });
+        if(!res.ok) throw new Error("Missing file: " + f);
+        const arr = await res.json();
+        parts.push(arr);
+      }
+      BANK = parts.flat();
+      return BANK;
     }
 
-    async function joinGame(){
-      roomId = ($("roomInput").value || "").trim().toUpperCase();
-      const name = ($("nameInput").value || "").trim();
-      if(!roomId || !name){
-        setToast($("joinToast"), "Enter nickname (and ensure room code is present).");
+    function buildChoices(question, bank, seed, qIndex){
+      const r = mulberry32(hashSeed(seed, qIndex));
+      const correct = String(question.answer);
+      const pool = bank.filter(q => String(q.answer) !== correct).map(q=>String(q.answer));
+      const decoys = new Set();
+      while(decoys.size < 3 && pool.length){
+        const cand = pool[Math.floor(r()*pool.length)];
+        if(cand && cand !== correct) decoys.add(cand);
+      }
+      const choices = [correct, ...Array.from(decoys).slice(0,3)];
+      for(let i=choices.length-1;i>0;i--){
+        const j = Math.floor(r()*(i+1));
+        [choices[i], choices[j]] = [choices[j], choices[i]];
+      }
+      return choices;
+    }
+
+    function qs(name){
+      return new URLSearchParams(location.search).get(name);
+    }
+
+    // ------- Sounds (WebAudio) -------
+    let audioCtx = null;
+    function ctx(){
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+    function beep(freq=440, dur=0.06, type="sine", vol=0.06){
+      const c = ctx();
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g); g.connect(c.destination);
+      o.start();
+      o.stop(c.currentTime + dur);
+    }
+    function clickSound(){ beep(520, .05, "square", .04); }
+    function revealSound(){
+      // little “game show” chirp
+      const c = ctx();
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.type="sine";
+      g.gain.value = .06;
+      o.connect(g); g.connect(c.destination);
+      o.start();
+      o.frequency.setValueAtTime(420, c.currentTime);
+      o.frequency.exponentialRampToValueAtTime(880, c.currentTime+.18);
+      o.frequency.exponentialRampToValueAtTime(520, c.currentTime+.34);
+      o.stop(c.currentTime+.36);
+    }
+    function tickSound(secondsLeft){
+      // pitch rises as time approaches 0
+      const freq = 220 + (20 - secondsLeft) * 28;
+      beep(freq, .05, "sine", .035);
+    }
+
+    // ------- UI refs -------
+    const joinCard = document.getElementById("joinCard");
+    const waitCard = document.getElementById("waitCard");
+    const gameCard = document.getElementById("gameCard");
+    const finalCard = document.getElementById("finalCard");
+
+    const roomCodeEl = document.getElementById("roomCode");
+    const nickEl = document.getElementById("nick");
+    const roomInputEl = document.getElementById("roomInput");
+    const btnJoin = document.getElementById("btnJoin");
+    const joinStatus = document.getElementById("joinStatus");
+
+    const playersMini = document.getElementById("playersMini");
+
+    const qTextEl = document.getElementById("qText");
+    const answersEl = document.getElementById("answers");
+    const timeLeftEl = document.getElementById("timeLeft");
+
+    const btnClaim = document.getElementById("btnClaim");
+    const btnSabotage = document.getElementById("btnSabotage");
+    const btnCheat = document.getElementById("btnCheat");
+    const btnHelp = document.getElementById("btnHelp");
+    const perkPrompt = document.getElementById("perkPrompt");
+
+    const sabotageMsg = document.getElementById("sabotageMsg");
+    const revealResult = document.getElementById("revealResult");
+
+    const lbBack = document.getElementById("lbBack");
+    const lbClose = document.getElementById("lbClose");
+    const lbTable = document.getElementById("lbTable");
+    lbClose.onclick = ()=> lbBack.style.display="none";
+
+    const rulesBack = document.getElementById("rulesBack");
+    document.getElementById("btnRules").onclick = ()=> rulesBack.style.display="flex";
+    document.getElementById("rulesClose").onclick = ()=> rulesBack.style.display="none";
+
+    const finalTitle = document.getElementById("finalTitle");
+    const finalSub = document.getElementById("finalSub");
+
+    // ------- State -------
+    let roomCode = (qs("room")||"").toUpperCase();
+    let playerId = localStorage.getItem("kia_playerId") || null;
+    let roomRef = null;
+    let playerRef = null;
+    let playersCol = null;
+
+    let roomUnsub = null;
+    let playersUnsub = null;
+    let tickTimer = null;
+
+    let currentRoom = null;
+    let currentPlayer = null;
+
+    let currentChoices = [];
+    let lockedChoice = null;
+    let lockDisabled = false;
+
+    // sabotage targeting modal uses leaderboard modal
+    let sabotagePicking = false;
+
+    // ------- Startup fill -------
+    if(roomCode){
+      roomInputEl.value = roomCode;
+      roomCodeEl.textContent = roomCode;
+    }
+
+    function show(screen){
+      joinCard.style.display = screen==="join" ? "" : "none";
+      waitCard.style.display = screen==="wait" ? "" : "none";
+      gameCard.style.display = screen==="game" ? "" : "none";
+      finalCard.style.display = screen==="final" ? "" : "none";
+    }
+    show("join");
+
+    function safeNick(n){
+      n = String(n||"").trim();
+      n = n.replace(/\s+/g," ");
+      if(n.length < 2) return null;
+      if(n.length > 16) n = n.slice(0,16);
+      return n;
+    }
+    function uuid(){
+      return "p_" + Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    async function joinRoom(){
+      const nick = safeNick(nickEl.value);
+      const code = String(roomInputEl.value||"").trim().toUpperCase();
+      if(!nick){ setJoinStatus("Enter a nickname (2+ chars).", true); return; }
+      if(!code){ setJoinStatus("Enter a room code.", true); return; }
+
+      // ensure audio context unlocks on user gesture
+      clickSound();
+
+      roomCode = code;
+      roomCodeEl.textContent = roomCode;
+
+      roomRef = doc(db, "rooms", roomCode);
+      playersCol = collection(db, "rooms", roomCode, "players");
+
+      const snap = await getDoc(roomRef);
+      if(!snap.exists()){
+        setJoinStatus("Room not found. Check the code.", true);
         return;
       }
 
-      const snap = await roomRef().get();
-      if(!snap.exists){
-        setToast($("joinToast"), "Room not found. Scan the QR again.");
-        return;
+      if(!playerId){
+        playerId = uuid();
+        localStorage.setItem("kia_playerId", playerId);
       }
+      playerRef = doc(db, "rooms", roomCode, "players", playerId);
 
-      await playersRef().doc(uid).set({
-        id: uid,
-        name,
+      await setDoc(playerRef, {
+        nick,
+        joinedAt: serverTimestamp(),
         score: 0,
         streak: 0,
-        rewardPending: false,
-        rewardEarnedAtQuestionIndex: null,
         lastAnswer: null,
-        cheatLeft: 1,
-        helpLeft: 3,
-        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+        lastAnswerMs: null,
+        lastCorrect: null,
+        cheatUsed: false,
+        helpUsed: 0,
+        pendingPerk: false,
+        sabotagedNext: false,
+        sabotageNotice: null
       }, { merge:true });
 
-      joined = true;
-      setToast($("joinToast"), "");
-      show($("joinCard"), false);
-      show($("waitCard"), true);
-
-      listenLive();
+      bindListeners();
+      show("wait");
+      setJoinStatus("", false, true);
     }
 
-    function keyForRoomQ(room){ return `${roomId}|${room.questionIndex}`; }
-
-    function isSabotaged(room){
-      if(room.status !== "question") return false;
-      const s = room.sabotage;
-      if(!s || s.activeForQuestionIndex !== room.questionIndex) return false;
-      const blocks = s.blocks || [];
-      return blocks.some(b => b.targetPlayerId === uid);
+    function setJoinStatus(msg, isError=false, hide=false){
+      joinStatus.style.display = hide ? "none" : "";
+      joinStatus.textContent = msg;
+      joinStatus.className = "statusBox " + (isError ? "bad" : "good");
+      if(hide) joinStatus.style.display="none";
     }
 
-    function sabotageBlockInfoForQuestion(room, qIndex){
-      const s = room?.sabotage;
-      if(!s || s.activeForQuestionIndex !== qIndex) return null;
-      const blocks = s.blocks || [];
-      return blocks.find(b => b.targetPlayerId === uid) || null;
-    }
+    btnJoin.onclick = ()=> joinRoom().catch(e=>{
+      console.error(e);
+      setJoinStatus("Join failed: " + e.message, true);
+    });
 
-    function isPendingStreakDecision(room, me){
-      if(room.status !== "reveal") return false;
-      if(!room.pause || room.pause.type !== "streak") return false;
-      const pending = room.pause.pendingPlayerIds || [];
-      return !!(me && me.rewardPending === true && pending.includes(uid));
-    }
+    // ------- Rendering -------
+    async function render(room, me, players){
+      currentRoom = room;
+      currentPlayer = me;
 
-    async function alreadyAnswered(qIdx){
-      const doc = await answersRef().doc(`${qIdx}_${uid}`).get();
-      return doc.exists;
-    }
-
-    async function writeAnswer(qIdx, choiceIndex){
-      if(await alreadyAnswered(qIdx)) return;
-      await answersRef().doc(`${qIdx}_${uid}`).set({
-        id: `${qIdx}_${uid}`,
-        uid,
-        roomId,
-        questionIndex: qIdx,
-        choiceIndex,
-        answeredAtMs: nowMs()
-      });
-    }
-
-    async function pickAnswer(choiceIndex){
-      if(!latestRoom) return;
-      if(latestRoom.status !== "question") return;
-      if(isSabotaged(latestRoom)) return;
-
-      const key = keyForRoomQ(latestRoom);
-      if(localSelected.has(key)) return;
-
-      localSelected.set(key, choiceIndex);
-      renderAnswers();
-
-      await writeAnswer(latestRoom.questionIndex, choiceIndex);
-      setToast($("playToast"), "Answer locked in.");
-    }
-
-    function suppressReveal(qIdx){
-      suppressRevealForQ = qIdx;
-      modalOn("revealModal", false);
-      $("revealHint").textContent = "Host will start the next question…";
-    }
-
-    function clearAutoClose(){ if(autoCloseTimer){ clearTimeout(autoCloseTimer); autoCloseTimer = null; } }
-
-    function startAutoClose(room){
-      clearAutoClose();
-      $("revealHint").textContent = "You unlocked a 5-streak! Closing in 3 seconds so you can choose…";
-      autoCloseTimer = setTimeout(()=>{
-        if(latestRoom && latestRoom.status === "reveal" && latestRoom.questionIndex === room.questionIndex){
-          suppressReveal(room.questionIndex);
-        }
-      }, 3000);
-    }
-
-    async function claim20(){
-      if(!latestRoom) return;
-      const meSnap = await playersRef().doc(uid).get();
-      if(!meSnap.exists) return;
-      const me = meSnap.data();
-      if(!isPendingStreakDecision(latestRoom, me)) return;
-
-      await db.runTransaction(async (tx) => {
-        const roomDoc = await tx.get(roomRef());
-        const meDoc = await tx.get(playersRef().doc(uid));
-        if(!roomDoc.exists || !meDoc.exists) return;
-
-        const room = roomDoc.data();
-        const player = meDoc.data();
-
-        const pending = (room.pause?.pendingPlayerIds || []).slice();
-        if(!pending.includes(uid)) return;
-
-        const newPending = pending.filter(x => x !== uid);
-
-        tx.update(playersRef().doc(uid), {
-          score: (player.score||0) + 20,
-          rewardPending: false,
-          rewardEarnedAtQuestionIndex: null,
-          streak: 0
-        });
-
-        tx.update(roomRef(), {
-          pause: newPending.length ? { ...room.pause, pendingPlayerIds: newPending } : null,
-          updatedAtMs: nowMs()
-        });
-      });
-
-      modalOn("sabotageModal", false);
-      $("selectionPrompt").style.display = "none";
-    }
-
-    async function openSabotage(){
-      if(!latestRoom) return;
-      const meSnap = await playersRef().doc(uid).get();
-      if(!meSnap.exists) return;
-      const me = meSnap.data();
-      if(!isPendingStreakDecision(latestRoom, me)) return;
-
-      if(!latestPlayers || latestPlayers.length === 0){
-        const pSnap = await playersRef().get();
-        latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-      }
-
-      renderSabotageTargets();
-      modalOn("sabotageModal", true);
-    }
-
-    function renderSabotageTargets(){
-      const wrap = $("sabTargets");
-      wrap.innerHTML = "";
-
-      const candidates = latestPlayers
-        .filter(p => p.id !== uid)
-        .sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
-
-      if(candidates.length === 0){
-        const d = document.createElement("div");
-        d.className = "toast bad";
-        d.textContent = "No players available to sabotage.";
-        wrap.appendChild(d);
+      // waiting list
+      if(room.status === "lobby"){
+        show("wait");
+        playersMini.textContent = players.length
+          ? players.map(p=>p.nick).join(", ")
+          : "No other players yet.";
         return;
       }
 
-      candidates.forEach((p,i)=>{
+      // final
+      if(room.status === "final"){
+        show("final");
+        // simple result: if top score ties => winner
+        const sorted = players.slice().sort((a,b)=>(b.score||0)-(a.score||0));
+        const top = sorted[0]?.score || 0;
+        const winners = sorted.filter(p=>(p.score||0)===top).map(p=>p.nick);
+        const iAmWinner = winners.includes(me.nick);
+
+        finalTitle.textContent = iAmWinner ? "You Know It All! 🎉" : "Not too bad! 🙂";
+        finalSub.textContent = iAmWinner
+          ? "You finished top of the leaderboard!"
+          : "Great effort — try again and go for the top spot.";
+        return;
+      }
+
+      // question / reveal / awaitingPerks
+      show("game");
+
+      // sabotage message
+      const sabotaged = !!me.sabotagedNext;
+      sabotageMsg.style.display = sabotaged ? "" : "none";
+
+      // load bank + current question
+      const bank = await loadBank();
+      const order = seededShuffle(bank, room.seed).slice(0, room.questionCount);
+      const qIndex = room.qIndex || 0;
+      const q = order[qIndex];
+      if(!q){
+        qTextEl.textContent = "Question not found.";
+        return;
+      }
+      qTextEl.textContent = q.text;
+
+      // build choices (consistent)
+      currentChoices = buildChoices(q, order, room.seed, qIndex);
+
+      // if new question, clear UI lock
+      if(room.status === "question"){
+        // If room.qStartMs changes, reset local locks
+        // (best-effort: clear lock when qIndex changes)
+      }
+
+      // render answers
+      renderAnswers(q, room, me);
+
+      // timer
+      syncTimer(room);
+
+      // perk buttons
+      const pendingPerk = !!me.pendingPerk;
+      btnClaim.disabled = !pendingPerk;
+      btnSabotage.disabled = !pendingPerk;
+
+      perkPrompt.classList.toggle("show", pendingPerk);
+
+      // cheat/help counts
+      btnCheat.disabled = !!me.cheatUsed || sabotaged || room.status !== "question";
+      btnCheat.textContent = me.cheatUsed ? "CHEAT (USED)" : "CHEAT (1)";
+      btnHelp.disabled = (me.helpUsed||0) >= 3 || sabotaged || room.status !== "question";
+      btnHelp.textContent = (me.helpUsed||0) >= 3 ? "HELP (USED)" : `HELP (${3-(me.helpUsed||0)})`;
+
+      // reveal result text & sounds
+      if(room.status === "reveal" || room.status === "awaitingPerks"){
+        revealResult.style.display = "";
+        const ok = me.lastCorrect === true;
+        revealResult.className = "statusBox " + (ok ? "good" : "bad");
+        revealResult.textContent = ok ? "Correct ✅" : (sabotaged ? "Sabotaged — no answer counted" : "Incorrect ❌");
+
+        // show leaderboard popup
+        openLeaderboard(players);
+
+        // auto close after 3 seconds (but if perk is pending, we still close so player can select)
+        setTimeout(()=>{ lbBack.style.display="none"; }, 3000);
+
+        // reveal sound once per revealAtMs (best effort)
+        if(room.revealAtMs && (!window.__lastRevealAtMs || window.__lastRevealAtMs !== room.revealAtMs)){
+          window.__lastRevealAtMs = room.revealAtMs;
+          revealSound();
+        }
+      } else {
+        revealResult.style.display = "none";
+      }
+
+      // if awaiting perks and this player has pending perk, ensure leaderboard closes quickly
+      if(room.status === "awaitingPerks" && pendingPerk){
+        setTimeout(()=>{ lbBack.style.display="none"; }, 3000);
+      }
+    }
+
+    function renderAnswers(q, room, me){
+      answersEl.innerHTML = "";
+      const correct = String(q.answer);
+      const inQuestion = room.status === "question";
+      const sabotaged = !!me.sabotagedNext;
+
+      // Lock: if already selected in this question, read from me.lastAnswer? (we clear at reveal, but during question we store)
+      lockedChoice = me.lastAnswer ?? lockedChoice;
+
+      currentChoices.forEach(choice=>{
         const btn = document.createElement("button");
-        btn.className = "targetBtn";
-        btn.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px;">
-          <div><span class="mono" style="opacity:.7">#${i+1}</span> <b>${p.name}</b></div>
-          <div class="mono">${p.score||0}</div>
-        </div>`;
-        btn.onclick = () => { SFX.ensureUnlocked(); SFX.click(); applySabotage(p.id); };
-        wrap.appendChild(btn);
+        btn.className = "ans";
+        btn.textContent = choice;
+
+        const isSelected = lockedChoice != null && String(lockedChoice) === String(choice);
+        if(isSelected) btn.classList.add("selected","locked");
+
+        // if sabotaged, disable all
+        if(sabotaged || !inQuestion){
+          btn.classList.add("disabled");
+          btn.disabled = true;
+        }
+
+        // apply help/cheat markings stored in window for current qIndex
+        const removedSet = window.__removedChoices || new Set();
+
+        if(removedSet.has(choice)){
+          btn.classList.add("disabled");
+          btn.disabled = true;
+        }
+
+        // when reveal, show green/red feedback visually
+        if(room.status === "reveal" || room.status === "awaitingPerks"){
+          if(choice === correct) btn.classList.add("correctNow");
+          else btn.classList.add("wrongNow");
+          btn.disabled = true;
+        }
+
+        btn.onclick = async ()=>{
+          clickSound();
+          if(!inQuestion) return;
+          if(sabotaged) return;
+          if(lockedChoice != null) return; // cannot change once selected
+
+          lockedChoice = choice; // local
+          // update Firestore
+          await updateDoc(playerRef, {
+            lastAnswer: choice,
+            lastAnswerMs: Date.now()
+          });
+
+          // re-render to show white highlight
+          renderAnswers(q, room, { ...me, lastAnswer: choice });
+        };
+
+        answersEl.appendChild(btn);
       });
     }
+
+    function syncTimer(room){
+      if(tickTimer) clearInterval(tickTimer);
+
+      if(room.status === "question" && room.qStartMs){
+        tickTimer = setInterval(()=>{
+          const now = Date.now();
+          const left = Math.max(0, Math.ceil((room.qStartMs + 20000 - now)/1000));
+          timeLeftEl.textContent = String(left);
+
+          // play tick from 20 downwards (only once per second)
+          if(window.__lastTickSecond !== left){
+            window.__lastTickSecond = left;
+            // start ticking immediately from 20
+            if(left <= 20 && left >= 0) tickSound(left);
+          }
+
+          if(left <= 0){
+            clearInterval(tickTimer);
+          }
+        }, 150);
+      } else {
+        timeLeftEl.textContent = "20";
+      }
+    }
+
+    function openLeaderboard(players){
+      // build table
+      const sorted = players.slice().sort((a,b)=>(b.score||0)-(a.score||0));
+      const rows = [];
+      rows.push(`<tr><th>Rank</th><th>Player</th><th>Score</th><th>Status</th></tr>`);
+      sorted.forEach((p,i)=>{
+        const st = p.sabotagedNext ? `<span class="tag bad">Sabotaged</span>` : `<span class="tag good">OK</span>`;
+        rows.push(`<tr>
+          <td>${i+1}</td>
+          <td>${escapeHtml(p.nick||"Player")}</td>
+          <td><b style="color:var(--orange)">${p.score||0}</b></td>
+          <td>${st}</td>
+        </tr>`);
+      });
+      lbTable.innerHTML = rows.join("");
+      lbBack.style.display = "flex";
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    // ------- Power Buttons -------
+    btnCheat.onclick = async ()=>{
+      clickSound();
+      if(!currentRoom || !currentPlayer) return;
+      if(currentRoom.status !== "question") return;
+      if(currentPlayer.sabotagedNext) return;
+      if(currentPlayer.cheatUsed) return;
+
+      // ensure audio unlocked
+      ctx();
+
+      // determine correct answer for current question
+      const bank = await loadBank();
+      const order = seededShuffle(bank, currentRoom.seed).slice(0, currentRoom.questionCount);
+      const q = order[currentRoom.qIndex||0];
+      const correct = String(q.answer);
+
+      // mark wrong answers immediately red (UX)
+      // store removed choices = none, but mark wrongNow visually by setting a set for render
+      window.__removedChoices = new Set(); // don't remove, just highlight after click
+      lockedChoice = correct;
+
+      await updateDoc(playerRef, {
+        cheatUsed: true,
+        lastAnswer: correct,
+        lastAnswerMs: Date.now()
+      });
+
+      // Immediately re-render with lock and show wrong answers red? (Only requested for cheat: wrong answers go red immediately)
+      // We’ll “temporarily” mark non-correct answers wrongNow in the UI for this question.
+      // (We do this by adding a flag on window and re-render below)
+      window.__cheatShowWrongNow = true;
+
+      // Rerender now
+      renderAnswers(q, currentRoom, { ...currentPlayer, lastAnswer: correct });
+
+      // paint the wrong ones red immediately in current view
+      Array.from(answersEl.querySelectorAll(".ans")).forEach(b=>{
+        const txt = b.textContent;
+        if(txt !== correct) b.classList.add("wrongNow");
+        else b.classList.add("correctNow");
+      });
+    };
+
+    btnHelp.onclick = async ()=>{
+      clickSound();
+      if(!currentRoom || !currentPlayer) return;
+      if(currentRoom.status !== "question") return;
+      if(currentPlayer.sabotagedNext) return;
+      if((currentPlayer.helpUsed||0) >= 3) return;
+
+      const bank = await loadBank();
+      const order = seededShuffle(bank, currentRoom.seed).slice(0, currentRoom.questionCount);
+      const q = order[currentRoom.qIndex||0];
+      const correct = String(q.answer);
+
+      // disable 2 wrong answers immediately
+      const wrongs = currentChoices.filter(c => String(c) !== correct);
+      const r = mulberry32(hashSeed(currentRoom.seed, (currentRoom.qIndex||0)+999));
+      // pick 2 wrongs to remove deterministically
+      const pickWrong = wrongs.slice();
+      for(let i=pickWrong.length-1;i>0;i--){
+        const j = Math.floor(r()*(i+1));
+        [pickWrong[i], pickWrong[j]] = [pickWrong[j], pickWrong[i]];
+      }
+      const remove = pickWrong.slice(0,2);
+      window.__removedChoices = new Set(remove);
+
+      await updateDoc(playerRef, {
+        helpUsed: (currentPlayer.helpUsed||0) + 1
+      });
+
+      // rerender immediately
+      renderAnswers(q, currentRoom, currentPlayer);
+    };
+
+    btnClaim.onclick = async ()=>{
+      clickSound();
+      if(!currentRoom || !currentPlayer) return;
+      if(!currentPlayer.pendingPerk) return;
+
+      // add +20 points, clear pendingPerk, remove from awaitingPerkFor in room if present
+      const roomSnap = await getDoc(roomRef);
+      if(!roomSnap.exists()) return;
+      const room = roomSnap.data();
+      const awaiting = (room.awaitingPerkFor||[]).filter(id => id !== playerId);
+
+      await updateDoc(playerRef, {
+        score: (currentPlayer.score||0) + 20,
+        pendingPerk: false
+      });
+      await updateDoc(roomRef, {
+        awaitingPerkFor: awaiting,
+        status: awaiting.length ? "awaitingPerks" : "reveal"
+      });
+    };
+
+    btnSabotage.onclick = async ()=>{
+      clickSound();
+      if(!currentRoom || !currentPlayer) return;
+      if(!currentPlayer.pendingPerk) return;
+
+      // open leaderboard modal to pick a target
+      sabotagePicking = true;
+      lbBack.style.display="flex";
+      lbClose.textContent = "Cancel";
+
+      // Replace leaderboard with clickable rows
+      const pSnap = await getDocs(query(playersCol, orderBy("score","desc")));
+      const players = pSnap.docs.map(d=>({id:d.id, ...d.data()})).filter(p=>p.id !== playerId);
+
+      const rows = [];
+      rows.push(`<tr><th>Select target</th><th>Score</th></tr>`);
+      players.forEach(p=>{
+        rows.push(`<tr data-id="${p.id}" style="cursor:pointer">
+          <td><b>${escapeHtml(p.nick||"Player")}</b></td>
+          <td style="color:var(--orange);font-weight:950">${p.score||0}</td>
+        </tr>`);
+      });
+      lbTable.innerHTML = rows.join("");
+
+      // click handler
+      Array.from(lbTable.querySelectorAll("tr[data-id]")).forEach(tr=>{
+        tr.onclick = async ()=>{
+          const targetId = tr.getAttribute("data-id");
+          await applySabotage(targetId);
+        };
+      });
+
+      lbClose.onclick = ()=>{
+        sabotagePicking = false;
+        lbBack.style.display="none";
+        lbClose.textContent = "Close";
+        lbClose.onclick = ()=> lbBack.style.display="none";
+      };
+    };
 
     async function applySabotage(targetId){
-      if(!latestRoom) return;
+      // set room.sabotageNext[targetId]=true, clear pending perk, update awaitingPerkFor
+      const roomSnap = await getDoc(roomRef);
+      if(!roomSnap.exists()) return;
+      const room = roomSnap.data();
 
-      await db.runTransaction(async (tx) => {
-        const roomDoc = await tx.get(roomRef());
-        const meDoc = await tx.get(playersRef().doc(uid));
-        if(!roomDoc.exists || !meDoc.exists) return;
+      const sabotageNext = room.sabotageNext || {};
+      sabotageNext[targetId] = true;
 
-        const room = roomDoc.data();
-        const me = meDoc.data();
+      const awaiting = (room.awaitingPerkFor||[]).filter(id => id !== playerId);
 
-        const pending = (room.pause?.pendingPlayerIds || []).slice();
-        if(!pending.includes(uid)) return;
-
-        const newPending = pending.filter(x => x !== uid);
-
-        const nextQ = room.questionIndex + 1;
-        let sabotage = room.sabotage;
-
-        if(!sabotage || sabotage.activeForQuestionIndex !== nextQ){
-          sabotage = { activeForQuestionIndex: nextQ, blocks: [] };
-        }
-
-        const blocks = Array.isArray(sabotage.blocks) ? sabotage.blocks.slice() : [];
-        blocks.push({ targetPlayerId: targetId, byName: me.name });
-
-        tx.update(roomRef(), {
-          sabotage: { activeForQuestionIndex: nextQ, blocks },
-          pause: newPending.length ? { ...room.pause, pendingPlayerIds: newPending } : null,
-          updatedAtMs: nowMs()
-        });
-
-        tx.update(playersRef().doc(uid), {
-          rewardPending: false,
-          rewardEarnedAtQuestionIndex: null,
-          streak: 0
-        });
+      await updateDoc(playerRef, {
+        pendingPerk: false
+      });
+      await updateDoc(roomRef, {
+        sabotageNext,
+        awaitingPerkFor: awaiting,
+        status: awaiting.length ? "awaitingPerks" : "reveal"
       });
 
-      modalOn("sabotageModal", false);
-      $("selectionPrompt").style.display = "none";
+      // close modal
+      sabotagePicking = false;
+      lbBack.style.display="none";
+      lbClose.textContent = "Close";
+      lbClose.onclick = ()=> lbBack.style.display="none";
     }
 
-    async function cheat(){
-      if(!latestRoom) return;
-      if(latestRoom.status !== "question") return;
-      if(isSabotaged(latestRoom)) return;
+    // ------- Listeners -------
+    function bindListeners(){
+      if(roomUnsub) roomUnsub();
+      if(playersUnsub) playersUnsub();
 
-      const meSnap = await playersRef().doc(uid).get();
-      if(!meSnap.exists) return;
-      const me = meSnap.data();
-
-      const key = keyForRoomQ(latestRoom);
-      if(localSelected.has(key)) return;
-      if(me.rewardPending) return;
-      if((me.cheatLeft||0) <= 0) return;
-
-      await playersRef().doc(uid).update({ cheatLeft: (me.cheatLeft||0) - 1 });
-
-      const correctIndex = latestRoom.currentQuestion.correctIndex;
-      localSelected.set(key, correctIndex);
-      renderAnswers();
-
-      await writeAnswer(latestRoom.questionIndex, correctIndex);
-      setToast($("playToast"), "CHEAT used. Answer locked in.");
-    }
-
-    async function help5050(){
-      if(!latestRoom) return;
-      if(latestRoom.status !== "question") return;
-      if(isSabotaged(latestRoom)) return;
-
-      const meSnap = await playersRef().doc(uid).get();
-      if(!meSnap.exists) return;
-      const me = meSnap.data();
-
-      const key = keyForRoomQ(latestRoom);
-      if(localSelected.has(key)) return;
-      if(me.rewardPending) return;
-      if((me.helpLeft||0) <= 0) return;
-      if(localHelpRemoved.has(key)) return;
-
-      const correct = latestRoom.currentQuestion.correctIndex;
-      const wrong = [];
-      for(let i=0;i<latestRoom.currentQuestion.options.length;i++){
-        if(i !== correct) wrong.push(i);
-      }
-      wrong.sort(()=>Math.random()-0.5);
-      localHelpRemoved.set(key, wrong.slice(0,2));
-
-      await playersRef().doc(uid).update({ helpLeft: (me.helpLeft||0) - 1 });
-
-      renderAnswers();
-      setToast($("playToast"), "HELP used.");
-    }
-
-    function renderAnswers(){
-      if(!latestRoom) return;
-      const ansBox = $("answers");
-      ansBox.innerHTML = "";
-      const q = latestRoom.currentQuestion;
-      if(!q) return;
-
-      const key = keyForRoomQ(latestRoom);
-      const removed = localHelpRemoved.get(key) || [];
-      const selected = localSelected.get(key);
-
-      const lockAll = latestRoom.status !== "question" || isSabotaged(latestRoom) || localSelected.has(key);
-
-      q.options.forEach((opt, idx)=>{
-        const b = document.createElement("button");
-        b.className = "answer";
-
-        if(typeof selected === "number" && selected === idx) b.classList.add("selected");
-        if(removed.includes(idx)){
-          b.classList.add("removed");
-          b.disabled = true;
+      roomUnsub = onSnapshot(roomRef, async (snap)=>{
+        if(!snap.exists()){
+          show("join");
+          setJoinStatus("Room closed.", true);
+          return;
         }
-        if(lockAll && !(typeof selected === "number" && selected === idx)){
-          b.classList.add("locked");
-          b.disabled = true;
-        }
-        if(!lockAll && !b.disabled){
-          b.onclick = () => { SFX.ensureUnlocked(); SFX.click(); pickAnswer(idx); };
+        const room = snap.data();
+
+        // Get me
+        const meSnap = await getDoc(playerRef);
+        const me = meSnap.exists() ? meSnap.data() : null;
+        if(!me) return;
+
+        // Players list
+        const pSnap = await getDocs(query(playersCol, orderBy("score","desc")));
+        const players = pSnap.docs.map(d=>({id:d.id, ...d.data()}));
+
+        // If new question index, clear help removed choices & local selection lock (but keep if already answered)
+        if(!window.__lastQIndex || window.__lastQIndex !== room.qIndex){
+          window.__lastQIndex = room.qIndex;
+          window.__removedChoices = new Set();
+          window.__cheatShowWrongNow = false;
+          lockedChoice = me.lastAnswer; // carry from firestore
+          window.__lastTickSecond = null;
         }
 
-        b.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
-        ansBox.appendChild(b);
-      });
-    }
-
-    function renderRevealLeaderboard(me){
-      const box = $("revealLB");
-      box.innerHTML = "";
-
-      const sorted = latestPlayers.slice().sort((a,b)=> (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
-      sorted.forEach((p,i)=>{
-        const row = document.createElement("div");
-        row.className = "lbRow";
-        row.innerHTML = `<div><span class="mono" style="opacity:.7">#${i+1}</span> <strong>${p.name||"Player"}</strong>${p.id===uid ? ' <span class="badge" style="padding:4px 10px; font-size:12px;">YOU</span>' : ''}</div><div class="mono">${p.score||0}</div>`;
-        box.appendChild(row);
+        await render(room, me, players);
       });
 
-      if(latestRoom && latestRoom.status === "reveal" && me && me.lastAnswer && me.lastAnswer.questionIndex === latestRoom.questionIndex){
-        if(me.lastAnswer.isCorrect){
-          setToast($("revealResultToast"), `✅ Correct! +${me.lastAnswer.pointsAwarded||0} points`, "good");
-        }else{
-          setToast($("revealResultToast"), `❌ Wrong answer`, "bad");
-        }
-      }else{
-        setToast($("revealResultToast"), "", "");
-      }
-    }
-
-    function fillRules(){
-      $("rulesContent").innerHTML = `
-        <h3>Players</h3>
-        <ul>
-          <li><b>Recommended:</b> 2–20 players per game (best experience).</li>
-          <li>One device is the <b>Host</b>. Everyone else joins on their phone.</li>
-        </ul>
-        <h3>How to play</h3>
-        <ul>
-          <li>The host starts the game and controls reveal + next question.</li>
-          <li>Each question has a <b>20 second</b> timer.</li>
-          <li>Tap an answer to lock it in — you <b>cannot change</b> it.</li>
-          <li>On reveal, the leaderboard updates for everyone.</li>
-        </ul>
-        <h3>Scoring</h3>
-        <ul>
-          <li>Correct answers score based on speed.</li>
-          <li>Up to <b>100 points</b> per question.</li>
-        </ul>
-        <h3>5-Streak Reward</h3>
-        <ul>
-          <li>Get <b>5 correct in a row</b> to unlock a choice:</li>
-          <li><b>Claim +20</b> bonus points, or <b>Sabotage</b> another player.</li>
-          <li>The game pauses until all streak players choose.</li>
-        </ul>
-        <h3>Sabotage</h3>
-        <ul>
-          <li>Pick a player from the list.</li>
-          <li>They cannot answer the <b>next</b> question and get a warning.</li>
-        </ul>
-        <h3>Power Buttons</h3>
-        <ul>
-          <li><b>CHEAT (1 use per game):</b> auto-picks the correct answer and locks it.</li>
-          <li><b>HELP (3 uses per game):</b> removes 2 wrong answers immediately (red).</li>
-        </ul>
-      `;
-    }
-
-    function listenLive(){
-      if(unsubRoom) unsubRoom();
-      if(unsubPlayers) unsubPlayers();
-
-      unsubPlayers = playersRef().onSnapshot((snap)=>{
-        latestPlayers = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-        if(latestRoom && latestRoom.status === "reveal"){
-          const me = latestPlayers.find(p=>p.id===uid) || null;
-          renderRevealLeaderboard(me);
-        }
-      });
-
-      unsubRoom = roomRef().onSnapshot(async (snap)=>{
-        if(!snap.exists) return;
-        latestRoom = snap.data();
-
-        show($("joinCard"), !joined);
-        show($("waitCard"), joined && latestRoom.status === "lobby");
-        show($("playCard"), joined && (latestRoom.status === "question" || latestRoom.status === "reveal"));
-        show($("finalCard"), joined && latestRoom.status === "final");
-
-        $("status").textContent = latestRoom.status;
-        $("phaseBadge").textContent = latestRoom.status === "reveal" ? "Reveal" : "Question";
-        $("qText").textContent = latestRoom.currentQuestion?.text || "Question";
-
-        if(timerUI) clearInterval(timerUI);
-        if(latestRoom.status === "question" || latestRoom.status === "reveal"){
-          timerUI = setInterval(()=>{
-            const left = fmtTimeLeft(latestRoom.questionEndsAt);
-            $("timer").textContent = String(left);
-            if(latestRoom.status === "question") SFX.tick(left);
-          }, 150);
-        } else {
-          SFX.resetTick();
-        }
-
-        // Load me
-        const meSnap = await playersRef().doc(uid).get();
-        const me = meSnap.exists ? meSnap.data() : null;
-
-        if(me){
-          $("score").textContent = String(me.score||0);
-          $("streak").textContent = String(me.streak||0);
-          $("btnCheat").textContent = `CHEAT (${me.cheatLeft||0})`;
-          $("btnHelp").textContent = `HELP (${me.helpLeft||0})`;
-        }
-
-        // Sabotage: if blocked on this question, show clear message
-        const blockedInfo = sabotageBlockInfoForQuestion(latestRoom, latestRoom.questionIndex);
-        if(joined && latestRoom.status === "question" && blockedInfo){
-          setToast(
-            $("blockedToast"),
-            `⚠ You have been sabotaged by ${blockedInfo.byName || "a player"}.\nYou cannot answer the next question (this one).`,
-            "bad"
-          );
-        } else {
-          setToast($("blockedToast"), "", "bad");
-        }
-
-        const pendingForMe = (me && isPendingStreakDecision(latestRoom, me));
-        $("btnClaim").disabled = !pendingForMe;
-        $("btnSabotage").disabled = !pendingForMe;
-        $("selectionPrompt").style.display = pendingForMe ? "" : "none";
-
-        const key = keyForRoomQ(latestRoom);
-        const canAct = latestRoom.status === "question"
-          && !isSabotaged(latestRoom)
-          && me && !me.rewardPending
-          && !localSelected.has(key);
-
-        $("btnCheat").disabled = !(canAct && (me?.cheatLeft||0) > 0);
-        $("btnHelp").disabled  = !(canAct && (me?.helpLeft||0) > 0);
-
-        renderAnswers();
-
-        if(joined && latestRoom.status === "reveal"){
-          // early warning: if you will be blocked next question, warn on reveal
-          const nextBlockedInfo = sabotageBlockInfoForQuestion(latestRoom, latestRoom.questionIndex + 1);
-          if(nextBlockedInfo){
-            setToast(
-              $("playToast"),
-              `⚠ You have been sabotaged by ${nextBlockedInfo.byName || "a player"}.\nYou will NOT be able to answer the next question.`,
-              "bad"
-            );
-          } else {
-            setToast($("playToast"), pendingForMe ? "5-streak unlocked! Choose Claim or Sabotage." : "Waiting for next question…");
-          }
-
-          if(suppressRevealForQ === latestRoom.questionIndex) modalOn("revealModal", false);
-          else modalOn("revealModal", true);
-
-          if(!latestPlayers || latestPlayers.length === 0){
-            const pSnap = await playersRef().get();
-            latestPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-          }
-          renderRevealLeaderboard(me);
-
-          if(suppressRevealForQ !== latestRoom.questionIndex && lastRevealSoundQ !== latestRoom.questionIndex){
-            lastRevealSoundQ = latestRoom.questionIndex;
-            SFX.reveal();
-          }
-
-          if(pendingForMe && suppressRevealForQ !== latestRoom.questionIndex) startAutoClose(latestRoom);
-          else { clearAutoClose(); $("revealHint").textContent = "Host will start the next question…"; }
-
-        } else {
-          modalOn("revealModal", false);
-          modalOn("sabotageModal", false);
-          clearAutoClose();
-
-          if(latestRoom.status === "question" || latestRoom.status === "lobby" || latestRoom.status === "final"){
-            suppressRevealForQ = null;
-          }
-
-          if(latestRoom.status !== "question") setToast($("playToast"), "");
-        }
-
-        if(latestRoom.status === "final" && me){
-          const winners = latestRoom.winners || [];
-          const isWinner = winners.includes(uid);
-          $("finalTitle").textContent = isWinner ? "You Know It All" : "Not too bad!";
-          $("finalSpark").textContent = isWinner ? "✦ ✧ ✦ ✧ ✦" : "☹";
-          $("finalSub").textContent = `Final score: ${me.score||0}`;
+      // also live mini list during waiting
+      playersUnsub = onSnapshot(query(playersCol, orderBy("joinedAt","asc")), (snap)=>{
+        const players = snap.docs.map(d=>d.data().nick).filter(Boolean);
+        if(document.getElementById("waitCard").style.display !== "none"){
+          playersMini.textContent = players.length ? players.join(", ") : "No other players yet.";
         }
       });
     }
 
-    function hook(btnId, fn){
-      $(btnId).addEventListener("click", async ()=>{
-        SFX.ensureUnlocked();
-        SFX.click();
-        await fn();
-      });
-    }
-
-    hook("btnJoin", joinGame);
-    hook("btnClaim", claim20);
-    hook("btnSabotage", openSabotage);
-    hook("btnCheat", cheat);
-    hook("btnHelp", help5050);
-
-    $("btnCloseSab").onclick = ()=>{ SFX.ensureUnlocked(); SFX.click(); modalOn("sabotageModal", false); };
-
-    $("btnCloseReveal").onclick = ()=>{
-      SFX.ensureUnlocked(); SFX.click();
-      if(latestRoom && latestRoom.status === "reveal") suppressReveal(latestRoom.questionIndex);
-      else modalOn("revealModal", false);
-    };
-
-    $("btnRules").onclick = ()=>{
-      SFX.ensureUnlocked(); SFX.click();
-      fillRules();
-      modalOn("rulesModal", true);
-    };
-    $("btnCloseRules").onclick = ()=>{
-      SFX.ensureUnlocked(); SFX.click();
-      modalOn("rulesModal", false);
-    };
-
-    (async function init(){
-      await signInPlayer();
-      if(roomId) $("roomInput").value = roomId;
-    })();
   </script>
 </body>
 </html>
