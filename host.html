@@ -7,15 +7,9 @@
 
   <style>
     :root{
-      --bg:#070707;
-      --border:#232323;
-      --text:#f3f3f3;
-      --muted:#bdbdbd;
-      --orange:#ff7a18;
-      --good:#29d17d;
-      --bad:#ff4b4b;
-      --shadow: 0 20px 60px rgba(0,0,0,.45);
-      --radius:20px;
+      --bg:#070707; --border:#232323; --text:#f3f3f3; --muted:#bdbdbd;
+      --orange:#ff7a18; --good:#29d17d; --bad:#ff4b4b;
+      --shadow: 0 20px 60px rgba(0,0,0,.45); --radius:20px;
     }
     *{box-sizing:border-box}
     body{
@@ -47,11 +41,7 @@
       border:1px solid rgba(255,122,24,.35);
       box-shadow: 0 12px 30px rgba(255,122,24,.12);
     }
-    .brand .t1{
-      font-size:30px;
-      letter-spacing:.6px;
-      line-height:1.02;
-    }
+    .brand .t1{font-size:34px;letter-spacing:.7px;line-height:1.02;font-weight:990}
     .brand .t2{font-size:12px;color:var(--muted);font-weight:800;margin-top:2px}
 
     .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
@@ -89,7 +79,7 @@
 
     .layout{
       display:grid;
-      grid-template-columns: 1.45fr 0.55fr;
+      grid-template-columns: 1.55fr 0.45fr; /* bigger Q area, thinner leaderboard */
       gap:14px;
       margin-top:14px;
       align-items:start;
@@ -137,10 +127,10 @@
     }
 
     .qTitle{
-      font-size:30px;
-      font-weight:980;
+      font-size:34px;
+      font-weight:990;
       letter-spacing:.3px;
-      line-height:1.18;
+      line-height:1.14;
       margin:8px 0 14px
     }
     .answers{display:grid;gap:12px;grid-template-columns:1fr 1fr}
@@ -162,7 +152,7 @@
 
     .timerBig{font-size:30px;font-weight:980;color:var(--orange);letter-spacing:1px}
     .hostControls{display:flex;gap:10px;flex-wrap:wrap}
-    .hostControls .btn{flex:1 1 200px}
+    .hostControls .btn{flex:1 1 220px}
 
     .plist{display:flex;flex-direction:column;gap:8px;max-height: calc(100vh - 220px); overflow:auto; padding-right:6px}
     .pitem{
@@ -173,7 +163,7 @@
     }
     .pname{font-weight:950}
     .psub{font-size:12px;color:var(--muted);font-weight:800}
-    .pscore{font-weight:980;color:var(--orange)}
+    .pscore{font-weight:990;color:var(--orange)}
     .tag{font-size:12px;font-weight:950;color:#000;background:var(--orange);padding:4px 8px;border-radius:999px}
     .tag.bad{background:var(--bad); color:#fff}
     .tag.good{background:var(--good); color:#000}
@@ -270,7 +260,7 @@
                 <button class="btn" id="btnShareMessenger" disabled>Share Messenger</button>
               </div>
               <div class="note">
-                Fixed 20 seconds per question (not editable). Questions random order each game.
+                Fixed 20 seconds per question (not editable). Questions are random each game.
               </div>
             </div>
           </div>
@@ -331,7 +321,7 @@
         Game pauses until all perk players choose.<br><br>
         <b>CHEAT</b> (1): instantly selects the correct answer.<br>
         <b>HELP</b> (3): removes 2 wrong answers immediately (50/50).<br><br>
-        <b>Voice chat</b>: press <b>Voice Chat</b> to open the room on Jitsi.
+        <b>Voice chat</b>: press <b>Voice Chat</b> (Jitsi audio room).
       </div>
     </div>
   </div>
@@ -374,7 +364,7 @@
     function sClick(){ beep(560, 0.03, "square", 0.04); }
     function sReveal(){ beep(740, 0.06, "sawtooth", 0.06); setTimeout(()=>beep(980,0.08,"sawtooth",0.06), 70); }
 
-    // RNG
+    // RNG helpers
     function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
     function mulberry32(seed){
       return function(){
@@ -393,23 +383,17 @@
       }
       return a;
     }
-    function makeRoomCode(){
-      const chars="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-      let s="";
-      for(let i=0;i<5;i++) s += chars[Math.floor(Math.random()*chars.length)];
-      return s;
+
+    // Room name for Jitsi
+    function jitsiRoomName(code){
+      return `KnowItAll-${String(code||"").toUpperCase().replace(/[^A-Z0-9-]/g,"")}`;
     }
 
-    // Bank
+    // Question bank loader (kept as-is; we’ll replace files next)
     let BANK=null;
     async function loadBank(){
       if(BANK) return BANK;
-      const files = [
-        "./question_bank_part1.json",
-        "./question_bank_part2.json",
-        "./question_bank_part3.json",
-        "./question_bank_part4.json"
-      ];
+      const files = ["./question_bank_part1.json","./question_bank_part2.json","./question_bank_part3.json","./question_bank_part4.json"];
       const parts=[];
       for(const f of files){
         const res = await fetch(f, { cache:"no-store" });
@@ -418,7 +402,7 @@
         if(!Array.isArray(arr)) throw new Error("Bad JSON in " + f);
         parts.push(arr);
       }
-      BANK = parts.flat().map((q)=>({
+      BANK = parts.flat().map(q=>({
         question: q.question ?? q.text ?? "",
         answer: q.answer ?? "",
         choices: q.choices ?? q.options ?? null
@@ -426,57 +410,10 @@
       return BANK;
     }
 
-    function isNumericAnswer(ans){
-      const s = String(ans).trim();
-      return /^-?\d+(\.\d+)?$/.test(s);
-    }
-
-    function buildChoices(q, bank, seed, idx){
-      if(Array.isArray(q.choices) && q.choices.length === 4){
-        const set = new Set(q.choices.map(x=>String(x).trim()));
-        if(set.has(String(q.answer).trim())) return seededShuffle(q.choices.map(String), seed + idx*17 + 9);
-      }
-
-      const correct = String(q.answer).trim();
-      const wantNumber = isNumericAnswer(correct);
-      const r = mulberry32(seed + idx*1000 + 77);
-
-      let pool = bank
-        .map(x => String(x.answer).trim())
-        .filter(a => a && a !== correct)
-        .filter(a => isNumericAnswer(a) === wantNumber);
-
-      pool = Array.from(new Set(pool));
-
-      function scoreDecoy(a){
-        if(wantNumber){
-          const c = Number(correct), n = Number(a);
-          if(!Number.isFinite(c) || !Number.isFinite(n)) return 999999;
-          return Math.abs(c - n);
-        }
-        return Math.abs(a.length - correct.length);
-      }
-      pool.sort((a,b)=>scoreDecoy(a)-scoreDecoy(b));
-      const top = pool.slice(0, Math.min(200, pool.length));
-
-      const choices = [correct];
-      while(choices.length < 4){
-        if(top.length){
-          const pick = top.splice(Math.floor(r()*top.length),1)[0];
-          if(!choices.includes(pick)) choices.push(pick);
-        } else {
-          if(wantNumber){
-            const c = Number(correct);
-            const delta = (Math.floor(r()*9)+1) * (r() < 0.5 ? -1 : 1);
-            const gen = String(Number.isFinite(c) ? (c + delta) : (Math.floor(r()*200)+1));
-            if(!choices.includes(gen)) choices.push(gen);
-          } else {
-            const gen = "I don't know";
-            if(!choices.includes(gen)) choices.push(gen);
-          }
-        }
-      }
-      return seededShuffle(choices, seed + idx*17 + 123);
+    function buildChoices(q){
+      if(Array.isArray(q.choices) && q.choices.length === 4) return q.choices.map(String);
+      // fallback (should not happen once bank fixed)
+      return [String(q.answer), "Option B", "Option C", "Option D"];
     }
 
     // UI
@@ -528,10 +465,6 @@
     function makeJoinUrl(code){ return baseUrl() + "player.html?room=" + encodeURIComponent(code); }
     function shareMessage(url){ return `Just started a quiz game “Know It All?” — fancy joining in?\n${url}`; }
 
-    function jitsiRoomName(code){
-      // Safe Jitsi room name
-      return `KnowItAll-${String(code||"").toUpperCase().replace(/[^A-Z0-9-]/g,"")}`;
-    }
     function openVoiceChat(){
       if(!roomCode) return;
       sClick();
@@ -540,6 +473,12 @@
     }
     btnVoice.onclick = openVoiceChat;
 
+    function makeRoomCode(){
+      const chars="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+      let s="";
+      for(let i=0;i<5;i++) s += chars[Math.floor(Math.random()*chars.length)];
+      return s;
+    }
     function renderQR(code){
       const qrEl = document.getElementById("qr");
       qrEl.innerHTML = "";
@@ -616,7 +555,7 @@
       qTotalEl.textContent = String(room.questionCount || order.length);
       qNumEl.textContent = String(qIndex + 1);
 
-      const choices = buildChoices(q, order, room.seed, qIndex);
+      const choices = buildChoices(q);
       const reveal = (room.status === "reveal" || room.status === "awaitingPerks" || room.status === "final");
       const correct = String(q.answer).trim();
 
@@ -670,8 +609,7 @@
 
       btnResetGame.disabled = false;
       btnResetGameTop.disabled = false;
-
-      btnVoice.disabled = false; // ✅ voice enabled once room exists
+      btnVoice.disabled = false;
 
       bindRoomListeners();
     }
@@ -793,6 +731,7 @@
           lastCorrect,
           score: (p.score||0) + scoreAdd,
           streak: newStreak,
+          // IMPORTANT: do NOT clear pending perk after it becomes true
           pendingPerk: false,
           sabotagedNext: false
         };
