@@ -1,329 +1,368 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Know It All? — Host</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
   <style>
     :root{
-      --bg0:#050506; --bg1:#0b0b10; --line: rgba(255,255,255,.10);
-      --text:#f5f7ff; --muted: rgba(245,247,255,.70);
-      --orange:#ff6a00; --orange2:#ff9a3d; --glow: rgba(255,106,0,.35);
-      --good:#2cff9a; --bad:#ff3b5c; --radius:18px;
+      --bg:#070707;
+      --panel:#0e0e0e;
+      --panel2:#111;
+      --border:#232323;
+      --text:#f3f3f3;
+      --muted:#bdbdbd;
+      --orange:#ff7a18;
+      --orange2:#ff9a3d;
+      --good:#29d17d;
+      --bad:#ff4b4b;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius:20px;
     }
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
     body{
-      margin:0; color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(900px 500px at 20% 10%, rgba(255,106,0,.14), transparent 60%),
-        radial-gradient(900px 500px at 80% 20%, rgba(255,154,61,.10), transparent 60%),
-        radial-gradient(1200px 700px at 60% 90%, rgba(255,106,0,.08), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg0));
+      margin:0; background:radial-gradient(1200px 700px at 30% -10%, rgba(255,122,24,.18), transparent 60%),
+               radial-gradient(900px 600px at 90% 0%, rgba(255,122,24,.10), transparent 65%),
+               var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       min-height:100vh;
     }
-    .container{ max-width:1200px; margin:0 auto; padding:22px; }
-    .topbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; }
-    .brand h1{ margin:0; font-weight:1000; font-size:36px; letter-spacing:.5px; }
-    .brand h1 span{ color:var(--orange); text-shadow:0 0 20px var(--glow); }
-    .brand .tag{ color:var(--muted); font-size:13px; letter-spacing:.18em; text-transform:uppercase; margin-top:6px; }
-
-    .card{
-      background: linear-gradient(180deg, rgba(15,17,23,.92), rgba(10,12,16,.92));
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      padding:16px;
-      box-shadow: 0 15px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,106,0,.06) inset;
-      backdrop-filter: blur(10px);
+    .wrap{max-width:1200px;margin:0 auto;padding:18px 16px 30px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 12px;border:1px solid var(--border);border-radius:18px;
+      background:linear-gradient(180deg, rgba(17,17,17,.85), rgba(10,10,10,.65));
+      box-shadow:var(--shadow);
+      position:sticky; top:12px; z-index:10; backdrop-filter: blur(10px);
     }
-    .grid{ display:grid; gap:12px; }
-    .grid.two{ grid-template-columns: 1.3fr .7fr; }
-    @media (max-width:950px){ .grid.two{ grid-template-columns:1fr; } }
-
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:999px;
-      border:1px solid rgba(255,106,0,.35);
-      background: rgba(255,106,0,.10);
-      color:var(--orange2);
-      box-shadow: 0 0 22px rgba(255,106,0,.12);
-      font-weight:1000; letter-spacing:.04em;
+    .brand{
+      display:flex;align-items:center;gap:12px;
+      font-weight:900; letter-spacing:.5px;
     }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-    .big-code{
-      font-size:54px; font-weight:1000; letter-spacing:10px;
-      text-align:center; margin:12px 0 6px;
-      text-shadow:0 0 24px var(--glow);
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,154,61,.9), rgba(255,122,24,.35) 40%, rgba(0,0,0,.5) 75%),
+                  linear-gradient(180deg, rgba(255,122,24,.25), rgba(255,122,24,.06));
+      border:1px solid rgba(255,122,24,.35);
+      box-shadow: 0 12px 30px rgba(255,122,24,.12);
     }
-    .small{ color:var(--muted); font-size:13px; }
-
-    button{
-      font:inherit; cursor:pointer;
-      border-radius:14px;
-      border:1px solid rgba(255,106,0,.55);
-      background: linear-gradient(180deg, rgba(255,106,0,.35), rgba(255,106,0,.12));
+    .brand .t1{font-size:18px}
+    .brand .t2{font-size:12px;color:var(--muted);font-weight:700;margin-top:-2px}
+    .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;border:1px solid var(--border);
+      background:rgba(10,10,10,.6); color:var(--muted); font-weight:800;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(20,20,20,.9), rgba(10,10,10,.85));
       color:var(--text);
-      padding:12px 12px;
-      box-shadow: 0 10px 30px rgba(255,106,0,.10);
-      font-weight:1000;
+      padding:10px 14px;border-radius:14px;
+      font-weight:900; cursor:pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+      transition: transform .08s ease, filter .12s ease, border-color .12s ease;
+      user-select:none;
     }
-    button:hover{ filter:brightness(1.12); }
-    button:disabled{ opacity:.35; cursor:not-allowed; filter:none; }
-    .btn-ghost{
-      border-color: rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
-      box-shadow:none;
-      font-weight:900;
+    .btn:hover{filter:brightness(1.12);border-color:rgba(255,122,24,.35)}
+    .btn:active{transform:translateY(1px)}
+    .btn.orange{
+      border-color:rgba(255,122,24,.45);
+      background:linear-gradient(180deg, rgba(255,122,24,.22), rgba(10,10,10,.88));
+      box-shadow: 0 14px 40px rgba(255,122,24,.12);
     }
-    .btn-share{
-      border-color: rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      box-shadow:none;
-      font-weight:900;
+    .btn.danger{
+      border-color: rgba(255,75,75,.35);
+      background: linear-gradient(180deg, rgba(255,75,75,.20), rgba(10,10,10,.88));
     }
-
-    .list{ list-style:none; margin:0; padding:0; }
-    .list li{
-      display:flex; justify-content:space-between; gap:10px;
-      padding:10px;
-      border-bottom:1px solid rgba(255,255,255,.07);
-      color:var(--muted); align-items:center;
+    .btn:disabled{opacity:.45;cursor:not-allowed;filter:saturate(.6)}
+    .grid{
+      display:grid;gap:14px;margin-top:14px;
+      grid-template-columns: 420px 1fr;
     }
-    .list li strong{ color:var(--text); }
-    .list li:last-child{ border-bottom:none; }
-    .rank{
-      width:26px; height:26px; border-radius:10px;
-      display:inline-flex; align-items:center; justify-content:center;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color:var(--muted); font-weight:1000;
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background:linear-gradient(180deg, rgba(17,17,17,.75), rgba(9,9,9,.65));
+      box-shadow:var(--shadow);
+      padding:14px;
     }
-    .nameRow{ display:flex; gap:10px; align-items:center; }
-
-    .qtext{ font-size:32px; font-weight:1000; margin:8px 0 6px; }
-    .answers{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px; }
-    @media (max-width:520px){ .answers{ grid-template-columns:1fr; } }
-    .answer{
-      text-align:left; padding:14px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      opacity:.75;
+    .card h2{margin:6px 0 10px;font-size:16px}
+    .muted{color:var(--muted)}
+    .divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
+    .qrWrap{
+      display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;
     }
-    .answer.correct{ opacity:1; border-color: rgba(44,255,154,.70); background: rgba(44,255,154,.12); }
-
-    .toast{
-      margin-top:10px; padding:10px 12px; border-radius:14px;
-      border:1px solid rgba(255,106,0,.25);
-      background: rgba(255,106,0,.08);
-      color:var(--orange2);
-      white-space: pre-line;
-    }
-    .toast.bad{
-      border-color: rgba(255,59,92,.28);
-      background: rgba(255,59,92,.10);
-      color: rgba(255,220,228,.92);
-    }
-
-    .qrWrap{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:10px; }
-    /* UPDATED QR container: centered + scan-friendly border */
     #qr{
-      width:140px;
-      height:140px;
+      width:188px;height:188px;
+      border-radius:18px;
+      background:#fff;
       padding:10px;
+      border:2px solid rgba(255,122,24,.85); /* border to help scanning */
+      box-shadow: 0 12px 35px rgba(255,122,24,.18);
+      overflow:hidden;
+    }
+    .small{font-size:12px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .row > *{flex: 1 1 auto}
+    input, select{
+      width:100%;
+      padding:11px 12px;border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(8,8,8,.65);
+      color:var(--text);
+      outline:none;
+      font-weight:800;
+    }
+
+    /* Game view */
+    .qTitle{
+      font-size:22px;font-weight:950;letter-spacing:.3px;line-height:1.25;margin:8px 0 10px;
+    }
+    .answers{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+    @media(max-width:720px){.answers{grid-template-columns:1fr}}
+    .ansBtn{
+      text-align:left;
       border-radius:16px;
-
-      background:#ffffff;
-      border:3px solid rgba(255,106,0,.85);
-      box-shadow: 0 0 0 6px rgba(255,106,0,.12);
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      padding:12px 12px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(16,16,16,.85), rgba(8,8,8,.8));
+      cursor:default;
+      font-weight:900;
+      color:var(--text);
+      position:relative;
+      min-height:50px;
     }
-
-    .copyRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-
-    .rulesBtn{
-      position:fixed;
-      right:14px;
-      bottom:14px;
-      z-index:9998;
-      border-radius:999px;
-      padding:10px 14px;
-      border:1px solid rgba(255,106,0,.55);
-      background: rgba(255,106,0,.14);
-      box-shadow: 0 10px 30px rgba(255,106,0,.12);
-      font-weight:1000;
+    .ansBtn.correct{
+      border-color: rgba(41,209,125,.35);
+      background: linear-gradient(180deg, rgba(41,209,125,.18), rgba(8,8,8,.85));
     }
+    .ansBtn.wrong{
+      opacity:.6;
+    }
+    .timerBig{
+      font-size:28px;font-weight:950;color:var(--orange);letter-spacing:1px;
+    }
+    .hostControls{display:flex;gap:10px;flex-wrap:wrap}
+    .hostControls .btn{flex:1 1 160px}
 
-    .modal{
-      position:fixed; inset:0;
-      display:none;
-      align-items:center; justify-content:center;
+    /* Players list */
+    .plist{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto;padding-right:6px}
+    .pitem{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(10,10,10,.5);
+    }
+    .pname{font-weight:900}
+    .psub{font-size:12px;color:var(--muted);font-weight:800}
+    .pscore{font-weight:950;color:var(--orange)}
+    .tag{font-size:12px;font-weight:900;color:#000;background:var(--orange);padding:4px 8px;border-radius:999px}
+    .tag.bad{background:var(--bad); color:#fff}
+    .tag.good{background:var(--good); color:#000}
+
+    /* Modals */
+    .modalBack{
+      position:fixed;inset:0;background:rgba(0,0,0,.6);
+      display:none;align-items:center;justify-content:center;z-index:999;
       padding:18px;
-      background: rgba(0,0,0,.68);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
     }
-    .modal.on{ display:flex; }
-    .modalCard{
-      width:min(760px, 100%);
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(15,17,23,.96), rgba(10,12,16,.96));
-      box-shadow: 0 20px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,106,0,.06) inset;
-      padding: 16px;
+    .modal{
+      width:min(720px, 100%);
+      border-radius:22px;
+      border:1px solid rgba(255,122,24,.35);
+      background: linear-gradient(180deg, rgba(16,16,16,.92), rgba(8,8,8,.90));
+      box-shadow: 0 25px 80px rgba(0,0,0,.6);
+      padding:14px;
     }
-    .modalTop{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      margin-bottom: 10px;
+    .modal h3{margin:6px 0 6px;font-size:18px}
+    .modal .modalTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .modal .close{width:auto}
+    .lbTable{width:100%;border-collapse:collapse;margin-top:8px}
+    .lbTable th,.lbTable td{padding:10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+    .lbTable th{color:var(--muted);font-size:12px;letter-spacing:.5px}
+    .note{
+      margin-top:10px;color:var(--muted);font-weight:800;font-size:12px;line-height:1.45
     }
-    .modalTitle{
-      font-size: 20px;
-      font-weight: 1000;
-      letter-spacing: .02em;
+
+    /* Rules floating button */
+    .rulesBtn{
+      position:fixed;right:16px;bottom:16px;z-index:1000;
+      border-radius:999px;padding:10px 14px;
+      background:linear-gradient(180deg, rgba(255,122,24,.25), rgba(10,10,10,.85));
+      border:1px solid rgba(255,122,24,.45);
+      font-weight:950;cursor:pointer;
+      box-shadow: 0 14px 44px rgba(255,122,24,.12);
     }
-    .rulesText{
-      color: rgba(245,247,255,.90);
-      line-height: 1.5;
-    }
-    .rulesText h3{
-      margin: 14px 0 6px;
-      font-size: 16px;
-      letter-spacing: .02em;
-      color: var(--orange2);
-    }
-    .rulesText ul{ margin: 8px 0 0 18px; padding:0; }
-    .rulesText li{ margin: 6px 0; color: rgba(245,247,255,.86); }
   </style>
 </head>
 <body>
-  <button class="rulesBtn" id="btnRules">Rules</button>
-
-  <div class="container">
+  <div class="wrap">
     <div class="topbar">
       <div class="brand">
-        <h1>Know It <span>All?</span></h1>
-        <div class="tag">HOST MODE • PLAYERS JOIN BY QR</div>
+        <div class="logo"></div>
+        <div>
+          <div class="t1">Know It All?</div>
+          <div class="t2">Host Screen</div>
+        </div>
       </div>
-      <div>
-        <button class="btn-ghost" id="btnForgetRoom">Forget Room (Local)</button>
+      <div class="actions">
+        <span class="pill" id="roomPill">Room: <b id="roomCode">—</b></span>
+        <span class="pill">Players: <b id="playerCount">0</b></span>
+        <button class="btn" id="btnOpenLeaderboard">Leaderboard</button>
+        <button class="btn danger" id="btnResetAll" disabled>Reset Game</button>
       </div>
     </div>
 
-    <div class="grid two" id="lobby">
-      <div class="card">
-        <div class="badge">Host • Lobby</div>
-        <div class="big-code mono" id="roomCode">----</div>
-        <p class="small" id="hint">Create a room to generate a join code + QR.</p>
+    <div class="grid">
+      <div class="card" id="lobbyCard">
+        <h2>Startup</h2>
+        <div class="muted small">Create a room, share the QR/link, then start.</div>
+        <div class="divider"></div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-          <button id="btnCreate">Create Room</button>
-          <button id="btnStart" disabled>Start Game</button>
-          <button class="btn-ghost" id="btnReset" disabled>Reset Game</button>
-        </div>
-
-        <div class="qrWrap" id="qrArea" style="display:none;">
-          <div id="qr"></div>
+        <div class="row">
           <div>
-            <div class="badge">Scan to Join</div>
-            <div class="small" style="margin-top:8px;">Players open <span class="mono">player.html</span> with this room.</div>
-
-            <div class="copyRow">
-              <button class="btn-ghost" id="btnCopy">Copy Join Link</button>
-              <button class="btn-ghost" id="btnOpen">Open Join Link</button>
-            </div>
-
-            <div class="copyRow">
-              <button class="btn-share" id="btnShareWhatsApp">Share WhatsApp</button>
-              <button class="btn-share" id="btnShareMessenger">Share Messenger</button>
-            </div>
-
-            <div class="small mono" id="joinLinkText" style="margin-top:10px; word-break:break-all;"></div>
+            <label class="small muted">Game length</label>
+            <select id="gameLength">
+              <option value="50">50 questions</option>
+              <option value="100">100 questions</option>
+              <option value="150">150 questions</option>
+            </select>
+          </div>
+          <div style="max-width:220px">
+            <label class="small muted">Timer per question</label>
+            <input id="qTime" type="text" value="20 seconds" disabled />
           </div>
         </div>
 
-        <div class="toast" id="hostToast" style="display:none;"></div>
-      </div>
-
-      <div class="card">
-        <div class="badge">Players Joined</div>
-        <ul class="list" id="playersList"></ul>
-      </div>
-    </div>
-
-    <div class="grid two" id="question" style="display:none;">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-          <div class="badge" id="phaseBadge">Host • Question</div>
-          <div class="badge">Timer: <span class="mono" id="timer">20</span>s</div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn orange" id="btnCreateRoom">Create Room</button>
+          <button class="btn orange" id="btnStartGame" disabled>Start Game</button>
         </div>
 
-        <div class="qtext" id="qText">Question</div>
-        <div class="answers" id="answers"></div>
+        <div class="divider"></div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-          <button id="btnReveal">Reveal</button>
-          <button class="btn-ghost" id="btnNext" disabled>Next Question</button>
-          <button class="btn-ghost" id="btnResetFromQ">Reset Game</button>
+        <div class="qrWrap">
+          <div>
+            <div class="small muted" style="margin-bottom:8px">Join QR</div>
+            <div id="qr"></div>
+          </div>
+          <div style="flex:1;min-width:220px">
+            <div class="small muted">Join link</div>
+            <input id="joinLink" readonly value="Create a room first..." />
+            <div class="row" style="margin-top:10px">
+              <button class="btn" id="btnCopyLink" disabled>Copy link</button>
+              <button class="btn" id="btnShareWhatsApp" disabled>Share WhatsApp</button>
+              <button class="btn" id="btnShareMessenger" disabled>Share Messenger</button>
+            </div>
+            <div class="note">
+              If “Share” doesn’t open an app, just use Copy Link and paste it into WhatsApp / Messenger.
+            </div>
+          </div>
         </div>
 
-        <div class="toast" id="revealToast" style="display:none;"></div>
-        <div class="toast bad" id="pauseToast" style="display:none;"></div>
+        <div class="divider"></div>
+
+        <h2>Players Joined</h2>
+        <div class="plist" id="playersList"></div>
       </div>
 
-      <div class="card">
-        <div class="badge">Leaderboard</div>
-        <ul class="list" id="leaderboard"></ul>
-      </div>
-    </div>
+      <div class="card" id="gameCard" style="display:none">
+        <div class="row" style="align-items:flex-start">
+          <div style="flex:1">
+            <div class="muted small">Question</div>
+            <div class="qTitle" id="qText">—</div>
+          </div>
+          <div style="text-align:right;min-width:140px">
+            <div class="muted small">Timer</div>
+            <div class="timerBig"><span id="timeLeft">20</span>s</div>
+            <div class="muted small">Q <span id="qNum">0</span>/<span id="qTotal">0</span></div>
+          </div>
+        </div>
 
-    <div class="card" id="final" style="display:none;">
-      <div class="badge">Host • Final</div>
-      <div style="font-size:46px; font-weight:1000; text-align:center; margin:10px 0;">Winner!</div>
-      <div style="text-align:center; letter-spacing:6px; color:var(--orange2);">✦ ✧ ✦ ✧ ✦</div>
-      <p class="small" id="finalSub" style="text-align:center; margin-top:12px;"></p>
-      <div style="display:flex; justify-content:center; gap:10px; margin-top:14px; flex-wrap:wrap;">
-        <button id="btnResetFinal">Reset Game</button>
+        <div class="divider"></div>
+
+        <div class="answers" id="answersHost"></div>
+
+        <div class="divider"></div>
+
+        <div class="hostControls">
+          <button class="btn orange" id="btnReveal" disabled>Reveal Answer</button>
+          <button class="btn orange" id="btnNext" disabled>Next Question</button>
+          <button class="btn danger" id="btnResetGame" disabled>Reset Room</button>
+        </div>
+
+        <div class="note">
+          Tip: Reveal will show correct answer + trigger leaderboard popup on all phones.
+          If someone earned a 5-streak perk, the game will pause until they choose Claim/Sabotage.
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="modal" id="rulesModal">
-    <div class="modalCard">
+  <button class="rulesBtn" id="btnRules">Rules</button>
+
+  <!-- Leaderboard Modal -->
+  <div class="modalBack" id="lbModalBack">
+    <div class="modal">
       <div class="modalTop">
-        <div class="modalTitle">Rules • How to Play</div>
-        <button class="btn-ghost" id="btnCloseRules">Close</button>
+        <h3>Leaderboard</h3>
+        <button class="btn close" id="lbClose">Close</button>
       </div>
-      <div class="rulesText" id="rulesContent"></div>
+      <table class="lbTable" id="lbTable"></table>
+      <div class="note">Scores update live. Sabotaged players can’t answer the next question.</div>
     </div>
   </div>
 
-  <script>
-    const SFX = (() => {
-      let ctx = null;
-      function getCtx(){ if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); return ctx; }
-      function ensureUnlocked(){ try{ getCtx().resume(); }catch{} }
-      function tone(freq=440, dur=0.06, type="sine", vol=0.06){
-        const c = getCtx();
-        const o = c.createOscillator();
-        const g = c.createGain();
-        o.type = type; o.frequency.value = freq; g.gain.value = vol;
-        o.connect(g); g.connect(c.destination);
-        o.start(); o.stop(c.currentTime + dur);
-      }
-      function click(){ tone(900,0.03,"square",0.04); }
-      function reveal(){ tone(660,0.09,"sine",0.06); setTimeout(()=>tone(990,0.10,"sine",0.06), 90); setTimeout(()=>tone(1320,0.12,"sine",0.06), 200); }
-      return { ensureUnlocked, click, reveal };
-    })();
+  <!-- Rules Modal -->
+  <div class="modalBack" id="rulesBack">
+    <div class="modal">
+      <div class="modalTop">
+        <h3>Rules & How to Play</h3>
+        <button class="btn close" id="rulesClose">Close</button>
+      </div>
+      <div class="note" style="font-size:13px;line-height:1.55;color:#e9e9e9">
+        <b>Know It All?</b> is a fast-paced live quiz for up to <b>20 players</b> per room.<br><br>
+
+        <b>How it works</b><br>
+        1) Host creates a room and shares the QR/link.<br>
+        2) Players join with a nickname and wait.<br>
+        3) Each question has <b>20 seconds</b>. Players pick one answer (locked in).<br>
+        4) Host presses <b>Reveal</b> to show the correct answer and update scores.<br>
+        5) A quick <b>Leaderboard popup</b> appears after each reveal.<br><br>
+
+        <b>Points</b><br>
+        • Speed scoring: up to <b>100 points</b> for a correct answer.<br>
+        • Faster answers score higher.<br><br>
+
+        <b>Streak Perk (5 correct in a row)</b><br>
+        When a player reaches a 5-correct streak, the game pauses after the reveal until they choose:<br>
+        • <b>Claim +20 points</b> OR<br>
+        • <b>Sabotage</b> one player (they can’t answer the next question).<br><br>
+
+        <b>Power Buttons (Player screen)</b><br>
+        • <b>CHEAT</b> (1 use per game): instantly selects the correct answer.<br>
+        • <b>HELP</b> (3 uses per game): removes 2 wrong answers (like 50/50).<br>
+        • <b>CLAIM</b> / <b>SABOTAGE</b> only light up when earned by streak.<br><br>
+
+        <b>Winning</b><br>
+        After the last question, the game shows the winner(s). Host can reset the room.
+      </div>
+    </div>
+  </div>
+
+  <!-- QRCode lib -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <script type="module">
+    // Firebase (your config)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+      getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot,
+      collection, query, orderBy, getDocs, serverTimestamp, writeBatch
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
@@ -333,512 +372,584 @@
       messagingSenderId: "975815651315",
       appId: "1:975815651315:web:7a5e981548448b382aec86"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
 
-    const QUESTIONS = [
-      { text:"Which planet is known as the Red Planet?", options:["Earth","Mars","Jupiter","Venus"], correctIndex:1 },
-      { text:"What does HTML stand for?", options:["HyperText Markup Language","HighText Machine Language","Hyperlink Tool Markup Language","Home Tool Markup Language"], correctIndex:0 },
-      { text:"Fastest land animal?", options:["Cheetah","Lion","Horse","Greyhound"], correctIndex:0 },
-      { text:"2 + 2 × 2 = ?", options:["6","8","4","10"], correctIndex:0 },
-      { text:"Capital of Japan?", options:["Kyoto","Tokyo","Osaka","Nagoya"], correctIndex:1 },
-      { text:"Which is a JavaScript framework?", options:["Laravel","Django","React","Rails"], correctIndex:2 },
-      { text:"Largest ocean?", options:["Indian","Arctic","Atlantic","Pacific"], correctIndex:3 },
-      { text:"What gas do plants absorb?", options:["Oxygen","Carbon Dioxide","Nitrogen","Helium"], correctIndex:1 },
-      { text:"Primary color NOT in RGB?", options:["Red","Green","Blue","Yellow"], correctIndex:3 },
-      { text:"How many seconds in a minute?", options:["30","45","60","90"], correctIndex:2 },
-    ];
-    const QUESTION_SECONDS = 20;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    function nowMs(){ return Date.now(); }
-    function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
-    function randomCode(len=4){
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      let out = "";
-      for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
-      return out;
+    // ---------- Utilities ----------
+    function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+    function makeRoomCode(){
+      const chars="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+      let s="";
+      for(let i=0;i<5;i++) s += chars[Math.floor(Math.random()*chars.length)];
+      return s;
     }
-    function calcPoints(remainingSeconds){
-      const t = Math.max(0, Math.min(QUESTION_SECONDS, remainingSeconds));
-      return 20 + Math.floor(80 * (t / QUESTION_SECONDS));
-    }
-    function $(id){ return document.getElementById(id); }
-    function show(el,on=true){ el.style.display = on ? "" : "none"; }
-    function setToast(el,msg){ if(!msg){ el.style.display="none"; el.textContent=""; } else { el.style.display=""; el.textContent=msg; } }
-    function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
-    function modalOn(id, on){
-      const m = $(id);
-      if(on) m.classList.add("on"); else m.classList.remove("on");
-    }
-
-    let hostUid = null;
-    let roomId = null;
-    let unsubRoom = null;
-    let unsubPlayers = null;
-    let latestRoom = null;
-    let latestPlayers = [];
-    let timerUI = null;
-
-    let joinLink = "";
-    let shareText = "";
-
-    function roomRef(){ return db.collection("rooms").doc(roomId); }
-    function playersRef(){ return roomRef().collection("players"); }
-    function answersRef(){ return roomRef().collection("answers"); }
-
-    async function signInHost(){
-      const cred = await auth.signInAnonymously();
-      hostUid = cred.user.uid;
-    }
-
-    function baseRoomState(id){
-      return {
-        roomId: id,
-        hostUid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        status: "lobby",
-        questionIndex: 0,
-        questionEndsAt: 0,
-        currentQuestion: null,
-        reveal: null,
-        pause: null,
-        sabotage: null,
-        winners: [],
-        updatedAtMs: nowMs()
+    function mulberry32(seed){
+      return function(){
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
       };
     }
-
-    function getJoinLink(){
-      const base = location.href.replace(/host\.html.*$/i, "");
-      return base + "player.html?room=" + encodeURIComponent(roomId);
-    }
-    function updateShareText(){
-      shareText = `Just started a quiz game fancy joining in? ${joinLink}`;
-    }
-
-    function renderQRCode(){
-      joinLink = getJoinLink();
-      updateShareText();
-
-      $("joinLinkText").textContent = joinLink;
-      show($("qrArea"), true);
-
-      $("qr").innerHTML = "";
-      new QRCode(document.getElementById("qr"), { text: joinLink, width: 120, height: 120 });
-
-      $("roomCode").textContent = roomId;
-      $("hint").textContent = "Players scan the QR or use the join link.";
-    }
-
-    async function shareViaWebShare(preferText){
-      if(navigator.share){
-        try{
-          await navigator.share({ title: "Know It All?", text: preferText, url: joinLink });
-          setToast($("hostToast"), "Share opened.");
-          return true;
-        }catch(e){}
+    function seededShuffle(arr, seed){
+      const r = mulberry32(seed);
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(r()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
       }
-      return false;
+      return a;
     }
-    async function shareWhatsApp(){
-      if(!joinLink) return;
-      const usedShare = await shareViaWebShare(shareText);
-      if(usedShare) return;
-      window.open("https://wa.me/?text=" + encodeURIComponent(shareText), "_blank");
+    function hashSeed(seed, idx){
+      // deterministic per question
+      return (seed * 1000003 + idx * 9176) >>> 0;
     }
-    async function shareMessenger(){
-      if(!joinLink) return;
-      const usedShare = await shareViaWebShare(shareText);
-      if(usedShare) return;
 
-      window.open("fb-messenger://share?link=" + encodeURIComponent(joinLink), "_blank");
-      try{
-        await navigator.clipboard.writeText(shareText);
-        setToast($("hostToast"), "Copied message + link. Paste into Messenger.");
-      }catch{
-        setToast($("hostToast"), "Copy failed. Copy the link manually and paste into Messenger.");
+    // Fetch 2000 bank (4 files)
+    let BANK = null;
+    async function loadBank(){
+      if(BANK) return BANK;
+      const files = [
+        "./question_bank_part1.json",
+        "./question_bank_part2.json",
+        "./question_bank_part3.json",
+        "./question_bank_part4.json"
+      ];
+      const parts = [];
+      for(const f of files){
+        const res = await fetch(f, { cache:"no-store" });
+        if(!res.ok) throw new Error("Missing file: " + f);
+        const arr = await res.json();
+        if(!Array.isArray(arr)) throw new Error("Bad JSON array in " + f);
+        parts.push(arr);
       }
+      BANK = parts.flat();
+      return BANK;
     }
 
-    function listenLive(){
-      if(unsubRoom) unsubRoom();
-      if(unsubPlayers) unsubPlayers();
-
-      unsubRoom = roomRef().onSnapshot((snap) => {
-        if(!snap.exists) return;
-        latestRoom = snap.data();
-        render(latestRoom, latestPlayers);
-      });
-
-      unsubPlayers = playersRef().onSnapshot((snap) => {
-        latestPlayers = snap.docs.map(d => ({ id:d.id, ...d.data() }))
-          .sort((a,b) => (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
-        if(latestRoom) render(latestRoom, latestPlayers);
-      });
+    function buildChoices(question, bank, seed, qIndex){
+      // pick 3 decoys from bank answers, avoid duplicates
+      const r = mulberry32(hashSeed(seed, qIndex));
+      const correct = String(question.answer);
+      const pool = bank.filter(q => String(q.answer) !== correct).map(q => String(q.answer));
+      const decoys = new Set();
+      while(decoys.size < 3 && pool.length){
+        const cand = pool[Math.floor(r()*pool.length)];
+        if(cand && cand !== correct) decoys.add(cand);
+      }
+      const choices = [correct, ...Array.from(decoys).slice(0,3)];
+      // shuffle choices deterministically
+      for(let i=choices.length-1;i>0;i--){
+        const j = Math.floor(r()*(i+1));
+        [choices[i], choices[j]] = [choices[j], choices[i]];
+      }
+      return choices;
     }
 
+    // ---------- UI refs ----------
+    const roomCodeEl = document.getElementById("roomCode");
+    const playerCountEl = document.getElementById("playerCount");
+    const playersListEl = document.getElementById("playersList");
+
+    const lobbyCard = document.getElementById("lobbyCard");
+    const gameCard = document.getElementById("gameCard");
+
+    const btnCreateRoom = document.getElementById("btnCreateRoom");
+    const btnStartGame = document.getElementById("btnStartGame");
+    const btnReveal = document.getElementById("btnReveal");
+    const btnNext = document.getElementById("btnNext");
+    const btnResetGame = document.getElementById("btnResetGame");
+    const btnResetAll = document.getElementById("btnResetAll");
+
+    const gameLengthSel = document.getElementById("gameLength");
+
+    const qTextEl = document.getElementById("qText");
+    const answersHostEl = document.getElementById("answersHost");
+    const timeLeftEl = document.getElementById("timeLeft");
+    const qNumEl = document.getElementById("qNum");
+    const qTotalEl = document.getElementById("qTotal");
+
+    const joinLinkEl = document.getElementById("joinLink");
+    const btnCopyLink = document.getElementById("btnCopyLink");
+    const btnShareWhatsApp = document.getElementById("btnShareWhatsApp");
+    const btnShareMessenger = document.getElementById("btnShareMessenger");
+
+    const lbModalBack = document.getElementById("lbModalBack");
+    const lbTable = document.getElementById("lbTable");
+    document.getElementById("btnOpenLeaderboard").onclick = ()=> openLeaderboardModal();
+    document.getElementById("lbClose").onclick = ()=> closeLeaderboardModal();
+
+    const rulesBack = document.getElementById("rulesBack");
+    document.getElementById("btnRules").onclick = ()=> rulesBack.style.display="flex";
+    document.getElementById("rulesClose").onclick = ()=> rulesBack.style.display="none";
+
+    // ---------- Room state ----------
+    let roomCode = null;
+    let roomUnsub = null;
+    let playersUnsub = null;
+    let roomDocRef = null;
+    let playersColRef = null;
+    let playersCache = []; // sorted
+    let tickTimer = null;
+
+    function setLobby(enabled){
+      lobbyCard.style.display = enabled ? "" : "none";
+      gameCard.style.display = enabled ? "none" : "";
+    }
+
+    function baseUrl(){
+      return window.location.href.replace(/host\.html.*$/,"");
+    }
+
+    function makeJoinUrl(code){
+      return baseUrl() + "player.html?room=" + encodeURIComponent(code);
+    }
+
+    function renderQR(code){
+      const qrEl = document.getElementById("qr");
+      qrEl.innerHTML = "";
+      const url = makeJoinUrl(code);
+      new QRCode(qrEl, { text:url, width:168, height:168, correctLevel: QRCode.CorrectLevel.H });
+    }
+
+    // ---------- Firestore ----------
     async function createRoom(){
-      roomId = randomCode(4);
-      await roomRef().set(baseRoomState(roomId));
-      localStorage.setItem("KIA_LAST_ROOM_HOST", roomId);
-      renderQRCode();
-      listenLive();
-      setToast($("hostToast"), "Room created. Players can join now.");
+      const code = makeRoomCode();
+      const seed = randInt(1, 2_000_000_000);
+      const gameLen = parseInt(gameLengthSel.value,10);
+
+      const bank = await loadBank(); // ensures files exist
+      if(bank.length < 2000) throw new Error("Question bank not loaded (need 2000).");
+
+      roomCode = code;
+      roomDocRef = doc(db, "rooms", roomCode);
+      playersColRef = collection(db, "rooms", roomCode, "players");
+
+      await setDoc(roomDocRef, {
+        createdAt: serverTimestamp(),
+        status: "lobby",                // lobby | question | reveal | awaitingPerks | final
+        questionCount: gameLen,         // 50/100/150
+        seed,
+        qIndex: 0,
+        qStartMs: null,
+        revealAtMs: null,
+        awaitingPerkFor: [],            // array of playerIds who must choose claim/sabotage
+        lastRevealSummary: null,        // { qIndex, correctAnswer, choices, revealedAtMs }
+        sabotageNext: {},               // map playerId -> true (means cannot answer next)
+        finishedAt: null
+      });
+
+      // UI
+      roomCodeEl.textContent = roomCode;
+      renderQR(roomCode);
+      const url = makeJoinUrl(roomCode);
+      joinLinkEl.value = url;
+      btnCopyLink.disabled = false;
+      btnShareWhatsApp.disabled = false;
+      btnShareMessenger.disabled = false;
+      btnResetAll.disabled = false;
+
+      // Listen
+      bindRoomListeners();
     }
 
-    async function startGame(){
-      if(!roomId) return;
-      if(latestPlayers.length === 0){
-        setToast($("hostToast"), "At least 1 player must join.");
+    function bindRoomListeners(){
+      if(roomUnsub) roomUnsub();
+      if(playersUnsub) playersUnsub();
+
+      roomUnsub = onSnapshot(roomDocRef, async (snap)=>{
+        if(!snap.exists()) return;
+        const room = snap.data();
+
+        // Show correct UI
+        setLobby(room.status === "lobby");
+
+        qTotalEl.textContent = String(room.questionCount || 0);
+        qNumEl.textContent = String((room.qIndex||0) + (room.status==="final"?0:1));
+
+        // Start button enable only if players >= 1
+        btnStartGame.disabled = !(playersCache.length >= 1 && room.status === "lobby");
+
+        btnResetGame.disabled = false;
+        btnReveal.disabled = !(room.status === "question");
+        btnNext.disabled = !(room.status === "reveal" || room.status === "awaitingPerks");
+
+        // render game question if in question/reveal/awaitingPerks
+        if(room.status !== "lobby"){
+          await renderHostQuestion(room);
+        }
+
+        // timer UI (host uses qStartMs as source)
+        syncHostTimer(room);
+      });
+
+      playersUnsub = onSnapshot(query(playersColRef, orderBy("score","desc")), (snap)=>{
+        playersCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        playerCountEl.textContent = String(playersCache.length);
+        renderPlayersList(playersCache);
+        renderLeaderboardTable(playersCache);
+        // update start button condition
+        if(roomCode && roomDocRef){
+          // room listener handles state, but keep start enabled fresh:
+          // (it will be set properly when room snapshot arrives)
+        }
+      });
+    }
+
+    async function renderHostQuestion(room){
+      const bank = await loadBank();
+      const order = seededShuffle(bank, room.seed).slice(0, room.questionCount);
+      const qIndex = room.qIndex || 0;
+      const q = order[Math.min(qIndex, order.length-1)];
+      if(!q){ qTextEl.textContent = "No question loaded."; return; }
+
+      qTextEl.textContent = q.text;
+
+      const choices = buildChoices(q, order, room.seed, qIndex);
+      answersHostEl.innerHTML = "";
+
+      const reveal = (room.status === "reveal" || room.status === "awaitingPerks" || room.status === "final");
+      const correct = String(q.answer);
+
+      choices.forEach((choice)=>{
+        const div = document.createElement("div");
+        div.className = "ansBtn";
+        div.textContent = choice;
+
+        if(reveal){
+          if(choice === correct){
+            div.classList.add("correct");
+          } else {
+            div.classList.add("wrong");
+          }
+        }
+        answersHostEl.appendChild(div);
+      });
+
+      // if final, show winner card in lobby modal style? (handled via leaderboard modal)
+      if(room.status === "final"){
+        openLeaderboardModal(true);
+      }
+    }
+
+    function syncHostTimer(room){
+      if(tickTimer) clearInterval(tickTimer);
+
+      if(room.status === "question" && room.qStartMs){
+        tickTimer = setInterval(()=>{
+          const now = Date.now();
+          const left = Math.max(0, Math.ceil((room.qStartMs + 20000 - now)/1000));
+          timeLeftEl.textContent = String(left);
+        }, 200);
+      } else {
+        timeLeftEl.textContent = "20";
+      }
+    }
+
+    function renderPlayersList(players){
+      playersListEl.innerHTML = "";
+      if(players.length === 0){
+        const d = document.createElement("div");
+        d.className="muted small";
+        d.textContent="No players yet. Share the QR/link.";
+        playersListEl.appendChild(d);
         return;
       }
-      await startQuestion(0);
-    }
-
-    async function startQuestion(qIdx){
-      const q = QUESTIONS[qIdx];
-
-      const snap = await roomRef().get();
-      const room = snap.data();
-      let sabotage = room?.sabotage || null;
-      if(!sabotage || sabotage.activeForQuestionIndex !== qIdx) sabotage = null;
-
-      await roomRef().update({
-        status: "question",
-        questionIndex: qIdx,
-        questionEndsAt: nowMs() + QUESTION_SECONDS * 1000,
-        currentQuestion: q,
-        reveal: null,
-        pause: null,
-        sabotage,
-        updatedAtMs: nowMs()
+      players.forEach(p=>{
+        const row = document.createElement("div");
+        row.className = "pitem";
+        const left = document.createElement("div");
+        left.innerHTML = `<div class="pname">${escapeHtml(p.nick||"Player")}</div>
+                          <div class="psub">Streak: ${p.streak||0} • Cheat: ${(p.cheatUsed? "used":"ready")} • Help: ${p.helpUsed||0}/3</div>`;
+        const right = document.createElement("div");
+        const sabotaged = p.sabotagedNext ? `<span class="tag bad">SABOTAGED</span>` : "";
+        right.innerHTML = `<div class="pscore">${p.score||0}</div>${sabotaged}`;
+        row.appendChild(left);
+        row.appendChild(right);
+        playersListEl.appendChild(row);
       });
     }
 
-    async function revealNow(){
-      if(!roomId) return;
-      const roomSnap = await roomRef().get();
-      if(!roomSnap.exists) return;
-      const room = roomSnap.data();
-      if(room.status !== "question") return;
+    function openLeaderboardModal(isFinal=false){
+      lbModalBack.style.display="flex";
+      // Title tweak if final
+      lbModalBack.querySelector("h3").textContent = isFinal ? "Final Leaderboard" : "Leaderboard";
+    }
+    function closeLeaderboardModal(){
+      lbModalBack.style.display="none";
+    }
 
-      const qIdx = room.questionIndex;
-      const correctIndex = room.currentQuestion.correctIndex;
+    function renderLeaderboardTable(players){
+      const rows = [];
+      rows.push(`<tr><th>Rank</th><th>Player</th><th>Score</th><th>Status</th></tr>`);
+      players.forEach((p,i)=>{
+        const st = p.sabotagedNext ? `<span class="tag bad">Sabotaged</span>` : (p.pendingPerk ? `<span class="tag">Perk</span>` : `<span class="tag good">OK</span>`);
+        rows.push(`<tr>
+          <td>${i+1}</td>
+          <td>${escapeHtml(p.nick||"Player")}</td>
+          <td><b style="color:var(--orange)">${p.score||0}</b></td>
+          <td>${st}</td>
+        </tr>`);
+      });
+      lbTable.innerHTML = rows.join("");
+    }
 
-      const aSnap = await answersRef().where("questionIndex", "==", qIdx).get();
-      const ansMap = new Map();
-      aSnap.docs.forEach(d => ansMap.set(d.data().uid, d.data()));
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
 
-      const pSnap = await playersRef().get();
-      const players = pSnap.docs.map(d => ({ id:d.id, ref:d.ref, ...d.data() }));
+    // ---------- Game flow ----------
+    async function startGame(){
+      if(!roomDocRef) return;
+      const snap = await getDoc(roomDocRef);
+      if(!snap.exists()) return;
+      const room = snap.data();
+      if(room.status !== "lobby") return;
 
-      const pendingStreakIds = [];
-      const batch = db.batch();
-
-      players.forEach(p => {
-        const ans = ansMap.get(p.id);
-        let isCorrect = false;
-        let points = 0;
-
-        if(ans && typeof ans.choiceIndex === "number"){
-          isCorrect = ans.choiceIndex === correctIndex;
-          const remaining = Math.max(0, Math.ceil((room.questionEndsAt - ans.answeredAtMs)/1000));
-          if(isCorrect) points = calcPoints(remaining);
-        }
-
-        const newScore = (p.score || 0) + (isCorrect ? points : 0);
-        const newStreak = isCorrect ? (p.streak || 0) + 1 : 0;
-
-        let rewardPending = (p.rewardPending === true);
-        let rewardEarnedAt = p.rewardEarnedAtQuestionIndex ?? null;
-
-        if(newStreak === 5 && !rewardPending){
-          rewardPending = true;
-          rewardEarnedAt = qIdx;
-          pendingStreakIds.push(p.id);
-        }
-
-        batch.update(p.ref, {
-          score: newScore,
-          streak: newStreak,
-          rewardPending,
-          rewardEarnedAtQuestionIndex: rewardEarnedAt,
-          lastAnswer: {
-            questionIndex: qIdx,
-            choiceIndex: ans ? ans.choiceIndex : null,
-            answeredAtMs: ans ? ans.answeredAtMs : null,
-            isCorrect,
-            pointsAwarded: points
-          }
+      // clear scores/streaks for clean start
+      const batch = writeBatch(db);
+      const pSnap = await getDocs(playersColRef);
+      pSnap.forEach(d=>{
+        batch.update(d.ref, {
+          score: 0,
+          streak: 0,
+          lastAnswer: null,
+          lastAnswerMs: null,
+          lastCorrect: null,
+          cheatUsed: false,
+          helpUsed: 0,
+          pendingPerk: false,
+          sabotagedNext: false
         });
       });
 
-      const pauseObj = pendingStreakIds.length
-        ? { type:"streak", pendingPlayerIds: pendingStreakIds, earnedAtQuestionIndex: qIdx }
-        : null;
+      batch.update(roomDocRef, {
+        status: "question",
+        qIndex: 0,
+        qStartMs: Date.now(),
+        revealAtMs: null,
+        awaitingPerkFor: [],
+        lastRevealSummary: null,
+        sabotageNext: {},
+        finishedAt: null
+      });
+      await batch.commit();
+    }
 
-      batch.update(roomRef(), {
-        status: "reveal",
-        reveal: { correctIndex },
-        pause: pauseObj,
-        updatedAtMs: nowMs()
+    async function revealAnswer(){
+      // Host reveals current question, awards points, triggers perk pause if needed
+      const snap = await getDoc(roomDocRef);
+      if(!snap.exists()) return;
+      const room = snap.data();
+      if(room.status !== "question") return;
+
+      const bank = await loadBank();
+      const order = seededShuffle(bank, room.seed).slice(0, room.questionCount);
+      const qIndex = room.qIndex || 0;
+      const q = order[qIndex];
+      const correct = String(q.answer);
+      const choices = buildChoices(q, order, room.seed, qIndex);
+
+      // Read all players
+      const pSnap = await getDocs(playersColRef);
+      const batch = writeBatch(db);
+
+      const awaiting = [];
+
+      pSnap.forEach(docSnap=>{
+        const pid = docSnap.id;
+        const p = docSnap.data();
+        const answer = p.lastAnswer;        // chosen option text
+        const answerMs = p.lastAnswerMs;    // ms timestamp when clicked
+        const sabotaged = !!p.sabotagedNext;
+
+        let lastCorrect = false;
+        let scoreAdd = 0;
+        let newStreak = p.streak || 0;
+
+        if(!sabotaged && answer != null){
+          lastCorrect = (String(answer) === correct);
+          if(lastCorrect){
+            // Speed points: max 100, based on time left at click
+            // timeLeft = clamp(0..20)
+            const start = room.qStartMs || Date.now();
+            const elapsed = Math.max(0, Math.min(20000, (answerMs||Date.now()) - start));
+            const timeLeft = Math.max(0, 20000 - elapsed);
+            scoreAdd = Math.round(100 * (timeLeft / 20000));
+            newStreak += 1;
+          } else {
+            newStreak = 0;
+          }
+        } else {
+          // no answer or sabotaged => streak reset
+          lastCorrect = false;
+          newStreak = 0;
+        }
+
+        const updates = {
+          lastCorrect,
+          score: (p.score||0) + scoreAdd,
+          streak: newStreak,
+          pendingPerk: false, // set below if needed
+        };
+
+        // If hit 5-streak now, mark pending perk
+        if(newStreak > 0 && newStreak % 5 === 0 && lastCorrect){
+          updates.pendingPerk = true;
+          awaiting.push(pid);
+        }
+
+        // Clear answer for next question
+        updates.lastAnswer = null;
+        updates.lastAnswerMs = null;
+
+        // Clear sabotage flag AFTER it took effect this question (we block answering on player side; host also treats it)
+        updates.sabotagedNext = false;
+
+        batch.update(docSnap.ref, updates);
+      });
+
+      // Move room to reveal, and if perks exist => awaitingPerks
+      const nextStatus = awaiting.length ? "awaitingPerks" : "reveal";
+
+      batch.update(roomDocRef, {
+        status: nextStatus,
+        revealAtMs: Date.now(),
+        lastRevealSummary: {
+          qIndex,
+          correctAnswer: correct,
+          choices,
+          revealedAtMs: Date.now()
+        },
+        awaitingPerkFor: awaiting
       });
 
       await batch.commit();
     }
 
     async function nextQuestion(){
-      if(!roomId) return;
-      const snap = await roomRef().get();
-      if(!snap.exists) return;
+      const snap = await getDoc(roomDocRef);
+      if(!snap.exists()) return;
       const room = snap.data();
-      if(room.status !== "reveal") return;
 
-      const pendingCount = (room.pause?.pendingPlayerIds||[]).length;
-      if(pendingCount > 0){
-        setToast($("pauseToast"), `GAME PAUSED: waiting for ${pendingCount} streak decision(s).`);
+      if(room.status !== "reveal" && room.status !== "awaitingPerks") return;
+
+      // if awaitingPerks, host cannot proceed until all resolved
+      if(room.status === "awaitingPerks" && (room.awaitingPerkFor||[]).length){
+        alert("Waiting for streak selection(s) before continuing.");
         return;
       }
 
-      const next = room.questionIndex + 1;
-      if(next >= QUESTIONS.length){
-        await finishGame();
-      }else{
-        await startQuestion(next);
+      const nextIndex = (room.qIndex||0) + 1;
+      if(nextIndex >= (room.questionCount||0)){
+        await updateDoc(roomDocRef, { status:"final", finishedAt: Date.now() });
+        openLeaderboardModal(true);
+        return;
       }
-    }
 
-    async function finishGame(){
-      const pSnap = await playersRef().get();
-      const players = pSnap.docs.map(d => ({ id:d.id, ...d.data() }))
-        .sort((a,b) => (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
+      // sabotageNext map applies to next question
+      // room.sabotageNext is map of playerId->true that should be applied to player doc flags
+      const sabotageNext = room.sabotageNext || {};
 
-      const topScore = players.length ? (players[0].score || 0) : 0;
-      const winners = players.filter(p => (p.score||0) === topScore).map(p => p.id);
-
-      await roomRef().update({
-        status: "final",
-        currentQuestion: null,
-        reveal: null,
-        questionEndsAt: 0,
-        pause: null,
-        winners,
-        updatedAtMs: nowMs()
-      });
-    }
-
-    async function resetGame(){
-      if(!roomId) return;
-
-      await roomRef().update({
-        status: "lobby",
-        questionIndex: 0,
-        questionEndsAt: 0,
-        currentQuestion: null,
-        reveal: null,
-        pause: null,
-        sabotage: null,
-        winners: [],
-        updatedAtMs: nowMs()
+      // apply sabotage to target players
+      const pSnap = await getDocs(playersColRef);
+      const batch = writeBatch(db);
+      pSnap.forEach(d=>{
+        if(sabotageNext[d.id]){
+          batch.update(d.ref, { sabotagedNext: true });
+        }
       });
 
-      const pSnap = await playersRef().get();
-      const batch = db.batch();
-
-      pSnap.docs.forEach(doc => {
-        batch.update(doc.ref, {
-          score: 0,
-          streak: 0,
-          rewardPending: false,
-          rewardEarnedAtQuestionIndex: null,
-          lastAnswer: null,
-          cheatLeft: 1,
-          helpLeft: 3
-        });
+      batch.update(roomDocRef, {
+        status: "question",
+        qIndex: nextIndex,
+        qStartMs: Date.now(),
+        revealAtMs: null,
+        lastRevealSummary: null,
+        sabotageNext: {} // consumed
       });
-
-      const aSnap = await answersRef().get();
-      aSnap.docs.forEach(doc => batch.delete(doc.ref));
       await batch.commit();
     }
 
-    function render(room, players){
-      show($("lobby"), room.status === "lobby");
-      show($("question"), room.status === "question" || room.status === "reveal");
-      show($("final"), room.status === "final");
+    async function resetRoom(){
+      if(!roomDocRef) return;
+      if(!confirm("Reset the room? This clears scores and returns to lobby.")) return;
 
-      $("btnReset").disabled = room.status !== "lobby";
-      $("btnStart").disabled = (players.length === 0) || room.status !== "lobby";
-
-      const ul = $("playersList");
-      ul.innerHTML = "";
-      if(players.length === 0){
-        ul.innerHTML = `<li><span class="small">No players yet</span><span></span></li>`;
-      }else{
-        players.forEach((p,i)=>{
-          const li = document.createElement("li");
-          li.innerHTML = `<div class="nameRow"><span class="rank mono">${i+1}</span><strong>${p.name||"Player"}</strong></div><span class="mono">${p.score||0}</span>`;
-          ul.appendChild(li);
+      const pSnap = await getDocs(playersColRef);
+      const batch = writeBatch(db);
+      pSnap.forEach(d=>{
+        batch.update(d.ref,{
+          score:0, streak:0,
+          lastAnswer:null, lastAnswerMs:null, lastCorrect:null,
+          cheatUsed:false, helpUsed:0,
+          pendingPerk:false, sabotagedNext:false
         });
-      }
-
-      if(room.status === "question" || room.status === "reveal"){
-        $("phaseBadge").textContent = room.status === "question" ? "Host • Question" : "Host • Reveal";
-        $("qText").textContent = room.currentQuestion?.text || "Question";
-
-        if(timerUI) clearInterval(timerUI);
-        timerUI = setInterval(()=> $("timer").textContent = String(fmtTimeLeft(room.questionEndsAt)), 150);
-
-        $("answers").innerHTML = "";
-        const q = room.currentQuestion;
-        if(q){
-          q.options.forEach((opt, idx)=>{
-            const div = document.createElement("div");
-            div.className = "answer";
-            div.innerHTML = `<div class="small mono">${labelAnswer(idx)}</div><div style="font-weight:1000;margin-top:4px;">${opt}</div>`;
-            if(room.status === "reveal" && room.reveal && idx === room.reveal.correctIndex){
-              div.classList.add("correct");
-            }
-            $("answers").appendChild(div);
-          });
-        }
-
-        const lb = $("leaderboard");
-        lb.innerHTML = "";
-        players.slice()
-          .sort((a,b)=> (b.score-a.score) || (a.name||"").localeCompare(b.name||""))
-          .forEach((p,i)=>{
-            const li = document.createElement("li");
-            li.innerHTML = `<div class="nameRow"><span class="rank mono">${i+1}</span><strong>${p.name}</strong><span class="small mono" style="opacity:.75">streak ${p.streak||0}</span></div><span class="mono">${p.score||0}</span>`;
-            lb.appendChild(li);
-          });
-
-        $("btnReveal").disabled = room.status !== "question";
-        const pendingCount = (room.pause?.pendingPlayerIds||[]).length;
-        $("btnNext").disabled = room.status !== "reveal" || pendingCount > 0;
-
-        if(room.status === "reveal" && room.reveal){
-          setToast($("revealToast"), `Correct answer: ${labelAnswer(room.reveal.correctIndex)} • ${pendingCount>0 ? "Paused…" : "Click Next Question."}`);
-        }else setToast($("revealToast"), "");
-
-        if(pendingCount > 0){
-          setToast($("pauseToast"), `GAME PAUSED: waiting for ${pendingCount} streak decision(s).`);
-        }else setToast($("pauseToast"), "");
-      }
-
-      if(room.status === "final"){
-        const winners = room.winners || [];
-        const names = winners.map(id => players.find(p=>p.id===id)?.name).filter(Boolean);
-        const topScore = winners.length ? (players.find(p=>p.id===winners[0])?.score||0) : 0;
-        $("finalSub").textContent = names.length ? `${names.join(" & ")} • ${topScore} points` : "No players found.";
-      }
-    }
-
-    setInterval(async ()=>{
-      if(!roomId || !latestRoom) return;
-      if(latestRoom.status === "question" && fmtTimeLeft(latestRoom.questionEndsAt) <= 0){
-        await revealNow();
-      }
-    }, 500);
-
-    function fillRules(){
-      $("rulesContent").innerHTML = `
-        <h3>Players</h3>
-        <ul>
-          <li><b>Recommended:</b> 2–20 players per game (best experience).</li>
-          <li>One device is the <b>Host</b>. Everyone else joins on their phone.</li>
-        </ul>
-        <h3>How to play</h3>
-        <ul>
-          <li>The host starts the game and controls reveal + next question.</li>
-          <li>Each question lasts <b>20 seconds</b>.</li>
-          <li>Players tap one answer — it locks and cannot be changed.</li>
-          <li>On reveal, everyone sees an updated leaderboard.</li>
-        </ul>
-        <h3>Scoring</h3>
-        <ul>
-          <li>Correct answers score more when answered faster.</li>
-          <li>Up to <b>100 points</b> per question.</li>
-        </ul>
-        <h3>5-Streak Reward</h3>
-        <ul>
-          <li>Get <b>5 correct in a row</b> to unlock a choice:</li>
-          <li><b>Claim +20</b> or <b>Sabotage</b> another player.</li>
-          <li>The game pauses until all streak players choose.</li>
-        </ul>
-        <h3>Sabotage</h3>
-        <ul>
-          <li>Pick a player from the list.</li>
-          <li>They cannot answer the <b>next</b> question.</li>
-        </ul>
-        <h3>Power Buttons</h3>
-        <ul>
-          <li><b>CHEAT (1 use per game):</b> auto-picks the correct answer and locks it.</li>
-          <li><b>HELP (3 uses per game):</b> removes 2 wrong answers immediately (red).</li>
-        </ul>
-      `;
-    }
-
-    function hookBtn(id, fn){
-      $(id).addEventListener("click", async ()=>{
-        SFX.ensureUnlocked();
-        SFX.click();
-        await fn();
       });
+      batch.update(roomDocRef,{
+        status:"lobby",
+        qIndex:0,
+        qStartMs:null,
+        revealAtMs:null,
+        awaitingPerkFor:[],
+        lastRevealSummary:null,
+        sabotageNext:{},
+        finishedAt:null
+      });
+      await batch.commit();
+
+      setLobby(true);
     }
 
-    hookBtn("btnCreate", createRoom);
-    hookBtn("btnStart", startGame);
-    hookBtn("btnReset", resetGame);
-    hookBtn("btnResetFromQ", resetGame);
-    hookBtn("btnResetFinal", resetGame);
+    async function hardResetAll(){
+      if(!roomDocRef) return;
+      if(!confirm("Hard reset: remove room and all players?")) return;
 
-    $("btnReveal").addEventListener("click", async ()=>{
-      SFX.ensureUnlocked();
-      SFX.click();
-      SFX.reveal();
-      await revealNow();
-    });
+      // simplest: reset room only (delete requires more rules). We'll reset.
+      await resetRoom();
+    }
 
-    hookBtn("btnNext", nextQuestion);
-
-    hookBtn("btnCopy", async ()=>{
-      try{ await navigator.clipboard.writeText(joinLink); setToast($("hostToast"), "Join link copied!"); }
-      catch{ setToast($("hostToast"), "Could not copy. Copy manually from the link."); }
-    });
-    hookBtn("btnOpen", ()=> window.open(joinLink, "_blank"));
-    hookBtn("btnShareWhatsApp", shareWhatsApp);
-    hookBtn("btnShareMessenger", shareMessenger);
-
-    hookBtn("btnForgetRoom", ()=>{
-      localStorage.removeItem("KIA_LAST_ROOM_HOST");
-      location.reload();
-    });
-
-    $("btnRules").onclick = ()=>{
-      SFX.ensureUnlocked(); SFX.click();
-      fillRules();
-      modalOn("rulesModal", true);
+    // ---------- Share ----------
+    function shareMessage(url){
+      return `Just started a quiz game “Know It All?” — fancy joining in?\n${url}`;
+    }
+    btnCopyLink.onclick = async ()=>{
+      const url = joinLinkEl.value;
+      await navigator.clipboard.writeText(url);
+      alert("Link copied!");
     };
-    $("btnCloseRules").onclick = ()=>{
-      SFX.ensureUnlocked(); SFX.click();
-      modalOn("rulesModal", false);
+    btnShareWhatsApp.onclick = ()=>{
+      const url = joinLinkEl.value;
+      const msg = encodeURIComponent(shareMessage(url));
+      window.open(`https://wa.me/?text=${msg}`, "_blank");
+    };
+    btnShareMessenger.onclick = ()=>{
+      const url = joinLinkEl.value;
+      // Messenger share (web). If it doesn't open app, users can copy link.
+      const shareUrl = encodeURIComponent(url);
+      window.open(`https://www.facebook.com/dialog/send?link=${shareUrl}`, "_blank");
+      // Note: FB dialog may require app params in some cases; copy link is always fallback.
     };
 
-    (async function init(){
-      await signInHost();
-      const last = localStorage.getItem("KIA_LAST_ROOM_HOST");
-      if(last){
-        const snap = await db.collection("rooms").doc(last).get();
-        if(snap.exists){
-          roomId = last;
-          renderQRCode();
-          listenLive();
-          setToast($("hostToast"), "Restored last room.");
-        }
+    // ---------- Buttons ----------
+    btnCreateRoom.onclick = async ()=>{
+      try{
+        btnCreateRoom.disabled = true;
+        await createRoom();
+      }catch(e){
+        console.error(e);
+        alert("Create room failed: " + e.message);
+      }finally{
+        btnCreateRoom.disabled = false;
       }
-    })();
+    };
+    btnStartGame.onclick = ()=> startGame().catch(e=>alert(e.message));
+    btnReveal.onclick = ()=> revealAnswer().catch(e=>alert(e.message));
+    btnNext.onclick = ()=> nextQuestion().catch(e=>alert(e.message));
+    btnResetGame.onclick = ()=> resetRoom().catch(e=>alert(e.message));
+    btnResetAll.onclick = ()=> hardResetAll().catch(e=>alert(e.message));
   </script>
 </body>
 </html>
