@@ -109,6 +109,7 @@
       border:1px solid rgba(255,106,0,.25);
       background: rgba(255,106,0,.08);
       color: var(--orange2);
+      white-space: pre-line;
     }
     .toast.good{
       border-color: rgba(44,255,154,.35);
@@ -143,7 +144,6 @@
     }
     .kpi .pill strong{ color: var(--text); display:block; }
 
-    /* floating rules btn */
     .rulesBtn{
       position:fixed;
       right:14px;
@@ -157,7 +157,6 @@
       font-weight:1000;
     }
 
-    /* MODALS */
     .modal{
       position:fixed; inset:0;
       display:none;
@@ -289,7 +288,6 @@
     </div>
   </div>
 
-  <!-- Reveal Modal -->
   <div class="modal" id="revealModal">
     <div class="modalCard">
       <div class="modalTop">
@@ -306,7 +304,6 @@
     </div>
   </div>
 
-  <!-- Sabotage Modal -->
   <div class="modal" id="sabotageModal">
     <div class="modalCard">
       <div class="modalTop">
@@ -318,7 +315,6 @@
     </div>
   </div>
 
-  <!-- Rules Modal -->
   <div class="modal" id="rulesModal">
     <div class="modalCard">
       <div class="modalTop">
@@ -330,49 +326,36 @@
   </div>
 
   <script>
-    /************** SOUNDS (WebAudio) **************/
     const SFX = (() => {
       let ctx = null;
-      function getCtx(){
-        if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-        return ctx;
-      }
+      function getCtx(){ if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); return ctx; }
       function ensureUnlocked(){ try{ getCtx().resume(); }catch{} }
-
       function tone(freq=440, dur=0.06, type="sine", vol=0.06){
         const c = getCtx();
         const o = c.createOscillator();
         const g = c.createGain();
-        o.type = type;
-        o.frequency.value = freq;
-        g.gain.value = vol;
+        o.type = type; o.frequency.value = freq; g.gain.value = vol;
         o.connect(g); g.connect(c.destination);
-        o.start();
-        o.stop(c.currentTime + dur);
+        o.start(); o.stop(c.currentTime + dur);
       }
       function click(){ tone(900,0.03,"square",0.04); }
-
       function reveal(){
         tone(660,0.09,"sine",0.06);
         setTimeout(()=>tone(990,0.10,"sine",0.06), 90);
         setTimeout(()=>tone(1320,0.12,"sine",0.06), 200);
       }
-
-      // Countdown tick: higher pitch as time decreases
       let lastTickSec = null;
       function tick(secLeft){
         if(secLeft === lastTickSec) return;
         lastTickSec = secLeft;
         const s = Math.max(0, Math.min(20, secLeft));
-        const freq = 420 + (20 - s) * 40; // 20->420, 0->1220
+        const freq = 420 + (20 - s) * 40;
         tone(freq, 0.03, "square", 0.028);
       }
       function resetTick(){ lastTickSec = null; }
-
       return { ensureUnlocked, click, reveal, tick, resetTick };
     })();
 
-    /************** FIREBASE **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
       authDomain: "knowitall-a47a1.firebaseapp.com",
@@ -398,8 +381,7 @@
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
     function modalOn(id, on){
       const m = $(id);
-      if(on) m.classList.add("on");
-      else m.classList.remove("on");
+      if(on) m.classList.add("on"); else m.classList.remove("on");
     }
 
     let uid = null;
@@ -417,13 +399,8 @@
     const localHelpRemoved = new Map();
     const localSelected = new Map();
 
-    // prevents reveal modal from reopening due to snapshot updates
     let suppressRevealForQ = null;
-
-    // auto close timer for decision players
     let autoCloseTimer = null;
-
-    // play reveal sound once per reveal question
     let lastRevealSoundQ = null;
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
@@ -470,9 +447,7 @@
       listenLive();
     }
 
-    function keyForRoomQ(room){
-      return `${roomId}|${room.questionIndex}`;
-    }
+    function keyForRoomQ(room){ return `${roomId}|${room.questionIndex}`; }
 
     function isSabotaged(room){
       if(room.status !== "question") return false;
@@ -480,6 +455,13 @@
       if(!s || s.activeForQuestionIndex !== room.questionIndex) return false;
       const blocks = s.blocks || [];
       return blocks.some(b => b.targetPlayerId === uid);
+    }
+
+    function sabotageBlockInfoForQuestion(room, qIndex){
+      const s = room?.sabotage;
+      if(!s || s.activeForQuestionIndex !== qIndex) return null;
+      const blocks = s.blocks || [];
+      return blocks.find(b => b.targetPlayerId === uid) || null;
     }
 
     function isPendingStreakDecision(room, me){
@@ -512,7 +494,7 @@
       if(isSabotaged(latestRoom)) return;
 
       const key = keyForRoomQ(latestRoom);
-      if(localSelected.has(key)) return; // locked
+      if(localSelected.has(key)) return;
 
       localSelected.set(key, choiceIndex);
       renderAnswers();
@@ -527,16 +509,14 @@
       $("revealHint").textContent = "Host will start the next question…";
     }
 
-    function clearAutoClose(){
-      if(autoCloseTimer){ clearTimeout(autoCloseTimer); autoCloseTimer = null; }
-    }
+    function clearAutoClose(){ if(autoCloseTimer){ clearTimeout(autoCloseTimer); autoCloseTimer = null; } }
 
     function startAutoClose(room){
       clearAutoClose();
       $("revealHint").textContent = "You unlocked a 5-streak! Closing in 3 seconds so you can choose…";
       autoCloseTimer = setTimeout(()=>{
         if(latestRoom && latestRoom.status === "reveal" && latestRoom.questionIndex === room.questionIndex){
-          suppressReveal(room.questionIndex); // key fix: stops reopen
+          suppressReveal(room.questionIndex);
         }
       }, 3000);
     }
@@ -714,13 +694,12 @@
 
       await playersRef().doc(uid).update({ helpLeft: (me.helpLeft||0) - 1 });
 
-      renderAnswers(); // immediate red-out
+      renderAnswers();
       setToast($("playToast"), "HELP used.");
     }
 
     function renderAnswers(){
       if(!latestRoom) return;
-
       const ansBox = $("answers");
       ansBox.innerHTML = "";
       const q = latestRoom.currentQuestion;
@@ -741,12 +720,10 @@
           b.classList.add("removed");
           b.disabled = true;
         }
-
         if(lockAll && !(typeof selected === "number" && selected === idx)){
           b.classList.add("locked");
           b.disabled = true;
         }
-
         if(!lockAll && !b.disabled){
           b.onclick = () => { SFX.ensureUnlocked(); SFX.click(); pickAnswer(idx); };
         }
@@ -786,7 +763,6 @@
           <li><b>Recommended:</b> 2–20 players per game (best experience).</li>
           <li>One device is the <b>Host</b>. Everyone else joins on their phone.</li>
         </ul>
-
         <h3>How to play</h3>
         <ul>
           <li>The host starts the game and controls reveal + next question.</li>
@@ -794,26 +770,22 @@
           <li>Tap an answer to lock it in — you <b>cannot change</b> it.</li>
           <li>On reveal, the leaderboard updates for everyone.</li>
         </ul>
-
         <h3>Scoring</h3>
         <ul>
           <li>Correct answers score based on speed.</li>
           <li>Up to <b>100 points</b> per question.</li>
         </ul>
-
         <h3>5-Streak Reward</h3>
         <ul>
           <li>Get <b>5 correct in a row</b> to unlock a choice:</li>
           <li><b>Claim +20</b> bonus points, or <b>Sabotage</b> another player.</li>
           <li>The game pauses until all streak players choose.</li>
         </ul>
-
         <h3>Sabotage</h3>
         <ul>
           <li>Pick a player from the list.</li>
           <li>They cannot answer the <b>next</b> question and get a warning.</li>
         </ul>
-
         <h3>Power Buttons</h3>
         <ul>
           <li><b>CHEAT (1 use per game):</b> auto-picks the correct answer and locks it.</li>
@@ -832,7 +804,7 @@
           const me = latestPlayers.find(p=>p.id===uid) || null;
           renderRevealLeaderboard(me);
         }
-      }, (err)=>console.error("Players listener error:", err));
+      });
 
       unsubRoom = roomRef().onSnapshot(async (snap)=>{
         if(!snap.exists) return;
@@ -847,7 +819,6 @@
         $("phaseBadge").textContent = latestRoom.status === "reveal" ? "Reveal" : "Question";
         $("qText").textContent = latestRoom.currentQuestion?.text || "Question";
 
-        // Timer + ticker sound
         if(timerUI) clearInterval(timerUI);
         if(latestRoom.status === "question" || latestRoom.status === "reveal"){
           timerUI = setInterval(()=>{
@@ -859,15 +830,7 @@
           SFX.resetTick();
         }
 
-        // sabotage message
-        if(joined && isSabotaged(latestRoom)){
-          const blocks = latestRoom.sabotage?.blocks || [];
-          const hit = blocks.find(b=>b.targetPlayerId === uid);
-          setToast($("blockedToast"), `⚠ You have been sabotaged by ${hit?.byName || "a player"}. You cannot answer this question.`, "bad");
-        }else{
-          setToast($("blockedToast"), "", "bad");
-        }
-
+        // Load me
         const meSnap = await playersRef().doc(uid).get();
         const me = meSnap.exists ? meSnap.data() : null;
 
@@ -878,7 +841,19 @@
           $("btnHelp").textContent = `HELP (${me.helpLeft||0})`;
         }
 
-        const pendingForMe = isPendingStreakDecision(latestRoom, me);
+        // Sabotage: if blocked on this question, show clear message
+        const blockedInfo = sabotageBlockInfoForQuestion(latestRoom, latestRoom.questionIndex);
+        if(joined && latestRoom.status === "question" && blockedInfo){
+          setToast(
+            $("blockedToast"),
+            `⚠ You have been sabotaged by ${blockedInfo.byName || "a player"}.\nYou cannot answer the next question (this one).`,
+            "bad"
+          );
+        } else {
+          setToast($("blockedToast"), "", "bad");
+        }
+
+        const pendingForMe = (me && isPendingStreakDecision(latestRoom, me));
         $("btnClaim").disabled = !pendingForMe;
         $("btnSabotage").disabled = !pendingForMe;
         $("selectionPrompt").style.display = pendingForMe ? "" : "none";
@@ -894,13 +869,21 @@
 
         renderAnswers();
 
-        // Reveal modal with suppression fix + reveal sound once
         if(joined && latestRoom.status === "reveal"){
-          if(suppressRevealForQ === latestRoom.questionIndex){
-            modalOn("revealModal", false);
-          }else{
-            modalOn("revealModal", true);
+          // early warning: if you will be blocked next question, warn on reveal
+          const nextBlockedInfo = sabotageBlockInfoForQuestion(latestRoom, latestRoom.questionIndex + 1);
+          if(nextBlockedInfo){
+            setToast(
+              $("playToast"),
+              `⚠ You have been sabotaged by ${nextBlockedInfo.byName || "a player"}.\nYou will NOT be able to answer the next question.`,
+              "bad"
+            );
+          } else {
+            setToast($("playToast"), pendingForMe ? "5-streak unlocked! Choose Claim or Sabotage." : "Waiting for next question…");
           }
+
+          if(suppressRevealForQ === latestRoom.questionIndex) modalOn("revealModal", false);
+          else modalOn("revealModal", true);
 
           if(!latestPlayers || latestPlayers.length === 0){
             const pSnap = await playersRef().get();
@@ -908,35 +891,26 @@
           }
           renderRevealLeaderboard(me);
 
-          // Reveal sound once per reveal question (only if not suppressed)
           if(suppressRevealForQ !== latestRoom.questionIndex && lastRevealSoundQ !== latestRoom.questionIndex){
             lastRevealSoundQ = latestRoom.questionIndex;
-            // will only play if audio is unlocked by a prior click (browser rule)
             SFX.reveal();
           }
 
-          if(pendingForMe && suppressRevealForQ !== latestRoom.questionIndex){
-            startAutoClose(latestRoom);
-          }else{
-            clearAutoClose();
-            $("revealHint").textContent = "Host will start the next question…";
-          }
+          if(pendingForMe && suppressRevealForQ !== latestRoom.questionIndex) startAutoClose(latestRoom);
+          else { clearAutoClose(); $("revealHint").textContent = "Host will start the next question…"; }
 
-          setToast($("playToast"), pendingForMe ? "5-streak unlocked! Choose Claim or Sabotage." : "Waiting for next question…");
-        }else{
+        } else {
           modalOn("revealModal", false);
           modalOn("sabotageModal", false);
-          setToast($("playToast"), "");
           clearAutoClose();
-          $("revealHint").textContent = "Host will start the next question…";
 
-          // reset suppression when leaving reveal
           if(latestRoom.status === "question" || latestRoom.status === "lobby" || latestRoom.status === "final"){
             suppressRevealForQ = null;
           }
+
+          if(latestRoom.status !== "question") setToast($("playToast"), "");
         }
 
-        // final screen
         if(latestRoom.status === "final" && me){
           const winners = latestRoom.winners || [];
           const isWinner = winners.includes(uid);
@@ -944,8 +918,7 @@
           $("finalSpark").textContent = isWinner ? "✦ ✧ ✦ ✧ ✦" : "☹";
           $("finalSub").textContent = `Final score: ${me.score||0}`;
         }
-
-      }, (err)=>console.error("Room listener error:", err));
+      });
     }
 
     function hook(btnId, fn){
@@ -966,11 +939,8 @@
 
     $("btnCloseReveal").onclick = ()=>{
       SFX.ensureUnlocked(); SFX.click();
-      if(latestRoom && latestRoom.status === "reveal"){
-        suppressReveal(latestRoom.questionIndex);
-      }else{
-        modalOn("revealModal", false);
-      }
+      if(latestRoom && latestRoom.status === "reveal") suppressReveal(latestRoom.questionIndex);
+      else modalOn("revealModal", false);
     };
 
     $("btnRules").onclick = ()=>{
