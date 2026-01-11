@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Know It All? — Player</title>
+
   <style>
     :root{
       --bg:#070707;
@@ -44,11 +45,17 @@
       border:1px solid rgba(255,122,24,.35);
       box-shadow: 0 12px 30px rgba(255,122,24,.12);
     }
+    .title{
+      font-size:22px; /* slightly bigger */
+      letter-spacing:.3px;
+      line-height:1.05;
+    }
     .pill{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 12px;border-radius:999px;border:1px solid var(--border);
       background:rgba(10,10,10,.6); color:var(--muted); font-weight:900;
     }
+    .pill b{color:var(--text)}
 
     .card{
       margin-top:14px;
@@ -124,6 +131,51 @@
     }
     .statusBox.good{border-color: rgba(41,209,125,.30)}
     .statusBox.bad{border-color: rgba(255,75,75,.30)}
+    .statusBox.orange{
+      border-color: rgba(255,122,24,.35);
+      background: linear-gradient(180deg, rgba(255,122,24,.14), rgba(10,10,10,.60));
+    }
+
+    .powerGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .powerBtn{
+      border-radius:16px;
+      padding:12px 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(10,10,10,.55);
+      font-weight:980;
+      color: rgba(255,255,255,.85);
+      cursor:pointer;
+      user-select:none;
+      transition: filter .12s ease, transform .08s ease, border-color .12s ease;
+      text-align:center;
+    }
+    .powerBtn:hover{filter:brightness(1.08); border-color: rgba(255,122,24,.25)}
+    .powerBtn:active{transform:translateY(1px)}
+    .powerBtn.on{
+      border-color: rgba(255,122,24,.55);
+      background: linear-gradient(180deg, rgba(255,122,24,.18), rgba(10,10,10,.70));
+      color:#fff;
+    }
+    .powerBtn.disabled{
+      opacity:.38; cursor:not-allowed; filter:saturate(.6);
+    }
+
+    .promptBar{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,122,24,.45);
+      background: linear-gradient(180deg, rgba(255,122,24,.18), rgba(8,8,8,.78));
+      font-weight:990;
+      letter-spacing:.8px;
+      text-align:center;
+      display:none;
+    }
 
     .rulesBtn{
       position:fixed;right:16px;bottom:16px;z-index:1000;
@@ -147,18 +199,45 @@
       background: linear-gradient(180deg, rgba(16,16,16,.92), rgba(8,8,8,.90));
       box-shadow: 0 25px 80px rgba(0,0,0,.6);
       padding:14px;
+      max-height: 80vh;
+      overflow:auto;
     }
     .modal .modalTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .note{margin-top:10px;color:var(--muted);font-weight:850;font-size:12px;line-height:1.45}
+
+    /* Leaderboard popup */
+    .lbList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .lbRow{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(10,10,10,.5);
+      font-weight:950;
+    }
+    .lbRow .score{color:var(--orange);font-weight:990}
+    .lbRow .mini{font-size:12px;color:var(--muted);font-weight:850}
+
+    /* Sabotage selection */
+    .pickRow{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(10,10,10,.5);
+      cursor:pointer;
+      user-select:none;
+    }
+    .pickRow:hover{filter:brightness(1.10); border-color: rgba(255,122,24,.25)}
+    .pickRow .score{color:var(--orange);font-weight:990}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
       <div class="brand">
         <div class="logo"></div>
         <div>
-          <div style="font-size:18px">Know It All?</div>
+          <div class="title">Know It All?</div>
           <div class="small muted">Player Screen</div>
         </div>
       </div>
@@ -167,6 +246,7 @@
 
     <div class="card" id="joinCard">
       <h2 style="margin:6px 0 8px">Join Game</h2>
+
       <div class="muted small">Enter a nickname, then join the room.</div>
       <div class="divider"></div>
 
@@ -210,7 +290,18 @@
       <div class="divider"></div>
       <div class="answers" id="answers"></div>
 
-      <div class="statusBox" id="revealResult" style="display:none"></div>
+      <!-- prompt above claim/sabotage -->
+      <div class="promptBar" id="perkPrompt">MAKE A SELECTION</div>
+
+      <!-- Powers (all buttons restored) -->
+      <div class="powerGrid">
+        <button class="powerBtn" id="btnClaim">CLAIM +20</button>
+        <button class="powerBtn" id="btnSabotage">SABOTAGE</button>
+        <button class="powerBtn" id="btnCheat">CHEAT (1)</button>
+        <button class="powerBtn" id="btnHelp">HELP (3)</button>
+      </div>
+
+      <div class="statusBox" id="statusMsg" style="display:none"></div>
     </div>
 
     <div class="card" id="finalCard" style="display:none">
@@ -221,6 +312,7 @@
 
   <button class="rulesBtn" id="btnRules">Rules</button>
 
+  <!-- Rules modal -->
   <div class="modalBack" id="rulesBack">
     <div class="modal">
       <div class="modalTop">
@@ -229,8 +321,48 @@
       </div>
       <div class="note" style="font-size:13px;line-height:1.55;color:#e9e9e9">
         <b>Know It All?</b> is a fast-paced live quiz for up to <b>20 players</b> per room.<br><br>
-        Tap one answer per question (it locks). Host reveals after timer. Speed earns more points.
+
+        <b>How it works</b><br>
+        • Join with a nickname and wait for the host.<br>
+        • Each question is <b>20 seconds</b>. Tap one answer (it locks).<br>
+        • Host reveals the correct answer and a leaderboard popup appears.<br><br>
+
+        <b>Points</b><br>
+        • Up to <b>100 points</b> per question based on speed.<br><br>
+
+        <b>Streak Perk</b><br>
+        • Every 5 correct in a row unlocks a perk: <b>Claim +20</b> or <b>Sabotage</b>.<br>
+        • Sabotage stops the victim answering the <b>next question</b>.<br>
+        • The game pauses until all perk players choose.<br><br>
+
+        <b>Powers</b><br>
+        • <b>CHEAT</b> (once per game): selects correct answer instantly.<br>
+        • <b>HELP</b> (3 uses): removes 2 wrong answers immediately.
       </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard modal -->
+  <div class="modalBack" id="lbBack">
+    <div class="modal">
+      <div class="modalTop">
+        <h3>Leaderboard</h3>
+        <button class="btn" id="lbClose">Close</button>
+      </div>
+      <div class="lbList" id="lbList"></div>
+      <div class="note" id="lbNote">Auto closes in 3 seconds.</div>
+    </div>
+  </div>
+
+  <!-- Sabotage pick modal -->
+  <div class="modalBack" id="pickBack">
+    <div class="modal">
+      <div class="modalTop">
+        <h3>Pick a player to sabotage</h3>
+        <button class="btn" id="pickClose">Close</button>
+      </div>
+      <div class="note">They won’t be able to answer the next question.</div>
+      <div class="lbList" id="pickList"></div>
     </div>
   </div>
 
@@ -238,7 +370,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import {
       getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot,
-      collection, query, orderBy, getDocs, serverTimestamp
+      collection, query, orderBy, getDocs, serverTimestamp,
+      runTransaction
     } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -252,6 +385,28 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    // ---------- Sound (no background music) ----------
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function ctx(){ if(!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
+    function beep(freq=440, dur=0.06, type="sine", vol=0.08){
+      const c = ctx();
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g); g.connect(c.destination);
+      o.start();
+      o.stop(c.currentTime + dur);
+    }
+    function sClick(){ beep(560, 0.03, "square", 0.04); }
+    function sReveal(){ beep(740, 0.06, "sawtooth", 0.06); setTimeout(()=>beep(980,0.08,"sawtooth",0.06), 70); }
+    function sTick(left){
+      // higher pitch nearer to 0
+      const freq = 220 + (20-left) * 45;
+      beep(freq, 0.03, "sine", 0.03);
+    }
 
     // ---------- RNG ----------
     function mulberry32(seed){
@@ -330,8 +485,8 @@
         .filter(a => isNumericAnswer(a) === wantNumber);
 
       pool = Array.from(new Set(pool));
-
       const choices = [correct];
+
       while(choices.length < 4){
         if(pool.length){
           const idx = Math.floor(r() * pool.length);
@@ -368,14 +523,33 @@
     const qTextEl = document.getElementById("qText");
     const answersEl = document.getElementById("answers");
     const timeLeftEl = document.getElementById("timeLeft");
-    const revealResult = document.getElementById("revealResult");
+
+    const statusMsg = document.getElementById("statusMsg");
+    const perkPrompt = document.getElementById("perkPrompt");
+
+    const btnClaim = document.getElementById("btnClaim");
+    const btnSabotage = document.getElementById("btnSabotage");
+    const btnCheat = document.getElementById("btnCheat");
+    const btnHelp = document.getElementById("btnHelp");
 
     const finalTitle = document.getElementById("finalTitle");
     const finalSub = document.getElementById("finalSub");
 
+    // Rules modal
     const rulesBack = document.getElementById("rulesBack");
-    document.getElementById("btnRules").onclick = ()=> rulesBack.style.display="flex";
-    document.getElementById("rulesClose").onclick = ()=> rulesBack.style.display="none";
+    document.getElementById("btnRules").onclick = ()=>{ sClick(); rulesBack.style.display="flex"; };
+    document.getElementById("rulesClose").onclick = ()=>{ sClick(); rulesBack.style.display="none"; };
+
+    // Leaderboard modal
+    const lbBack = document.getElementById("lbBack");
+    const lbList = document.getElementById("lbList");
+    const lbNote = document.getElementById("lbNote");
+    document.getElementById("lbClose").onclick = ()=>{ sClick(); hideLeaderboard(); };
+
+    // Sabotage pick modal
+    const pickBack = document.getElementById("pickBack");
+    const pickList = document.getElementById("pickList");
+    document.getElementById("pickClose").onclick = ()=>{ sClick(); pickBack.style.display="none"; };
 
     function show(screen){
       joinCard.style.display = (screen==="join") ? "" : "none";
@@ -406,7 +580,61 @@
     let lastQIndex = null;
     let lockedChoice = null;
 
-    btnJoin.onclick = async ()=>{
+    let lastTickSecond = null;
+    let currentRoom = null;
+    let currentMe = null;
+    let currentPlayers = [];
+    let currentQ = null;
+    let currentChoices = [];
+
+    let lbAutoTimer = null;
+
+    function setBtnState(btn, on, disabledText=null){
+      btn.classList.toggle("on", !!on);
+      btn.classList.toggle("disabled", !on);
+      btn.disabled = !on;
+      if(disabledText) btn.title = on ? "" : disabledText;
+    }
+
+    function setStatus(text, kind="orange"){
+      statusMsg.style.display = "";
+      statusMsg.className = "statusBox " + kind;
+      statusMsg.textContent = text;
+    }
+    function clearStatus(){ statusMsg.style.display="none"; statusMsg.textContent=""; }
+
+    function showLeaderboard(players){
+      lbList.innerHTML = "";
+      const sorted = players.slice().sort((a,b)=>(b.score||0)-(a.score||0));
+      sorted.forEach((p, i)=>{
+        const row = document.createElement("div");
+        row.className="lbRow";
+        const left = document.createElement("div");
+        left.innerHTML = `<div>#${i+1} ${escapeHtml(p.nick||"Player")}</div><div class="mini">Streak: ${p.streak||0}</div>`;
+        const right = document.createElement("div");
+        right.className="score";
+        right.textContent = String(p.score||0);
+        row.appendChild(left); row.appendChild(right);
+        lbList.appendChild(row);
+      });
+      lbBack.style.display = "flex";
+      lbNote.textContent = "Auto closes in 3 seconds. (Use Close if needed.)";
+
+      if(lbAutoTimer) clearTimeout(lbAutoTimer);
+      lbAutoTimer = setTimeout(()=>hideLeaderboard(), 3000);
+    }
+    function hideLeaderboard(){
+      if(lbAutoTimer) clearTimeout(lbAutoTimer);
+      lbBack.style.display = "none";
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    async function joinGame(){
       const nick = safeNick(nickEl.value);
       const code = String(roomInputEl.value||"").trim().toUpperCase();
       if(!nick){
@@ -452,13 +680,25 @@
         lastCorrect: null,
         cheatUsed: false,
         helpUsed: 0,
+        helpMasks: {},
         pendingPerk: false,
-        sabotagedNext: false
+        sabotagedNext: false,
+        sabotageMsg: null
       }, { merge:true });
 
       joinStatus.style.display="none";
       bindListeners();
       show("wait");
+    }
+
+    btnJoin.onclick = async ()=>{
+      try{
+        sClick();
+        btnJoin.disabled = true;
+        await joinGame();
+      } finally {
+        btnJoin.disabled = false;
+      }
     };
 
     async function getOrder(room){
@@ -468,11 +708,20 @@
 
     function syncTimer(room){
       if(tickTimer) clearInterval(tickTimer);
+
+      lastTickSecond = null;
+
       if(room.status === "question" && room.qStartMs){
         tickTimer = setInterval(()=>{
           const left = Math.max(0, Math.ceil((room.qStartMs + 20000 - Date.now())/1000));
           timeLeftEl.textContent = String(left);
-        }, 150);
+
+          if(left !== lastTickSecond){
+            // start ticking immediately from 20
+            sTick(left);
+            lastTickSecond = left;
+          }
+        }, 120);
       } else {
         timeLeftEl.textContent = "20";
       }
@@ -480,39 +729,57 @@
 
     function renderAnswers(room, me, q, choices){
       answersEl.innerHTML = "";
+
       const inQuestion = room.status === "question";
+      const correct = String(q.answer).trim();
+
+      // lock choice once set
       lockedChoice = me.lastAnswer ?? lockedChoice;
+
+      // sabotage blocks answers this question
+      const sabotaged = !!me.sabotagedNext;
 
       choices.forEach(choice=>{
         const btn = document.createElement("button");
         btn.className="ans";
-        btn.textContent=choice;
+        btn.textContent = choice;
 
+        // selected highlight (white look)
         if(lockedChoice && String(lockedChoice).trim() === String(choice).trim()){
           btn.classList.add("selected");
         }
 
-        if(!inQuestion || me.sabotagedNext){
+        // help mask: immediately show two wrong answers as red/disabled
+        const masks = me.helpMasks || {};
+        const maskForThis = masks[String(room.qIndex||0)] || [];
+        if(maskForThis.includes(String(choice))){
+          btn.classList.add("wrongNow");
           btn.classList.add("disabled");
           btn.disabled = true;
         }
 
+        // reveal UI
         if(room.status === "reveal" || room.status === "awaitingPerks"){
-          const correct = String(q.answer).trim();
           if(String(choice).trim() === correct) btn.classList.add("correctNow");
           else btn.classList.add("wrongNow");
           btn.disabled = true;
         }
 
+        // in-question clicking
+        if(!inQuestion || sabotaged){
+          btn.classList.add("disabled");
+          btn.disabled = true;
+        }
+
         btn.onclick = async ()=>{
           if(!inQuestion) return;
-          if(me.sabotagedNext) return;
-          if(lockedChoice) return; // lock once picked
+          if(sabotaged) return;
+          if(lockedChoice) return; // cannot change once chosen
+          sClick();
 
           lockedChoice = choice;
           await updateDoc(playerRef, { lastAnswer: choice, lastAnswerMs: Date.now() });
-
-          // visual lock
+          // re-render for selection highlight
           renderAnswers(room, { ...me, lastAnswer: choice }, q, choices);
         };
 
@@ -520,8 +787,207 @@
       });
     }
 
-    function renderFinal(room, me, players){
-      const sorted = players.slice().sort((a,b)=>(b.score||0)-(a.score||0));
+    function updatePowersUI(room, me){
+      const pending = !!me.pendingPerk;
+
+      // prompt bar and claim/sabotage
+      perkPrompt.style.display = pending ? "" : "none";
+      setBtnState(btnClaim, pending, "Unlock by getting 5 correct in a row");
+      setBtnState(btnSabotage, pending, "Unlock by getting 5 correct in a row");
+
+      // CHEAT once per game
+      const cheatOk = !me.cheatUsed && room.status === "question" && !me.sabotagedNext && !me.lastAnswer;
+      setBtnState(btnCheat, cheatOk, "Used already (1 per game)");
+
+      // HELP up to 3 per game
+      const helpOk = (me.helpUsed||0) < 3 && room.status === "question" && !me.sabotagedNext;
+      setBtnState(btnHelp, helpOk, "No helps left (3 per game)");
+    }
+
+    async function applyHelp(room, me){
+      if(!currentQ) return;
+      if(room.status !== "question") return;
+
+      const qIndex = room.qIndex || 0;
+      const correct = String(currentQ.answer).trim();
+
+      // pick 2 wrong answers to eliminate deterministically
+      const wrongs = currentChoices.filter(c => String(c).trim() !== correct);
+      const r = mulberry32((room.seed + 555) + qIndex * 999 + hashString(playerId));
+      const shuffled = wrongs.slice();
+      for(let i=shuffled.length-1;i>0;i--){
+        const j = Math.floor(r()*(i+1));
+        [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];
+      }
+      const elim = shuffled.slice(0,2).map(String);
+
+      const newMasks = { ...(me.helpMasks||{}) };
+      newMasks[String(qIndex)] = elim;
+
+      await updateDoc(playerRef, {
+        helpUsed: (me.helpUsed||0) + 1,
+        helpMasks: newMasks
+      });
+
+      setStatus("HELP used — two wrong answers removed.", "orange");
+      setTimeout(clearStatus, 1400);
+    }
+
+    function hashString(s){
+      let h = 0;
+      for(let i=0;i<s.length;i++) h = Math.imul(31,h) + s.charCodeAt(i) | 0;
+      return Math.abs(h);
+    }
+
+    async function applyCheat(room, me){
+      if(!currentQ) return;
+      if(room.status !== "question") return;
+      if(me.cheatUsed) return;
+      if(me.sabotagedNext) return;
+      if(me.lastAnswer) return;
+
+      const correct = String(currentQ.answer).trim();
+      await updateDoc(playerRef, {
+        cheatUsed: true,
+        lastAnswer: correct,
+        lastAnswerMs: Date.now()
+      });
+
+      setStatus("CHEAT used — answer locked in.", "orange");
+      setTimeout(clearStatus, 1400);
+    }
+
+    async function claimPerk(room, me){
+      if(!me.pendingPerk) return;
+
+      // +20 points, clear pendingPerk, remove from awaiting list transactionally
+      await runTransaction(db, async (tx)=>{
+        const roomSnap = await tx.get(roomRef);
+        const meSnap = await tx.get(playerRef);
+        if(!roomSnap.exists() || !meSnap.exists()) return;
+
+        const r = roomSnap.data();
+        const p = meSnap.data();
+
+        if(!p.pendingPerk) return;
+
+        tx.update(playerRef, {
+          score: (p.score||0) + 20,
+          pendingPerk: false
+        });
+
+        const awaiting = Array.isArray(r.awaitingPerkFor) ? r.awaitingPerkFor.slice() : [];
+        const idx = awaiting.indexOf(playerId);
+        if(idx >= 0) awaiting.splice(idx,1);
+
+        tx.update(roomRef, {
+          awaitingPerkFor: awaiting,
+          status: awaiting.length ? "awaitingPerks" : "reveal"
+        });
+      });
+
+      setStatus("Claimed +20 points!", "good");
+      setTimeout(clearStatus, 1500);
+    }
+
+    function openSabotagePicker(me){
+      pickList.innerHTML = "";
+      // show players sorted by score
+      const sorted = currentPlayers.slice().sort((a,b)=>(b.score||0)-(a.score||0));
+      sorted.forEach(p=>{
+        // cannot pick self
+        if(p.id === playerId) return;
+
+        const row = document.createElement("div");
+        row.className = "pickRow";
+        row.innerHTML = `<div>
+            <div style="font-weight:990">${escapeHtml(p.nick||"Player")}</div>
+            <div class="small muted">Score: ${p.score||0}</div>
+          </div>
+          <div class="score">${p.score||0}</div>`;
+        row.onclick = async ()=>{
+          sClick();
+          await sabotagePlayer(me, p.id, p.nick||"Player");
+          pickBack.style.display = "none";
+        };
+        pickList.appendChild(row);
+      });
+
+      pickBack.style.display = "flex";
+    }
+
+    async function sabotagePlayer(me, victimId, victimNick){
+      if(!me.pendingPerk) return;
+
+      await runTransaction(db, async (tx)=>{
+        const roomSnap = await tx.get(roomRef);
+        const meSnap = await tx.get(playerRef);
+        const victimRef = doc(db, "rooms", roomCode, "players", victimId);
+        const vSnap = await tx.get(victimRef);
+
+        if(!roomSnap.exists() || !meSnap.exists() || !vSnap.exists()) return;
+
+        const r = roomSnap.data();
+        const p = meSnap.data();
+        const v = vSnap.data();
+
+        if(!p.pendingPerk) return;
+
+        // apply sabotage to victim for NEXT question
+        tx.update(victimRef, {
+          sabotagedNext: true,
+          sabotageMsg: `You have been sabotaged by ${p.nick || "a player"} — you cannot answer the next question.`
+        });
+
+        // clear perk and remove from awaiting
+        tx.update(playerRef, { pendingPerk:false });
+
+        const awaiting = Array.isArray(r.awaitingPerkFor) ? r.awaitingPerkFor.slice() : [];
+        const idx = awaiting.indexOf(playerId);
+        if(idx >= 0) awaiting.splice(idx,1);
+
+        tx.update(roomRef, {
+          awaitingPerkFor: awaiting,
+          status: awaiting.length ? "awaitingPerks" : "reveal",
+          sabotage: { victimId, byId: playerId, byNick: p.nick || "Player", qIndex: r.qIndex ?? null }
+        });
+      });
+
+      setStatus(`Sabotaged ${victimNick}!`, "good");
+      setTimeout(clearStatus, 1600);
+    }
+
+    btnHelp.onclick = async ()=>{
+      if(!currentRoom || !currentMe) return;
+      if(btnHelp.disabled) return;
+      sClick();
+      await applyHelp(currentRoom, currentMe);
+    };
+
+    btnCheat.onclick = async ()=>{
+      if(!currentRoom || !currentMe) return;
+      if(btnCheat.disabled) return;
+      sClick();
+      await applyCheat(currentRoom, currentMe);
+    };
+
+    btnClaim.onclick = async ()=>{
+      if(!currentRoom || !currentMe) return;
+      if(btnClaim.disabled) return;
+      sClick();
+      await claimPerk(currentRoom, currentMe);
+    };
+
+    btnSabotage.onclick = async ()=>{
+      if(!currentRoom || !currentMe) return;
+      if(btnSabotage.disabled) return;
+      sClick();
+      openSabotagePicker(currentMe);
+    };
+
+    function renderFinal(room, me){
+      // determine winner(s)
+      const sorted = currentPlayers.slice().sort((a,b)=>(b.score||0)-(a.score||0));
       const top = sorted[0]?.score || 0;
       const winners = sorted.filter(p=>(p.score||0)===top).map(p=>p.nick);
       const iWin = winners.includes(me.nick);
@@ -534,49 +1000,85 @@
       onSnapshot(roomRef, async (snap)=>{
         if(!snap.exists()){ show("join"); return; }
         const room = snap.data();
+        currentRoom = room;
 
         const meSnap = await getDoc(playerRef);
         if(!meSnap.exists()) return;
         const me = meSnap.data();
+        currentMe = me;
 
-        const pSnap = await getDocs(query(playersCol, orderBy("joinedAt","asc")));
-        const players = pSnap.docs.map(d=>d.data());
+        // players list (also used for leaderboard popup and sabotage picker)
+        const pSnap = await getDocs(query(playersCol, orderBy("score","desc")));
+        currentPlayers = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
 
         if(room.status === "lobby"){
           show("wait");
-          playersMini.textContent = players.length ? players.map(p=>p.nick).join(", ") : "No other players yet.";
+          // list players joined in wait screen
+          const byJoin = currentPlayers.slice().sort((a,b)=>{
+            const aT = a.joinedAt?.seconds || 0;
+            const bT = b.joinedAt?.seconds || 0;
+            return aT - bT;
+          });
+          playersMini.textContent = byJoin.length ? byJoin.map(p=>p.nick).join(", ") : "No other players yet.";
           return;
         }
 
         if(room.status === "final"){
           show("final");
-          renderFinal(room, me, players);
+          renderFinal(room, me);
           return;
         }
 
+        // question/reveal/awaitingPerks
         show("game");
 
         const order = await getOrder(room);
         const qIndex = room.qIndex || 0;
 
+        // detect new question -> clear selection lock + clear status
         if(lastQIndex !== qIndex){
           lastQIndex = qIndex;
-          lockedChoice = me.lastAnswer; // reset lock state per question
+          lockedChoice = me.lastAnswer; // should be null at start of question
+          clearStatus();
         }
 
-        const q = order[qIndex];
-        qTextEl.textContent = q?.text || "Question missing";
+        currentQ = order[qIndex];
+        qTextEl.textContent = currentQ?.text || "Question missing";
 
-        const choices = buildChoices(q, order, room.seed, qIndex);
-        renderAnswers(room, me, q, choices);
+        currentChoices = buildChoices(currentQ, order, room.seed, qIndex);
+        renderAnswers(room, me, currentQ, currentChoices);
         syncTimer(room);
+        updatePowersUI(room, me);
 
+        // show sabotage message if present
+        if(me.sabotageMsg){
+          setStatus(me.sabotageMsg, "bad");
+          // clear it so it doesn't spam
+          await updateDoc(playerRef, { sabotageMsg: null });
+        }
+
+        // On reveal or awaitingPerks: show result + leaderboard popup
         if(room.status === "reveal" || room.status === "awaitingPerks"){
-          revealResult.style.display="";
-          revealResult.className = "statusBox " + (me.lastCorrect ? "good" : "bad");
-          revealResult.textContent = me.lastCorrect ? "Correct ✅" : (me.sabotagedNext ? "Sabotaged" : "Incorrect ❌");
+          sReveal();
+
+          // result line
+          const got = me.lastCorrect === true;
+          if(got) setStatus("Correct ✅", "good");
+          else if(me.lastCorrect === false) setStatus("Incorrect ❌", "bad");
+
+          // show leaderboard popup, but it auto-closes after 3 seconds
+          // If player needs to pick a perk, we still auto-close so they can choose.
+          showLeaderboard(currentPlayers);
         } else {
-          revealResult.style.display="none";
+          // if question screen, do not show leaderboard modal
+          // (but allow manual closing if it was open)
+        }
+
+        // If pending perk, ensure leaderboard doesn't block selection
+        // (auto close timer will handle, but we also nudge close if still open after 3s)
+        if(me.pendingPerk){
+          // the prompt bar + claim/sabotage is already shown by updatePowersUI
+          // ensure leaderboard will disappear soon
         }
       });
     }
