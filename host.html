@@ -4,9 +4,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Know It All? — Host</title>
+
   <style>
     :root{
       --bg:#070707;
+      --panel:#0e0e0e;
       --border:#232323;
       --text:#f3f3f3;
       --muted:#bdbdbd;
@@ -31,7 +33,9 @@
 
     .topbar{
       display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:10px 12px;border:1px solid var(--border);border-radius:18px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:18px;
       background:linear-gradient(180deg, rgba(17,17,17,.85), rgba(10,10,10,.65));
       box-shadow:var(--shadow);
       position:sticky; top:12px; z-index:10;
@@ -46,8 +50,12 @@
       border:1px solid rgba(255,122,24,.35);
       box-shadow: 0 12px 30px rgba(255,122,24,.12);
     }
-    .brand .t1{font-size:18px}
-    .brand .t2{font-size:12px;color:var(--muted);font-weight:700;margin-top:-2px}
+    .brand .t1{
+      font-size:24px; /* bigger title */
+      letter-spacing:.4px;
+      line-height:1.05;
+    }
+    .brand .t2{font-size:12px;color:var(--muted);font-weight:800;margin-top:2px}
 
     .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
     .pill{
@@ -55,6 +63,10 @@
       padding:8px 12px;border-radius:999px;border:1px solid var(--border);
       background:rgba(10,10,10,.6); color:var(--muted); font-weight:900;
     }
+    .pill b{color:var(--text)}
+    .pill.orange{border-color:rgba(255,122,24,.35); color:rgba(255,255,255,.9)}
+    .pill.orange b{color:var(--orange)}
+
     .btn{
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(20,20,20,.9), rgba(10,10,10,.85));
@@ -159,7 +171,7 @@
       border:1px solid rgba(255,122,24,.45);
       font-weight:980;cursor:pointer;
       box-shadow: 0 14px 44px rgba(255,122,24,.12);
-      color:#fff; /* ✅ visible */
+      color:#fff; /* visible */
     }
 
     .modalBack{
@@ -177,6 +189,16 @@
     }
     .modal .modalTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .note{margin-top:10px;color:var(--muted);font-weight:850;font-size:12px;line-height:1.45}
+
+    .banner{
+      margin-top:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,122,24,.25);
+      background: linear-gradient(180deg, rgba(255,122,24,.16), rgba(8,8,8,.82));
+      padding:10px 12px;
+      font-weight:950;
+      color:rgba(255,255,255,.92);
+    }
   </style>
 </head>
 
@@ -191,7 +213,7 @@
         </div>
       </div>
       <div class="actions">
-        <span class="pill">Room: <b id="roomCode">—</b></span>
+        <span class="pill orange">Room: <b id="roomCode">—</b></span>
         <span class="pill">Players: <b id="playerCount">0</b></span>
         <button class="btn danger" id="btnResetGameTop" disabled>Reset Game</button>
       </div>
@@ -232,6 +254,10 @@
             <div>
               <div class="small muted" style="margin-bottom:8px">Join QR</div>
               <div id="qr"></div>
+              <!-- ✅ room code shown under QR ONLY during setup -->
+              <div class="banner" style="margin-top:10px;text-align:center">
+                Room Code: <span id="roomCodeUnder">—</span>
+              </div>
             </div>
             <div style="flex:1;min-width:220px">
               <div class="small muted">Join link</div>
@@ -242,7 +268,7 @@
                 <button class="btn" id="btnShareMessenger" disabled>Share Messenger</button>
               </div>
               <div class="note">
-                Maths cap: 10 per 50 (20 per 100, 30 per 150). Decoys match answer type (no giveaways).
+                Fixed 20s per question. Maths capped at 10 per 50. Decoys match answer type (no giveaways).
               </div>
             </div>
           </div>
@@ -271,6 +297,10 @@
             <button class="btn orange" id="btnNext" disabled>Next Question</button>
             <button class="btn danger" id="btnResetGame" disabled>Reset Game</button>
           </div>
+
+          <div class="note" id="hostPauseNote" style="display:none">
+            Game paused: waiting for streak selections (Claim/Sabotage).
+          </div>
         </div>
       </div>
 
@@ -293,20 +323,26 @@
         <button class="btn" id="rulesClose">Close</button>
       </div>
       <div class="note" style="font-size:13px;line-height:1.55;color:#e9e9e9">
-        <b>Know It All?</b> is a fast-paced live quiz for up to <b>20 players</b> per room.<br><br>
+        <b>Know It All?</b> is a live quiz for up to <b>20 players</b> per room.<br><br>
+
         <b>How it works</b><br>
         1) Host creates a room and shares the QR/link.<br>
         2) Players join with a nickname and wait.<br>
         3) Each question has <b>20 seconds</b>. Players pick one answer (locked).<br>
         4) Host presses <b>Reveal</b> to show correct answer and update scores.<br>
-        5) Leaderboard popup appears after each reveal on player phones.<br><br>
+        5) A leaderboard popup appears after each reveal on player phones.<br><br>
+
         <b>Points</b><br>
-        • Up to <b>100 points</b> depending on speed.<br><br>
-        <b>Streak Perk (5 correct)</b><br>
-        • Claim +20 OR Sabotage a player (they can’t answer next question).<br><br>
-        <b>Power Buttons</b><br>
-        • Cheat (1) selects correct answer instantly.<br>
-        • Help (3) removes 2 wrong answers immediately (50/50).
+        • Up to <b>100 points</b> per question depending on speed.<br><br>
+
+        <b>Streak Perk (every 5 correct in a row)</b><br>
+        • The player must choose: <b>Claim +20</b> OR <b>Sabotage</b> a player.<br>
+        • Sabotage means the victim cannot answer the <b>next question</b>.<br>
+        • The game pauses until all streak players have chosen.<br><br>
+
+        <b>Powers</b><br>
+        • <b>CHEAT</b> (1 use per game): instantly selects the correct answer.<br>
+        • <b>HELP</b> (3 uses per game): removes 2 wrong answers immediately (50/50).
       </div>
     </div>
   </div>
@@ -317,7 +353,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import {
       getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot,
-      collection, query, orderBy, getDocs, serverTimestamp, writeBatch
+      collection, query, orderBy, getDocs, serverTimestamp, writeBatch,
+      runTransaction
     } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -331,6 +368,23 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    // ---------- Sound (no background music) ----------
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function ctx(){ if(!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
+    function beep(freq=440, dur=0.06, type="sine", vol=0.08){
+      const c = ctx();
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g); g.connect(c.destination);
+      o.start();
+      o.stop(c.currentTime + dur);
+    }
+    function sClick(){ beep(560, 0.03, "square", 0.04); }
+    function sReveal(){ beep(740, 0.06, "sawtooth", 0.06); setTimeout(()=>beep(980,0.08,"sawtooth",0.06), 70); }
 
     // ---------- RNG helpers ----------
     function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
@@ -384,7 +438,6 @@
     function isMathQuestion(q){
       const cat = String(q.category||"").toLowerCase();
       if(cat === "math" || cat === "maths") return true;
-
       const t = String(q.text||"").toLowerCase();
       const hasDigits = /\d/.test(t);
       const hasOps = /[+\-*/=]|×|÷|\bplus\b|\bminus\b|\btimes\b|\bdivid(ed|e)\b|\bsolve\b|\bcalculate\b/.test(t);
@@ -400,43 +453,36 @@
       for(const q of bank){
         (isMathQuestion(q) ? maths : non).push(q);
       }
-
       const m = seededShuffle(maths, seed + 11).slice(0, mathsCap);
       const n = seededShuffle(non, seed + 22).slice(0, total - m.length);
-
       return seededShuffle([...m, ...n], seed + 33);
     }
 
-    // ---------- Choice building with type-matching ----------
     function isNumericAnswer(ans){
       const s = String(ans).trim();
       return /^-?\d+(\.\d+)?$/.test(s);
     }
 
+    // ---------- Type-matched choices ----------
     function buildChoices(question, bank, seed, qIndex){
       const r = mulberry32(seed + qIndex * 1000 + 77);
       const correct = String(question.answer).trim();
       const wantNumber = isNumericAnswer(correct);
 
-      // pool of answers with the SAME type
       let pool = bank
         .map(q => String(q.answer).trim())
         .filter(a => a && a !== correct)
         .filter(a => isNumericAnswer(a) === wantNumber);
 
-      // de-dupe pool
       pool = Array.from(new Set(pool));
-
       const choices = [correct];
 
-      // pull decoys
       while(choices.length < 4){
         if(pool.length){
           const idx = Math.floor(r() * pool.length);
           const pick = pool.splice(idx,1)[0];
           if(!choices.includes(pick)) choices.push(pick);
         } else {
-          // fallback: generate believable decoys
           if(wantNumber){
             const n = Number(correct);
             const delta = (Math.floor(r()*9)+1) * (r() < 0.5 ? -1 : 1);
@@ -448,13 +494,12 @@
           }
         }
       }
-
-      // shuffle final choices
       return seededShuffle(choices, seed + qIndex * 17 + 123);
     }
 
     // ---------- UI refs ----------
     const roomCodeEl = document.getElementById("roomCode");
+    const roomCodeUnderEl = document.getElementById("roomCodeUnder");
     const playerCountEl = document.getElementById("playerCount");
     const playersListEl = document.getElementById("playersList");
     const roomStatusEl = document.getElementById("roomStatus");
@@ -468,6 +513,7 @@
     const btnNext = document.getElementById("btnNext");
     const btnResetGame = document.getElementById("btnResetGame");
     const btnResetGameTop = document.getElementById("btnResetGameTop");
+    const hostPauseNote = document.getElementById("hostPauseNote");
 
     const gameLengthSel = document.getElementById("gameLength");
     const qTextEl = document.getElementById("qText");
@@ -548,7 +594,8 @@
                           <div class="psub">Streak: ${p.streak||0} • Cheat: ${(p.cheatUsed? "used":"ready")} • Help: ${p.helpUsed||0}/3</div>`;
         const right = document.createElement("div");
         const st = p.sabotagedNext ? `<span class="tag bad">SABOTAGED</span>` : `<span class="tag good">OK</span>`;
-        right.innerHTML = `<div class="pscore">${p.score||0}</div>${st}`;
+        const perk = p.pendingPerk ? ` <span class="tag" style="background:#fff;color:#000">PERK</span>` : "";
+        right.innerHTML = `<div class="pscore">${p.score||0}</div>${st}${perk}`;
         row.appendChild(left); row.appendChild(right);
         playersListEl.appendChild(row);
       });
@@ -566,11 +613,9 @@
       }
     }
 
-    // Precompute order deterministically from seed
     async function getOrder(room){
       const bank = await loadBank();
-      const total = room.questionCount || 50;
-      return buildQuestionSet(bank, total, room.seed);
+      return buildQuestionSet(bank, room.questionCount || 50, room.seed);
     }
 
     async function renderHostQuestion(room){
@@ -622,12 +667,12 @@
         qStartMs: null,
         revealAtMs: null,
         awaitingPerkFor: [],
-        lastRevealSummary: null,
-        sabotageNext: {},
+        sabotage: { victimId: null, byId: null, byNick: null, qIndex: null }, // last sabotage record
         finishedAt: null
       });
 
       roomCodeEl.textContent = roomCode;
+      roomCodeUnderEl.textContent = roomCode;
       roomStatusEl.value = "lobby";
       renderQR(roomCode);
 
@@ -654,8 +699,15 @@
         roomStatusEl.value = currentRoom.status;
         applyHostViewMode();
 
-        btnReveal.disabled = !(currentRoom.status === "question");
-        btnNext.disabled = !(currentRoom.status === "reveal");
+        // host controls
+        const isQuestion = currentRoom.status === "question";
+        const isReveal = currentRoom.status === "reveal";
+        const isAwait = currentRoom.status === "awaitingPerks";
+
+        btnReveal.disabled = !isQuestion;
+        btnNext.disabled = !isReveal; // ✅ cannot continue while awaiting perks
+
+        hostPauseNote.style.display = isAwait ? "" : "none";
 
         updateStartButton();
 
@@ -690,7 +742,10 @@
           score:0, streak:0,
           lastAnswer:null, lastAnswerMs:null, lastCorrect:null,
           cheatUsed:false, helpUsed:0,
-          pendingPerk:false, sabotagedNext:false
+          helpMasks:{},
+          pendingPerk:false,
+          sabotagedNext:false,
+          sabotageMsg:null
         });
       });
 
@@ -700,7 +755,7 @@
         qStartMs:Date.now(),
         revealAtMs:null,
         awaitingPerkFor:[],
-        sabotageNext:{},
+        sabotage:{ victimId:null, byId:null, byNick:null, qIndex:null },
         finishedAt:null
       });
 
@@ -712,6 +767,8 @@
       if(!snap.exists()) return;
       const room = snap.data();
       if(room.status !== "question") return;
+
+      sReveal();
 
       const order = await getOrder(room);
       const qIndex = room.qIndex || 0;
@@ -751,9 +808,9 @@
           lastCorrect,
           score: (p.score||0) + scoreAdd,
           streak: newStreak,
+          // keep lastAnswer around for player reveal UI
+          // but lock in next question by resetting when host advances
           pendingPerk: false,
-          lastAnswer: null,
-          lastAnswerMs: null,
           sabotagedNext: false
         };
 
@@ -786,12 +843,25 @@
         return;
       }
 
-      await updateDoc(roomDocRef, {
+      // reset per-question fields on players
+      const pSnap = await getDocs(playersColRef);
+      const batch = writeBatch(db);
+      pSnap.forEach(d=>{
+        batch.update(d.ref,{
+          lastAnswer:null,
+          lastAnswerMs:null,
+          lastCorrect:null,
+          // sabotage already applied to "next question" by setting sabotagedNext=true on victim,
+          // which will be consumed in revealAnswer() and then cleared there.
+        });
+      });
+      batch.update(roomDocRef, {
         status: "question",
         qIndex: nextIndex,
         qStartMs: Date.now(),
         revealAtMs: null
       });
+      await batch.commit();
     }
 
     async function resetGame(){
@@ -804,8 +874,10 @@
         batch.update(d.ref,{
           score:0, streak:0,
           lastAnswer:null, lastAnswerMs:null, lastCorrect:null,
-          cheatUsed:false, helpUsed:0,
-          pendingPerk:false, sabotagedNext:false
+          cheatUsed:false, helpUsed:0, helpMasks:{},
+          pendingPerk:false,
+          sabotagedNext:false,
+          sabotageMsg:null
         });
       });
 
@@ -815,7 +887,7 @@
         qStartMs:null,
         revealAtMs:null,
         awaitingPerkFor:[],
-        sabotageNext:{},
+        sabotage:{ victimId:null, byId:null, byNick:null, qIndex:null },
         finishedAt:null
       });
 
@@ -824,14 +896,17 @@
 
     // Share buttons
     btnCopyLink.onclick = async ()=>{
+      sClick();
       await navigator.clipboard.writeText(joinLinkEl.value);
       alert("Link copied!");
     };
     btnShareWhatsApp.onclick = ()=>{
+      sClick();
       const msg = encodeURIComponent(shareMessage(joinLinkEl.value));
       window.open(`https://wa.me/?text=${msg}`, "_blank");
     };
     btnShareMessenger.onclick = ()=>{
+      sClick();
       const shareUrl = encodeURIComponent(joinLinkEl.value);
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, "_blank");
     };
@@ -839,6 +914,7 @@
     // Buttons
     btnCreateRoom.onclick = async ()=>{
       try{
+        sClick();
         btnCreateRoom.disabled = true;
         await createRoom();
       }catch(e){
@@ -848,11 +924,11 @@
         btnCreateRoom.disabled = false;
       }
     };
-    btnStartGame.onclick = ()=> startGame().catch(e=>alert(e.message));
-    btnReveal.onclick = ()=> revealAnswer().catch(e=>alert(e.message));
-    btnNext.onclick = ()=> nextQuestion().catch(e=>alert(e.message));
-    btnResetGame.onclick = ()=> resetGame().catch(e=>alert(e.message));
-    btnResetGameTop.onclick = ()=> resetGame().catch(e=>alert(e.message));
+    btnStartGame.onclick = ()=>{ sClick(); startGame().catch(e=>alert(e.message)); };
+    btnReveal.onclick = ()=>{ sClick(); revealAnswer().catch(e=>alert(e.message)); };
+    btnNext.onclick = ()=>{ sClick(); nextQuestion().catch(e=>alert(e.message)); };
+    btnResetGame.onclick = ()=>{ sClick(); resetGame().catch(e=>alert(e.message)); };
+    btnResetGameTop.onclick = ()=>{ sClick(); resetGame().catch(e=>alert(e.message)); };
   </script>
 </body>
 </html>
