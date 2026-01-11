@@ -1,0 +1,3002 @@
+[
+  {
+    "text": "What is the capital of Chile?",
+    "answer": "Santiago",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Peru?",
+    "answer": "Lima",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Bolivia?",
+    "answer": "Sucre",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Paraguay?",
+    "answer": "Asunci\u00f3n",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Uruguay?",
+    "answer": "Montevideo",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Ecuador?",
+    "answer": "Quito",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Panama?",
+    "answer": "Panama City",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Costa Rica?",
+    "answer": "San Jos\u00e9",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Guatemala?",
+    "answer": "Guatemala City",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Honduras?",
+    "answer": "Tegucigalpa",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of El Salvador?",
+    "answer": "San Salvador",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Nicaragua?",
+    "answer": "Managua",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Dominican Republic?",
+    "answer": "Santo Domingo",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Haiti?",
+    "answer": "Port-au-Prince",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Iceland?",
+    "answer": "Reykjav\u00edk",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Greenland?",
+    "answer": "Nuuk",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Ireland?",
+    "answer": "Dublin",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Scotland?",
+    "answer": "Edinburgh",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Wales?",
+    "answer": "Cardiff",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of England?",
+    "answer": "London",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of South Korea?",
+    "answer": "Seoul",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of North Korea?",
+    "answer": "Pyongyang",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Indonesia?",
+    "answer": "Jakarta",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Malaysia?",
+    "answer": "Kuala Lumpur",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Philippines?",
+    "answer": "Manila",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What is the capital of Singapore?",
+    "answer": "Singapore",
+    "category": "Geography",
+    "difficulty": 2
+  },
+  {
+    "text": "What planet is farthest from the Sun?",
+    "answer": "Neptune",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What is the chemical symbol for zinc?",
+    "answer": "Zn",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What gas do plants release?",
+    "answer": "Oxygen",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What organ produces insulin?",
+    "answer": "Pancreas",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What part of the body contains the smallest bones?",
+    "answer": "Ear",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What is the study of plants called?",
+    "answer": "Botany",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What type of energy is wind power?",
+    "answer": "Renewable",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What part of blood carries oxygen?",
+    "answer": "Red blood cells",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What metal is liquid at room temperature?",
+    "answer": "Mercury",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "What is the center of the solar system?",
+    "answer": "The Sun",
+    "category": "Science",
+    "difficulty": 1
+  },
+  {
+    "text": "Who was the first woman Prime Minister of the UK?",
+    "answer": "Margaret Thatcher",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "What year did the Cold War end?",
+    "answer": "1991",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "Who was the first President of the USA?",
+    "answer": "George Washington",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "What empire was ruled by Genghis Khan?",
+    "answer": "Mongol Empire",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "Who discovered America?",
+    "answer": "Christopher Columbus",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "What wall divided Berlin?",
+    "answer": "Berlin Wall",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "Who was the first man on the Moon?",
+    "answer": "Neil Armstrong",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "Which war ended in 1945?",
+    "answer": "World War II",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "Who was the Queen of England for most of the Victorian era?",
+    "answer": "Queen Victoria",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "Which civilization built the pyramids?",
+    "answer": "Egyptians",
+    "category": "History",
+    "difficulty": 2
+  },
+  {
+    "text": "What sport uses a puck?",
+    "answer": "Ice hockey",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport does Novak Djokovic play?",
+    "answer": "Tennis",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport is played at Wimbledon?",
+    "answer": "Tennis",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport uses a scrum?",
+    "answer": "Rugby",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport does Cristiano Ronaldo play?",
+    "answer": "Football",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport uses a pommel horse?",
+    "answer": "Gymnastics",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport uses a wicket?",
+    "answer": "Cricket",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport uses a javelin?",
+    "answer": "Athletics",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport uses gloves and a ring?",
+    "answer": "Boxing",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What sport uses lanes and pins?",
+    "answer": "Bowling",
+    "category": "Sports",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 109 + 53?",
+    "answer": "162",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 550 + 13?",
+    "answer": "563",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 95 \u00f7 19?",
+    "answer": "5",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 340 \u00f7 85?",
+    "answer": "4",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 564 \u2212 2?",
+    "answer": "562",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 695 \u2212 76?",
+    "answer": "619",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 215 \u2212 20?",
+    "answer": "195",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 329 \u00d7 54?",
+    "answer": "17766",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 589 \u00d7 7?",
+    "answer": "4123",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 367 \u2212 71?",
+    "answer": "296",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 96 \u00d7 8?",
+    "answer": "768",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 840 \u00f7 56?",
+    "answer": "15",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 110 \u00f7 22?",
+    "answer": "5",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 539 \u00d7 29?",
+    "answer": "15631",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 50 \u00d7 95?",
+    "answer": "4750",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 376 \u00d7 86?",
+    "answer": "32336",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 216 \u00f7 27?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 320 \u00f7 32?",
+    "answer": "10",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 279 \u00d7 66?",
+    "answer": "18414",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 221 + 68?",
+    "answer": "289",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 166 + 47?",
+    "answer": "213",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 45 \u00f7 3?",
+    "answer": "15",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 136 \u00d7 15?",
+    "answer": "2040",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 620 \u00d7 7?",
+    "answer": "4340",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 429 \u00f7 39?",
+    "answer": "11",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 54 \u00f7 27?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 748 \u2212 89?",
+    "answer": "659",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 604 + 12?",
+    "answer": "616",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 288 + 56?",
+    "answer": "344",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 102 \u00f7 17?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 528 \u00f7 22?",
+    "answer": "24",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 782 \u00f7 34?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 234 + 55?",
+    "answer": "289",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 118 \u2212 13?",
+    "answer": "105",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 739 \u2212 54?",
+    "answer": "685",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 345 \u00f7 69?",
+    "answer": "5",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 486 + 67?",
+    "answer": "553",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1702 \u00f7 74?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1479 \u00f7 87?",
+    "answer": "17",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 557 \u2212 51?",
+    "answer": "506",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1305 \u00f7 87?",
+    "answer": "15",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 943 \u00d7 37?",
+    "answer": "34891",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 103 \u00d7 59?",
+    "answer": "6077",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 396 + 66?",
+    "answer": "462",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 66 \u00d7 56?",
+    "answer": "3696",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 829 + 67?",
+    "answer": "896",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 173 + 76?",
+    "answer": "249",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 736 + 64?",
+    "answer": "800",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 212 + 41?",
+    "answer": "253",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 99 + 69?",
+    "answer": "168",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 925 + 20?",
+    "answer": "945",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 275 \u2212 15?",
+    "answer": "260",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 362 + 6?",
+    "answer": "368",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1600 \u00f7 64?",
+    "answer": "25",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 525 + 33?",
+    "answer": "558",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 830 + 90?",
+    "answer": "920",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 808 + 65?",
+    "answer": "873",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 489 \u2212 92?",
+    "answer": "397",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 122 \u00f7 61?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 500 \u00f7 20?",
+    "answer": "25",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 892 \u00d7 91?",
+    "answer": "81172",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1691 \u00f7 89?",
+    "answer": "19",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 977 \u00d7 75?",
+    "answer": "73275",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1288 \u00f7 56?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 752 \u00d7 57?",
+    "answer": "42864",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 36 \u00f7 6?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 476 \u2212 99?",
+    "answer": "377",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 564 \u00f7 47?",
+    "answer": "12",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1820 \u00f7 91?",
+    "answer": "20",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 717 \u2212 61?",
+    "answer": "656",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 819 \u2212 64?",
+    "answer": "755",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 622 \u00d7 81?",
+    "answer": "50382",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 273 \u00f7 13?",
+    "answer": "21",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 570 \u00f7 30?",
+    "answer": "19",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 293 \u2212 4?",
+    "answer": "289",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 515 \u00d7 27?",
+    "answer": "13905",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 643 \u2212 21?",
+    "answer": "622",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 192 \u00f7 32?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 538 \u2212 41?",
+    "answer": "497",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 176 \u2212 15?",
+    "answer": "161",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 432 + 36?",
+    "answer": "468",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 704 \u00f7 88?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 730 \u00d7 70?",
+    "answer": "51100",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 851 \u2212 70?",
+    "answer": "781",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 570 \u00d7 17?",
+    "answer": "9690",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 623 \u00f7 89?",
+    "answer": "7",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 685 \u00d7 42?",
+    "answer": "28770",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 969 \u00f7 51?",
+    "answer": "19",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 292 \u2212 12?",
+    "answer": "280",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 823 \u00d7 72?",
+    "answer": "59256",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 387 \u00f7 43?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 147 \u2212 51?",
+    "answer": "96",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 682 + 53?",
+    "answer": "735",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 722 + 21?",
+    "answer": "743",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 746 \u00d7 97?",
+    "answer": "72362",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 541 \u00d7 72?",
+    "answer": "38952",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 300 \u00f7 15?",
+    "answer": "20",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 355 \u2212 94?",
+    "answer": "261",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 774 \u00d7 89?",
+    "answer": "68886",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 266 \u2212 38?",
+    "answer": "228",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 679 \u2212 3?",
+    "answer": "676",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 520 \u00f7 65?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 866 + 88?",
+    "answer": "954",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 134 \u00d7 10?",
+    "answer": "1340",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 386 + 7?",
+    "answer": "393",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1083 \u00f7 57?",
+    "answer": "19",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 665 + 79?",
+    "answer": "744",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 420 \u00d7 86?",
+    "answer": "36120",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1152 \u00f7 72?",
+    "answer": "16",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 908 \u00d7 19?",
+    "answer": "17252",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 798 + 29?",
+    "answer": "827",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 325 \u00d7 17?",
+    "answer": "5525",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 347 \u2212 60?",
+    "answer": "287",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 880 + 64?",
+    "answer": "944",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 799 \u2212 41?",
+    "answer": "758",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 193 + 5?",
+    "answer": "198",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 292 \u00f7 73?",
+    "answer": "4",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 369 + 49?",
+    "answer": "418",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 113 + 99?",
+    "answer": "212",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 187 \u00f7 11?",
+    "answer": "17",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 795 + 41?",
+    "answer": "836",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 473 \u2212 21?",
+    "answer": "452",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 426 \u00d7 82?",
+    "answer": "34932",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 367 \u00d7 50?",
+    "answer": "18350",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1302 \u00f7 62?",
+    "answer": "21",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 566 \u2212 5?",
+    "answer": "561",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 338 \u2212 15?",
+    "answer": "323",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1358 \u00f7 97?",
+    "answer": "14",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 597 \u00d7 43?",
+    "answer": "25671",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 205 \u2212 65?",
+    "answer": "140",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 184 \u00f7 23?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 102 \u00f7 17?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 154 \u00f7 11?",
+    "answer": "14",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 94 \u2212 3?",
+    "answer": "91",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1360 \u00f7 80?",
+    "answer": "17",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 82 \u00f7 41?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 154 \u00f7 77?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 183 \u00f7 61?",
+    "answer": "3",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 498 \u00d7 60?",
+    "answer": "29880",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 879 \u2212 3?",
+    "answer": "876",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 470 \u2212 44?",
+    "answer": "426",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 2208 \u00f7 92?",
+    "answer": "24",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 578 \u2212 92?",
+    "answer": "486",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 258 \u00f7 43?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 828 \u00f7 36?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 367 \u2212 24?",
+    "answer": "343",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 501 \u00d7 97?",
+    "answer": "48597",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 583 \u00d7 60?",
+    "answer": "34980",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 205 \u2212 13?",
+    "answer": "192",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 590 \u2212 82?",
+    "answer": "508",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 756 \u2212 14?",
+    "answer": "742",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 586 \u2212 64?",
+    "answer": "522",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 518 \u00d7 96?",
+    "answer": "49728",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 101 \u00d7 14?",
+    "answer": "1414",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 574 \u00f7 82?",
+    "answer": "7",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 577 \u00d7 51?",
+    "answer": "29427",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 639 + 79?",
+    "answer": "718",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 264 \u2212 29?",
+    "answer": "235",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 344 \u2212 10?",
+    "answer": "334",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 986 + 42?",
+    "answer": "1028",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 895 \u2212 74?",
+    "answer": "821",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 844 \u00d7 64?",
+    "answer": "54016",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 738 + 19?",
+    "answer": "757",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 686 + 67?",
+    "answer": "753",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 193 \u00d7 23?",
+    "answer": "4439",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 465 \u00f7 93?",
+    "answer": "5",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 777 \u00d7 59?",
+    "answer": "45843",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 384 \u2212 58?",
+    "answer": "326",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 890 \u00f7 89?",
+    "answer": "10",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 923 + 47?",
+    "answer": "970",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 164 \u2212 81?",
+    "answer": "83",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 164 \u2212 45?",
+    "answer": "119",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 273 + 31?",
+    "answer": "304",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 108 \u00f7 6?",
+    "answer": "18",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 924 \u2212 41?",
+    "answer": "883",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 783 \u2212 75?",
+    "answer": "708",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 930 + 29?",
+    "answer": "959",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 194 \u00d7 8?",
+    "answer": "1552",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 416 + 83?",
+    "answer": "499",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 729 \u2212 90?",
+    "answer": "639",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 923 \u2212 56?",
+    "answer": "867",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 472 \u2212 86?",
+    "answer": "386",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 257 \u00d7 6?",
+    "answer": "1542",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 324 \u00f7 18?",
+    "answer": "18",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 905 \u2212 14?",
+    "answer": "891",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 219 \u00f7 73?",
+    "answer": "3",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 740 + 23?",
+    "answer": "763",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 729 \u00d7 64?",
+    "answer": "46656",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 26 \u00f7 13?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 608 \u2212 27?",
+    "answer": "581",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 437 + 34?",
+    "answer": "471",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 351 \u2212 33?",
+    "answer": "318",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 773 + 10?",
+    "answer": "783",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 709 \u2212 85?",
+    "answer": "624",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 403 + 70?",
+    "answer": "473",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 460 \u00d7 17?",
+    "answer": "7820",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1460 \u00f7 73?",
+    "answer": "20",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 951 \u00d7 24?",
+    "answer": "22824",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 332 + 55?",
+    "answer": "387",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1218 \u00f7 87?",
+    "answer": "14",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 560 \u00d7 87?",
+    "answer": "48720",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 507 \u2212 71?",
+    "answer": "436",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 358 + 14?",
+    "answer": "372",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 930 \u00f7 93?",
+    "answer": "10",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 542 \u2212 22?",
+    "answer": "520",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 462 \u00f7 66?",
+    "answer": "7",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 27 \u00f7 3?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1078 \u00f7 49?",
+    "answer": "22",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 485 \u00d7 54?",
+    "answer": "26190",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1500 \u00f7 75?",
+    "answer": "20",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 260 \u00f7 52?",
+    "answer": "5",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 197 \u00d7 87?",
+    "answer": "17139",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 732 \u2212 99?",
+    "answer": "633",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 833 + 39?",
+    "answer": "872",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 60 \u2212 52?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 667 + 9?",
+    "answer": "676",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 811 + 45?",
+    "answer": "856",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 473 + 58?",
+    "answer": "531",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 607 \u2212 60?",
+    "answer": "547",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 667 \u00d7 93?",
+    "answer": "62031",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 609 \u2212 5?",
+    "answer": "604",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 938 \u2212 64?",
+    "answer": "874",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1700 \u00f7 85?",
+    "answer": "20",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 871 \u00d7 89?",
+    "answer": "77519",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 292 + 14?",
+    "answer": "306",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 24 \u00f7 6?",
+    "answer": "4",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 820 \u00d7 50?",
+    "answer": "41000",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 67 \u2212 91?",
+    "answer": "-24",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 861 \u2212 8?",
+    "answer": "853",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 548 + 56?",
+    "answer": "604",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 234 \u00f7 26?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 539 \u2212 33?",
+    "answer": "506",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 763 \u00d7 17?",
+    "answer": "12971",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 814 \u00d7 71?",
+    "answer": "57794",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 933 \u2212 63?",
+    "answer": "870",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 998 \u2212 97?",
+    "answer": "901",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 767 \u2212 33?",
+    "answer": "734",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 210 + 55?",
+    "answer": "265",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 152 \u00d7 65?",
+    "answer": "9880",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1862 \u00f7 98?",
+    "answer": "19",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1710 \u00f7 95?",
+    "answer": "18",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 316 \u00d7 82?",
+    "answer": "25912",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 889 + 57?",
+    "answer": "946",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 782 \u00d7 97?",
+    "answer": "75854",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 156 \u00d7 10?",
+    "answer": "1560",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 319 + 4?",
+    "answer": "323",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 573 \u2212 62?",
+    "answer": "511",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 846 \u00d7 55?",
+    "answer": "46530",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 125 \u2212 50?",
+    "answer": "75",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 352 \u2212 79?",
+    "answer": "273",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 963 \u2212 58?",
+    "answer": "905",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 52 + 16?",
+    "answer": "68",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 566 \u00d7 49?",
+    "answer": "27734",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 512 + 40?",
+    "answer": "552",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 242 \u2212 9?",
+    "answer": "233",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 432 \u00f7 48?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 162 \u00f7 18?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 576 \u00d7 23?",
+    "answer": "13248",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 966 + 20?",
+    "answer": "986",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 379 + 39?",
+    "answer": "418",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 930 \u00d7 15?",
+    "answer": "13950",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 254 \u00d7 80?",
+    "answer": "20320",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 306 \u00d7 62?",
+    "answer": "18972",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 70 \u2212 53?",
+    "answer": "17",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 363 \u2212 93?",
+    "answer": "270",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 891 \u00f7 81?",
+    "answer": "11",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 930 \u2212 82?",
+    "answer": "848",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 922 + 43?",
+    "answer": "965",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 380 + 2?",
+    "answer": "382",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 143 \u2212 40?",
+    "answer": "103",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 403 \u00f7 31?",
+    "answer": "13",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1424 \u00f7 89?",
+    "answer": "16",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 173 \u00d7 30?",
+    "answer": "5190",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 187 \u00f7 17?",
+    "answer": "11",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 427 \u2212 86?",
+    "answer": "341",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 568 \u2212 75?",
+    "answer": "493",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 260 \u00d7 93?",
+    "answer": "24180",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 168 \u00f7 21?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 825 \u00f7 33?",
+    "answer": "25",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 676 \u00d7 81?",
+    "answer": "54756",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1817 \u00f7 79?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 280 \u00f7 35?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 499 \u2212 86?",
+    "answer": "413",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 52 + 83?",
+    "answer": "135",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 675 \u00d7 92?",
+    "answer": "62100",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 270 \u00f7 90?",
+    "answer": "3",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 352 \u00d7 75?",
+    "answer": "26400",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 755 \u2212 9?",
+    "answer": "746",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 873 \u00d7 90?",
+    "answer": "78570",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 415 \u00d7 33?",
+    "answer": "13695",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 319 \u2212 15?",
+    "answer": "304",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 426 \u00d7 78?",
+    "answer": "33228",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 510 \u00f7 85?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 27 \u2212 68?",
+    "answer": "-41",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 131 \u2212 30?",
+    "answer": "101",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 478 \u2212 7?",
+    "answer": "471",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 12 \u00f7 2?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1392 \u00f7 58?",
+    "answer": "24",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 344 \u00f7 86?",
+    "answer": "4",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 427 \u2212 67?",
+    "answer": "360",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 376 \u00d7 61?",
+    "answer": "22936",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 108 \u00f7 54?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 263 \u2212 34?",
+    "answer": "229",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 418 + 68?",
+    "answer": "486",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 581 + 25?",
+    "answer": "606",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 588 \u00d7 60?",
+    "answer": "35280",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 329 \u00d7 92?",
+    "answer": "30268",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 747 \u00f7 83?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 891 + 52?",
+    "answer": "943",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1920 \u00f7 80?",
+    "answer": "24",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 716 \u00d7 96?",
+    "answer": "68736",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 936 \u2212 20?",
+    "answer": "916",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 281 \u2212 83?",
+    "answer": "198",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 234 \u00d7 83?",
+    "answer": "19422",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 497 + 11?",
+    "answer": "508",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 846 + 9?",
+    "answer": "855",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 784 \u2212 86?",
+    "answer": "698",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 514 \u00d7 29?",
+    "answer": "14906",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 276 \u00f7 69?",
+    "answer": "4",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 568 + 32?",
+    "answer": "600",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 692 \u2212 51?",
+    "answer": "641",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 389 \u2212 15?",
+    "answer": "374",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1067 \u00f7 97?",
+    "answer": "11",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1225 \u00f7 49?",
+    "answer": "25",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 681 \u00d7 42?",
+    "answer": "28602",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 339 \u2212 28?",
+    "answer": "311",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 853 \u00d7 76?",
+    "answer": "64828",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 630 \u00f7 35?",
+    "answer": "18",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 335 \u00d7 19?",
+    "answer": "6365",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 922 \u2212 35?",
+    "answer": "887",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 632 + 74?",
+    "answer": "706",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 197 \u2212 34?",
+    "answer": "163",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 234 \u2212 45?",
+    "answer": "189",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 798 \u2212 12?",
+    "answer": "786",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 752 \u00d7 81?",
+    "answer": "60912",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 564 \u00d7 16?",
+    "answer": "9024",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 352 \u00f7 22?",
+    "answer": "16",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 150 \u00f7 75?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 338 + 95?",
+    "answer": "433",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 444 \u00f7 37?",
+    "answer": "12",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 661 \u2212 74?",
+    "answer": "587",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 464 + 39?",
+    "answer": "503",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 301 + 91?",
+    "answer": "392",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1155 \u00f7 77?",
+    "answer": "15",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 705 \u00d7 67?",
+    "answer": "47235",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 152 \u00f7 19?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 2185 \u00f7 95?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 106 + 14?",
+    "answer": "120",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 664 \u2212 6?",
+    "answer": "658",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 520 \u2212 23?",
+    "answer": "497",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 966 \u00f7 42?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 350 \u00f7 14?",
+    "answer": "25",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 625 + 56?",
+    "answer": "681",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 228 \u00f7 38?",
+    "answer": "6",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 252 \u00d7 14?",
+    "answer": "3528",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 898 \u2212 42?",
+    "answer": "856",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 746 + 34?",
+    "answer": "780",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 297 + 53?",
+    "answer": "350",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 679 \u00f7 97?",
+    "answer": "7",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 819 \u2212 50?",
+    "answer": "769",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 230 + 92?",
+    "answer": "322",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 296 \u00d7 71?",
+    "answer": "21016",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 440 \u00f7 22?",
+    "answer": "20",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 171 \u2212 2?",
+    "answer": "169",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 502 + 88?",
+    "answer": "590",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 534 \u00d7 39?",
+    "answer": "20826",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 556 \u2212 36?",
+    "answer": "520",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 322 \u2212 8?",
+    "answer": "314",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 254 + 11?",
+    "answer": "265",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 313 + 68?",
+    "answer": "381",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 222 \u00d7 8?",
+    "answer": "1776",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 904 + 64?",
+    "answer": "968",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 886 + 67?",
+    "answer": "953",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 770 \u00d7 60?",
+    "answer": "46200",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 330 + 82?",
+    "answer": "412",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 631 \u00d7 30?",
+    "answer": "18930",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 541 + 29?",
+    "answer": "570",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 315 \u00f7 45?",
+    "answer": "7",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 473 \u2212 84?",
+    "answer": "389",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 386 \u00d7 15?",
+    "answer": "5790",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 493 + 44?",
+    "answer": "537",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 288 \u00f7 24?",
+    "answer": "12",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 495 \u00f7 55?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 333 \u00f7 37?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 678 \u2212 47?",
+    "answer": "631",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 586 + 38?",
+    "answer": "624",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 545 + 13?",
+    "answer": "558",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 949 + 7?",
+    "answer": "956",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 460 \u00f7 46?",
+    "answer": "10",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 96 \u00f7 6?",
+    "answer": "16",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 363 + 79?",
+    "answer": "442",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 69 + 54?",
+    "answer": "123",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1536 \u00f7 64?",
+    "answer": "24",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 379 \u00d7 11?",
+    "answer": "4169",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 761 + 87?",
+    "answer": "848",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 120 \u00f7 15?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 928 + 78?",
+    "answer": "1006",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 477 \u00f7 53?",
+    "answer": "9",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 485 \u2212 68?",
+    "answer": "417",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 161 + 21?",
+    "answer": "182",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 338 \u00d7 30?",
+    "answer": "10140",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 797 + 68?",
+    "answer": "865",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 350 \u2212 23?",
+    "answer": "327",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 930 \u00d7 45?",
+    "answer": "41850",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 235 \u00d7 27?",
+    "answer": "6345",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 459 + 44?",
+    "answer": "503",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1332 \u00f7 74?",
+    "answer": "18",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 630 \u2212 38?",
+    "answer": "592",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1254 \u00f7 66?",
+    "answer": "19",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 944 + 9?",
+    "answer": "953",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 782 + 54?",
+    "answer": "836",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 904 + 5?",
+    "answer": "909",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 371 \u2212 17?",
+    "answer": "354",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 943 + 63?",
+    "answer": "1006",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 728 \u2212 3?",
+    "answer": "725",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 925 \u00d7 69?",
+    "answer": "63825",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 265 \u00d7 85?",
+    "answer": "22525",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 2058 \u00f7 98?",
+    "answer": "21",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 470 \u2212 17?",
+    "answer": "453",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 953 \u2212 24?",
+    "answer": "929",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 823 \u2212 66?",
+    "answer": "757",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1536 \u00f7 64?",
+    "answer": "24",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 793 + 21?",
+    "answer": "814",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 562 \u2212 52?",
+    "answer": "510",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 193 + 91?",
+    "answer": "284",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1449 \u00f7 69?",
+    "answer": "21",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 314 + 82?",
+    "answer": "396",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 429 \u00f7 39?",
+    "answer": "11",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 95 \u00d7 72?",
+    "answer": "6840",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 466 \u00d7 73?",
+    "answer": "34018",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 437 \u2212 81?",
+    "answer": "356",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 713 \u00f7 31?",
+    "answer": "23",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 142 + 94?",
+    "answer": "236",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 386 \u00d7 64?",
+    "answer": "24704",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1044 \u00f7 58?",
+    "answer": "18",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 172 \u00f7 86?",
+    "answer": "2",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 675 + 77?",
+    "answer": "752",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 940 \u00d7 83?",
+    "answer": "78020",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 315 \u00f7 45?",
+    "answer": "7",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 969 + 73?",
+    "answer": "1042",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 1720 \u00f7 86?",
+    "answer": "20",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 205 \u00f7 41?",
+    "answer": "5",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 112 \u00f7 14?",
+    "answer": "8",
+    "category": "Math",
+    "difficulty": 1
+  },
+  {
+    "text": "What is 679 + 2?",
+    "answer": "681",
+    "category": "Math",
+    "difficulty": 1
+  }
+]
