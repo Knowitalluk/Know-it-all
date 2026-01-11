@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Know It All? — Question Bank Generator (1000)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0a0a0a;color:#fff;margin:0;padding:24px}
+    .card{max-width:900px;margin:0 auto;border:1px solid #222;border-radius:16px;padding:16px;background:rgba(20,20,20,.8)}
+    h1{margin:0 0 8px}
+    p{color:#bbb;line-height:1.5}
+    button{
+      padding:10px 14px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;
+      font-weight:800;cursor:pointer;margin-right:10px
+    }
+    button:hover{border-color:#ff7a18}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .bar{height:10px;background:#111;border:1px solid #222;border-radius:999px;overflow:hidden;margin:12px 0}
+    .fill{height:100%;width:0;background:#ff7a18}
+    .log{white-space:pre-wrap;background:#0f0f0f;border:1px solid #222;border-radius:12px;padding:12px;color:#ddd;min-height:120px}
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+    .pill{display:inline-block;padding:6px 10px;border:1px solid #222;border-radius:999px;background:#111;color:#ddd;font-weight:800}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Question Bank Generator</h1>
+    <p>
+      This builds <b>1000 general knowledge</b> questions (multiple choice) using the free Open Trivia DB API
+      and <b>excludes maths</b> (category “Science: Mathematics”).<br/>
+      It exports <b>4 JSON files</b> (250 questions each) ready to upload to GitHub.
+    </p>
+
+    <div class="row">
+      <button id="btnStart">Generate 1000 Questions</button>
+      <button id="btnStop" disabled>Stop</button>
+      <span class="pill">Target: <b id="target">1000</b></span>
+      <span class="pill">Collected: <b id="count">0</b></span>
+    </div>
+
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="log" id="log"></div>
+
+    <div class="row" style="margin-top:14px">
+      <button id="dl1" disabled>Download part1 (250)</button>
+      <button id="dl2" disabled>Download part2 (250)</button>
+      <button id="dl3" disabled>Download part3 (250)</button>
+      <button id="dl4" disabled>Download part4 (250)</button>
+    </div>
+
+    <p style="margin-top:14px;color:#bbb">
+      After downloading, upload the 4 files into the same folder as your <code>host.html</code> and <code>player.html</code>.
+      Your game already loads: <code>question_bank_part1.json</code> ... <code>part4</code>.
+    </p>
+  </div>
+
+<script>
+(() => {
+  const TARGET = 1000;                 // EXACTLY 1000
+  const BATCH = 50;                    // OpenTDB max per call is 50
+  const EXCLUDE_CATEGORY = "Science: Mathematics";
+  const PART_SIZE = 250;
+
+  const btnStart = document.getElementById("btnStart");
+  const btnStop = document.getElementById("btnStop");
+  const logEl = document.getElementById("log");
+  const countEl = document.getElementById("count");
+  const fillEl = document.getElementById("fill");
+
+  const dl1 = document.getElementById("dl1");
+  const dl2 = document.getElementById("dl2");
+  const dl3 = document.getElementById("dl3");
+  const dl4 = document.getElementById("dl4");
+
+  let stopRequested = false;
+  let bank = [];
+  let seen = new Set(); // de-dupe by normalized question text
+
+  function log(msg){
+    logEl.textContent = msg + "\n" + logEl.textContent;
+  }
+
+  function setProgress(){
+    countEl.textContent = String(bank.length);
+    const pct = Math.min(100, Math.round((bank.length / TARGET) * 100));
+    fillEl.style.width = pct + "%";
+  }
+
+  function decodeHtml(str){
+    const txt = document.createElement("textarea");
+    txt.innerHTML = str;
+    return txt.value;
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function normalizeQ(s){
+    return decodeHtml(String(s||"")).trim().toLowerCase().replace(/\s+/g," ");
+  }
+
+  async function fetchBatch(){
+    // multiple-choice only (no true/false)
+    const url = `https://opentdb.com/api.php?amount=${BATCH}&type=multiple`;
+    const res = await fetch(url, { cache: "no-store" });
+    if(!res.ok) throw new Error("Network error fetching OpenTDB");
+    const data = await res.json();
+    if(data.response_code !== 0) throw new Error("OpenTDB response_code: " + data.response_code);
+    return data.results || [];
+  }
+
+  function convertToGameFormat(item){
+    // item: {category, question, correct_answer, incorrect_answers[]}
+    const question = decodeHtml(item.question);
+    const answer = decodeHtml(item.correct_answer);
+
+    const incorrect = (item.incorrect_answers || []).map(decodeHtml);
+    const choices = shuffle([answer, ...incorrect]).slice(0,4);
+
+    // Ensure 4 options always
+    if(choices.length !== 4) return null;
+
+    return { question, answer, choices };
+  }
+
+  function enableDownloads(){
+    const ok = bank.length === TARGET;
+    dl1.disabled = !ok;
+    dl2.disabled = !ok;
+    dl3.disabled = !ok;
+    dl4.disabled = !ok;
+  }
+
+  function downloadJson(filename, arr){
+    const blob = new Blob([JSON.stringify(arr, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 0);
+  }
+
+  function splitParts(){
+    return [
+      bank.slice(0, PART_SIZE),
+      bank.slice(PART_SIZE, PART_SIZE*2),
+      bank.slice(PART_SIZE*2, PART_SIZE*3),
+      bank.slice(PART_SIZE*3, PART_SIZE*4),
+    ];
+  }
+
+  async function run(){
+    stopRequested = false;
+    bank = [];
+    seen = new Set();
+    setProgress();
+    enableDownloads();
+
+    btnStart.disabled = true;
+    btnStop.disabled = false;
+
+    log("Starting… Fetching questions (excluding maths).");
+
+    try{
+      while(bank.length < TARGET && !stopRequested){
+        const raw = await fetchBatch();
+
+        let added = 0;
+        for(const item of raw){
+          if(stopRequested) break;
+          if(item.category === EXCLUDE_CATEGORY) continue;
+
+          const norm = normalizeQ(item.question);
+          if(seen.has(norm)) continue;
+
+          const q = convertToGameFormat(item);
+          if(!q) continue;
+
+          // Extra safety: avoid “answer obviously the only number” problem
+          // If answer is numeric, ensure at least 2 numeric choices in the set.
+          const isNum = (s)=>/^-?\d+(\.\d+)?$/.test(String(s).trim());
+          if(isNum(q.answer)){
+            const numChoices = q.choices.filter(isNum).length;
+            if(numChoices < 2) continue;
+          }
+
+          seen.add(norm);
+          bank.push(q);
+          added++;
+
+          if(bank.length >= TARGET) break;
+        }
+
+        setProgress();
+        log(`Fetched batch of ${raw.length}. Added ${added}. Total now ${bank.length}/${TARGET}.`);
+
+        // small pause so we don’t hammer the API
+        await new Promise(r=>setTimeout(r, 250));
+      }
+
+      if(stopRequested){
+        log("Stopped by user.");
+        return;
+      }
+
+      if(bank.length !== TARGET){
+        throw new Error(`Could not reach exactly ${TARGET}. Got ${bank.length}. Try again.`);
+      }
+
+      log("✅ Done! Bank has exactly 1000 questions. Downloads enabled.");
+      enableDownloads();
+
+    }catch(e){
+      console.error(e);
+      log("❌ Error: " + e.message);
+    }finally{
+      btnStart.disabled = false;
+      btnStop.disabled = true;
+    }
+  }
+
+  btnStart.onclick = run;
+  btnStop.onclick = ()=>{
+    stopRequested = true;
+    btnStop.disabled = true;
+    log("Stop requested…");
+  };
+
+  dl1.onclick = ()=>{ const [p1] = splitParts(); downloadJson("question_bank_part1.json", p1); };
+  dl2.onclick = ()=>{ const [,p2] = splitParts(); downloadJson("question_bank_part2.json", p2); };
+  dl3.onclick = ()=>{ const [,,p3] = splitParts(); downloadJson("question_bank_part3.json", p3); };
+  dl4.onclick = ()=>{ const [,,,p4] = splitParts(); downloadJson("question_bank_part4.json", p4); };
+
+})();
+</script>
+</body>
+</html>
