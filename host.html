@@ -124,6 +124,7 @@
       border:1px solid rgba(255,106,0,.25);
       background: rgba(255,106,0,.08);
       color:var(--orange2);
+      white-space: pre-line;
     }
     .toast.bad{
       border-color: rgba(255,59,92,.28);
@@ -132,15 +133,24 @@
     }
 
     .qrWrap{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+    /* UPDATED QR container: centered + scan-friendly border */
     #qr{
-      width:128px; height:128px; padding:10px;
+      width:140px;
+      height:140px;
+      padding:10px;
       border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
+
+      background:#ffffff;
+      border:3px solid rgba(255,106,0,.85);
+      box-shadow: 0 0 0 6px rgba(255,106,0,.12);
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
+
     .copyRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
 
-    /* floating rules btn */
     .rulesBtn{
       position:fixed;
       right:14px;
@@ -154,7 +164,6 @@
       font-weight:1000;
     }
 
-    /* modal */
     .modal{
       position:fixed; inset:0;
       display:none;
@@ -288,7 +297,6 @@
     </div>
   </div>
 
-  <!-- Rules Modal -->
   <div class="modal" id="rulesModal">
     <div class="modalCard">
       <div class="modalTop">
@@ -300,31 +308,23 @@
   </div>
 
   <script>
-    /************** SOUNDS (WebAudio) **************/
     const SFX = (() => {
       let ctx = null;
-      function getCtx(){
-        if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-        return ctx;
-      }
+      function getCtx(){ if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); return ctx; }
       function ensureUnlocked(){ try{ getCtx().resume(); }catch{} }
       function tone(freq=440, dur=0.06, type="sine", vol=0.06){
         const c = getCtx();
         const o = c.createOscillator();
         const g = c.createGain();
-        o.type = type;
-        o.frequency.value = freq;
-        g.gain.value = vol;
+        o.type = type; o.frequency.value = freq; g.gain.value = vol;
         o.connect(g); g.connect(c.destination);
-        o.start();
-        o.stop(c.currentTime + dur);
+        o.start(); o.stop(c.currentTime + dur);
       }
       function click(){ tone(900,0.03,"square",0.04); }
       function reveal(){ tone(660,0.09,"sine",0.06); setTimeout(()=>tone(990,0.10,"sine",0.06), 90); setTimeout(()=>tone(1320,0.12,"sine",0.06), 200); }
       return { ensureUnlocked, click, reveal };
     })();
 
-    /************** FIREBASE **************/
     const firebaseConfig = {
       apiKey: "AIzaSyClio_l3dpOesNw6tHNLDINOjWNDea0hSk",
       authDomain: "knowitall-a47a1.firebaseapp.com",
@@ -337,7 +337,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    /************** GAME DATA **************/
     const QUESTIONS = [
       { text:"Which planet is known as the Red Planet?", options:["Earth","Mars","Jupiter","Venus"], correctIndex:1 },
       { text:"What does HTML stand for?", options:["HyperText Markup Language","HighText Machine Language","Hyperlink Tool Markup Language","Home Tool Markup Language"], correctIndex:0 },
@@ -352,7 +351,6 @@
     ];
     const QUESTION_SECONDS = 20;
 
-    /************** HELPERS **************/
     function nowMs(){ return Date.now(); }
     function fmtTimeLeft(endsAtMs){ return Math.max(0, Math.ceil((endsAtMs - nowMs())/1000)); }
     function randomCode(len=4){
@@ -363,7 +361,7 @@
     }
     function calcPoints(remainingSeconds){
       const t = Math.max(0, Math.min(QUESTION_SECONDS, remainingSeconds));
-      return 20 + Math.floor(80 * (t / QUESTION_SECONDS)); // 20..100
+      return 20 + Math.floor(80 * (t / QUESTION_SECONDS));
     }
     function $(id){ return document.getElementById(id); }
     function show(el,on=true){ el.style.display = on ? "" : "none"; }
@@ -371,11 +369,9 @@
     function labelAnswer(i){ return ["A","B","C","D"][i] || String(i+1); }
     function modalOn(id, on){
       const m = $(id);
-      if(on) m.classList.add("on");
-      else m.classList.remove("on");
+      if(on) m.classList.add("on"); else m.classList.remove("on");
     }
 
-    /************** STATE **************/
     let hostUid = null;
     let roomId = null;
     let unsubRoom = null;
@@ -386,7 +382,6 @@
 
     let joinLink = "";
     let shareText = "";
-    let qrObj = null;
 
     function roomRef(){ return db.collection("rooms").doc(roomId); }
     function playersRef(){ return roomRef().collection("players"); }
@@ -402,13 +397,13 @@
         roomId: id,
         hostUid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        status: "lobby", // lobby | question | reveal | final
+        status: "lobby",
         questionIndex: 0,
         questionEndsAt: 0,
         currentQuestion: null,
         reveal: null,
-        pause: null,     // { type:"streak", pendingPlayerIds:[...], earnedAtQuestionIndex }
-        sabotage: null,  // { activeForQuestionIndex, blocks:[{targetPlayerId, byName}] }
+        pause: null,
+        sabotage: null,
         winners: [],
         updatedAtMs: nowMs()
       };
@@ -430,7 +425,7 @@
       show($("qrArea"), true);
 
       $("qr").innerHTML = "";
-      qrObj = new QRCode(document.getElementById("qr"), { text: joinLink, width: 128, height: 128 });
+      new QRCode(document.getElementById("qr"), { text: joinLink, width: 120, height: 120 });
 
       $("roomCode").textContent = roomId;
       $("hint").textContent = "Players scan the QR or use the join link.";
@@ -446,14 +441,12 @@
       }
       return false;
     }
-
     async function shareWhatsApp(){
       if(!joinLink) return;
       const usedShare = await shareViaWebShare(shareText);
       if(usedShare) return;
       window.open("https://wa.me/?text=" + encodeURIComponent(shareText), "_blank");
     }
-
     async function shareMessenger(){
       if(!joinLink) return;
       const usedShare = await shareViaWebShare(shareText);
@@ -476,14 +469,13 @@
         if(!snap.exists) return;
         latestRoom = snap.data();
         render(latestRoom, latestPlayers);
-      }, (err) => console.error("Room listener error:", err));
+      });
 
       unsubPlayers = playersRef().onSnapshot((snap) => {
-        latestPlayers = snap.docs
-          .map(d => ({ id:d.id, ...d.data() }))
+        latestPlayers = snap.docs.map(d => ({ id:d.id, ...d.data() }))
           .sort((a,b) => (b.score - a.score) || (a.name||"").localeCompare(b.name||""));
         if(latestRoom) render(latestRoom, latestPlayers);
-      }, (err) => console.error("Players listener error:", err));
+      });
     }
 
     async function createRoom(){
@@ -528,7 +520,6 @@
       if(!roomId) return;
       const roomSnap = await roomRef().get();
       if(!roomSnap.exists) return;
-
       const room = roomSnap.data();
       if(room.status !== "question") return;
 
@@ -669,7 +660,6 @@
 
       const aSnap = await answersRef().get();
       aSnap.docs.forEach(doc => batch.delete(doc.ref));
-
       await batch.commit();
     }
 
@@ -730,15 +720,11 @@
 
         if(room.status === "reveal" && room.reveal){
           setToast($("revealToast"), `Correct answer: ${labelAnswer(room.reveal.correctIndex)} • ${pendingCount>0 ? "Paused…" : "Click Next Question."}`);
-        }else{
-          setToast($("revealToast"), "");
-        }
+        }else setToast($("revealToast"), "");
 
         if(pendingCount > 0){
           setToast($("pauseToast"), `GAME PAUSED: waiting for ${pendingCount} streak decision(s).`);
-        }else{
-          setToast($("pauseToast"), "");
-        }
+        }else setToast($("pauseToast"), "");
       }
 
       if(room.status === "final"){
@@ -749,7 +735,6 @@
       }
     }
 
-    // Auto-reveal if timer hits 0
     setInterval(async ()=>{
       if(!roomId || !latestRoom) return;
       if(latestRoom.status === "question" && fmtTimeLeft(latestRoom.questionEndsAt) <= 0){
@@ -757,7 +742,6 @@
       }
     }, 500);
 
-    // Rules content
     function fillRules(){
       $("rulesContent").innerHTML = `
         <h3>Players</h3>
@@ -765,7 +749,6 @@
           <li><b>Recommended:</b> 2–20 players per game (best experience).</li>
           <li>One device is the <b>Host</b>. Everyone else joins on their phone.</li>
         </ul>
-
         <h3>How to play</h3>
         <ul>
           <li>The host starts the game and controls reveal + next question.</li>
@@ -773,26 +756,22 @@
           <li>Players tap one answer — it locks and cannot be changed.</li>
           <li>On reveal, everyone sees an updated leaderboard.</li>
         </ul>
-
         <h3>Scoring</h3>
         <ul>
           <li>Correct answers score more when answered faster.</li>
           <li>Up to <b>100 points</b> per question.</li>
         </ul>
-
         <h3>5-Streak Reward</h3>
         <ul>
           <li>Get <b>5 correct in a row</b> to unlock a choice:</li>
           <li><b>Claim +20</b> or <b>Sabotage</b> another player.</li>
           <li>The game pauses until all streak players choose.</li>
         </ul>
-
         <h3>Sabotage</h3>
         <ul>
           <li>Pick a player from the list.</li>
           <li>They cannot answer the <b>next</b> question.</li>
         </ul>
-
         <h3>Power Buttons</h3>
         <ul>
           <li><b>CHEAT (1 use per game):</b> auto-picks the correct answer and locks it.</li>
@@ -801,7 +780,6 @@
       `;
     }
 
-    // Button helper with click sound
     function hookBtn(id, fn){
       $(id).addEventListener("click", async ()=>{
         SFX.ensureUnlocked();
@@ -816,7 +794,6 @@
     hookBtn("btnResetFromQ", resetGame);
     hookBtn("btnResetFinal", resetGame);
 
-    // Reveal button has reveal sound too
     $("btnReveal").addEventListener("click", async ()=>{
       SFX.ensureUnlocked();
       SFX.click();
@@ -831,7 +808,6 @@
       catch{ setToast($("hostToast"), "Could not copy. Copy manually from the link."); }
     });
     hookBtn("btnOpen", ()=> window.open(joinLink, "_blank"));
-
     hookBtn("btnShareWhatsApp", shareWhatsApp);
     hookBtn("btnShareMessenger", shareMessenger);
 
